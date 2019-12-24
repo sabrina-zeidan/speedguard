@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: SpeedGuard\n"
-"POT-Creation-Date: 2018-11-06 14:32+0300\n"
-"PO-Revision-Date: 2018-11-06 14:36+0300\n"
+"POT-Creation-Date: 2018-11-11 22:35+0300\n"
+"PO-Revision-Date: 2018-11-11 22:38+0300\n"
 "Last-Translator: Sabrina Zeidan <sabrinazeidan@gmail.com>\n"
 "Language-Team: \n"
 "Language: ru_RU\n"
@@ -23,30 +23,30 @@ msgstr ""
 "X-Poedit-SearchPathExcluded-0: *.js\n"
 
 #. Plugin Name of the plugin/theme
-#: admin/class-speedguard-admin.php:238
+#: admin/class-speedguard-admin.php:247
 msgid "SpeedGuard"
 msgstr "SpeedGuard"
 
-#: admin/class-speedguard-admin.php:239
+#: admin/class-speedguard-admin.php:248
 msgid "Speed Tests"
 msgstr "Тесты скорости"
 
-#: admin/class-speedguard-admin.php:240
+#: admin/class-speedguard-admin.php:249
 msgid "Settings"
 msgstr "Настройки"
 
-#: admin/class-speedguard-admin.php:252
+#: admin/class-speedguard-admin.php:261
 #, php-format
 msgid "To start monitoring your site load time, please %1$senter API Key%2$s!"
 msgstr ""
 "Пожалуйста, %1$sвведите ключ API%2$s, чтобы начать отслеживать время "
 "загрузки вашего сайта!"
 
-#: admin/class-speedguard-admin.php:256
+#: admin/class-speedguard-admin.php:265
 msgid "API key you have entered is not valid."
 msgstr "Введенный ключ API не прошел проверку."
 
-#: admin/class-speedguard-admin.php:259
+#: admin/class-speedguard-admin.php:268
 #, php-format
 msgid ""
 "Everything is ready to test your site speed! %1$sAdd some pages%2$s to start "
@@ -55,7 +55,7 @@ msgstr ""
 "Всё готово для тестирования скорости сайта! Чтобы  начать, %1$sдобавьте "
 "адреса%2$s, которые нужно проверить."
 
-#: admin/class-speedguard-admin.php:266
+#: admin/class-speedguard-admin.php:275
 #, php-format
 msgid ""
 "Awesome, you've been using SpeedGuard for more than 1 week. May I ask you to "
@@ -66,7 +66,7 @@ msgstr ""
 "Могу я просить вас поставить этому плагину 5 баллов на сайте WordPress?  "
 "%1$sДа, плагин хорош%2$sУже поставил%3$sНе настолько хорош%4$s"
 
-#: admin/class-speedguard-admin.php:271
+#: admin/class-speedguard-admin.php:280
 #, php-format
 msgid ""
 "%1$sHow can I make SpeedGuard plugin better for you?%2$s %3$sI will be happy "
@@ -77,19 +77,19 @@ msgstr ""
 "ответ относительно описаных проблем на имейл %7$s. (Пожалуйста, напишите "
 "подробно)%4$s %5$sОтправить отзыв%6$s"
 
-#: admin/class-speedguard-admin.php:285
+#: admin/class-speedguard-admin.php:293
 msgid "Thank you friend!"
 msgstr "Большое спасибо!"
 
-#: admin/class-speedguard-admin.php:295
+#: admin/class-speedguard-admin.php:303
 msgid "Thank you for your honest opinion!"
 msgstr "Спасибо за ваше честное мнение!"
 
-#: admin/class-speedguard-admin.php:304
+#: admin/class-speedguard-admin.php:316
 msgid "Please wait. Tests are running..."
 msgstr "Пожалуйста, подождите. Идут тесты..."
 
-#: admin/class-speedguard-admin.php:308
+#: admin/class-speedguard-admin.php:320
 #, php-format
 msgid ""
 "Test limit is reached. Please wait for tomorrow or get %1$sprivate instance"
@@ -98,25 +98,25 @@ msgstr ""
 "Лимит тестов исчерпан. Вы можете подождать до завтра или запросить "
 "%1$sполучить индивидуальную квоту%2$s."
 
-#: admin/class-speedguard-admin.php:313
+#: admin/class-speedguard-admin.php:325
 msgid "Please select the post you want to add."
 msgstr "Пожалуйста, выберите запись, которую вы хотите добавить."
 
-#: admin/class-speedguard-admin.php:316
+#: admin/class-speedguard-admin.php:328
 msgid "Settings are updated!"
 msgstr "Настройки обновлены!"
 
-#: admin/class-speedguard-admin.php:320
+#: admin/class-speedguard-admin.php:332
 msgid "New URL is successfully added!"
 msgstr "Новый URL успешно добавлен!"
 
-#: admin/class-speedguard-admin.php:324
+#: admin/class-speedguard-admin.php:336
 msgid "Results are successfully updated!"
 msgstr "Результаты успешно обновлены!"
 
-#: admin/class-speedguard-admin.php:327
+#: admin/class-speedguard-admin.php:339
 msgid "Selected pages are not guarded anymore!"
-msgstr "Отмеченные страницы больше не мониторятся"
+msgstr "Отмеченные страницы больше не мониторятся!"
 
 #: admin/includes/class.notifications.php:17
 #, php-format
@@ -146,7 +146,7 @@ msgstr "Отчет SpeedGuard для"
 msgid "You can stop guarding urls or add new on %1$sSpeedGuard Tests%2$s page"
 msgstr ""
 "Вы можете добавить или удалить страницы, которые нужно мониторить, в "
-"%1$sразделе отчетов%2$s."
+"%1$sразделе отчетов%2$s"
 
 #: admin/includes/class.notifications.php:46 admin/includes/class.tests.php:52
 msgid "URL"
@@ -271,10 +271,10 @@ msgid "Save Settings"
 msgstr "Сохранить настройки"
 
 #: admin/includes/class.tests.php:21
-msgid "No pages guarded yet. Add new URL in the field above for the start."
+msgid "No pages guarded yet. Add something in the field above for the start."
 msgstr ""
-"Ни одна страница пока не мониторится. Для начала, добавьте новый адрес в "
-"поле выше."
+"Ни одна страница пока не мониторится. Для начала, добавьте что-нибудь в поле "
+"выше."
 
 #: admin/includes/class.tests.php:54
 msgid "Report link"
@@ -360,7 +360,7 @@ msgid "Site Speed Results"
 msgstr "Скорость сайта"
 
 #: admin/includes/class.widgets.php:114
-msgid "Add new URL"
+msgid "Add new"
 msgstr "Добавить новую страницу"
 
 #: admin/includes/class.widgets.php:115
@@ -418,8 +418,10 @@ msgstr ""
 "заметите положительную динамику, как только начнёте."
 
 #: admin/includes/class.widgets.php:157
-msgid "Start typing the title of the post"
-msgstr "Начните писать заголовок страницы"
+msgid "Start typing the title of the post, page or custom post type..."
+msgstr ""
+"Начните писать название обычной записи, страницы или пользовательского типа "
+"записи..."
 
 #: admin/includes/class.widgets.php:162
 msgid "Add"

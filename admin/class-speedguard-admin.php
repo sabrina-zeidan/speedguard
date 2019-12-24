@@ -226,7 +226,7 @@ class Speedguard_Admin {
 			wp_enqueue_script('postbox');  
 			
 		}
-		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'assets/js/speedguard-admin.js', array( 'jquery','jquery-ui-autocomplete'), $this->version, false  );
+		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'assets/js/speedguard-admin.js', array( 'jquery','auto'), $this->version, false  );
 	}
 	//Plugin Body classes
 	function body_classes_filter($classes) {		
@@ -268,40 +268,43 @@ class Speedguard_Admin {
 			$message = sprintf(__( 'Everything is ready to test your site speed! %1$sAdd some pages%2$s to start tests.', 'speedguard' ),'<a href="' .Speedguard_Admin::speedguard_page_url('tests'). '">','</a>');
 			$notices =  Speedguard_Admin::set_notice( $message,'warning' );	  
 		}
-		else if (Speedguard_Admin::is_screen('settings,tests')){	
+		if (Speedguard_Admin::is_screen('settings,tests')){	
 			$plugin_dir_created = filemtime(WP_PLUGIN_DIR.'/speedguard' );
 			$days_later = strtotime('+7 days', $plugin_dir_created);		
-			if (($speedguard_options['plugin_rated']  != true) && (time() > $days_later)){										
+			if (($speedguard_options['plugin_rated']  != true) && (time() > $days_later)){					
 				$ask_to_rate = sprintf(__( 'Awesome, you\'ve been using SpeedGuard for more than 1 week. May I ask you to give it a 5-star rating on WordPress?  %1$sOk, you deserved it%2$sI already did%3$sNot good enough%4$s', "speedguard" ),
 				'<form id="rate-speedguard" action="" method="post"><a href="https://wordpress.org/support/plugin/speedguard/reviews/?rate=5#new-post" target="_blank">',
-				'</a> | <input type="submit" style="border: 0;  background: transparent; color: #0073aa; cursor:pointer;text-decoration:underline;" name="speedguard_rating" value="',
-				'">| <span id="leave-feedback" style="border: 0;  background: transparent; color: #0073aa; cursor:pointer;text-decoration:underline;">',
+				'</a> | <button type="submit" name="speedguard_rating" value="already_rated" class="already-rated">', 
+				'</button>| <span id="leave-feedback" style="border: 0;  background: transparent; color: #0073aa; cursor:pointer;text-decoration:underline;">',
 				'</span>');	
 				$second = sprintf(__( '%1$sHow can I make SpeedGuard plugin better for you?%2$s %3$sI will be happy to receive support to my email %7$s regarding the issues I am reporting.(Please include a detailed description)%4$s %5$sSend feedback%6$s', "speedguard" ),
 				'<div style="display:none; margin-top: 2em;" id="feedback-form"><p><em>',
 				'</em></p><textarea rows="2" style="width: 100%;" id="speedguard_feedback" name="speedguard_feedback"></textarea>',
 				'<p><input name="answer_to_email" type="checkbox" checked="checked"><label for="answer_to_email">',
 				'</label></p>',
-				'<input type="submit" name="speedguard_rating" class="button button-secondary" value="',
-				'"></div></form>',
+				'<button type="submit" name="speedguard_rating" value="send_feedback" class="button button-secondary">',
+				'</button></div></form>',
 				'<input type="text" size="30" readonly  name="admin_email" value="'.Speedguard_Admin::get_this_plugin_option('admin_email').'">');		
 				$notices =  Speedguard_Admin::set_notice($ask_to_rate.$second,'success'); 										
 			}
 		}				
-		if ( !empty( $_POST['speedguard_rating']) && $_POST['speedguard_rating'] == 'I already did' ){				
+		if ( !empty( $_POST['speedguard_rating'])){
+			if ($_POST['speedguard_rating'] == 'already_rated' ){				
+				$notices =  Speedguard_Admin::set_notice(__('Thank you friend!','speedguard'),'success' );	 
+			}
+			else if ($_POST['speedguard_rating'] == 'send_feedback' ){	
+				$plugin_author_email = 'sabrinazeidan@gmail.com';
+				$site_url = str_replace( 'http://', '', get_home_url() );   				
+					if ( isset($_POST['answer_to_email']) && $_POST['answer_to_email'] == true){	
+						$answer_to_email = "Here is my email: ".$_POST['admin_email']; 					
+					}
+					else $answer_to_email = "Email not provided";
+				wp_mail($plugin_author_email,'New feedback for SpeedGuard',$_POST['speedguard_feedback'].' <p>from '.$site_url.' <p>'.$answer_to_email, array('Content-Type: text/html; charset=UTF-8'));
+				$notices =  Speedguard_Admin::set_notice(__('Thank you for your honest opinion!','speedguard'),'success' );	 
+			}
 			$speedguard_options['plugin_rated'] = true;
 			Speedguard_Admin::update_this_plugin_option('speedguard_options', $speedguard_options);
-			$notices =  Speedguard_Admin::set_notice(__('Thank you friend!','speedguard'),'success' );	 
-		}
-		if ( !empty( $_POST['speedguard_rating']) && $_POST['speedguard_rating'] == 'Send feedback' ){	
-			$plugin_author_email = 'sabrinazeidan@gmail.com';
-			$site_url = str_replace( 'http://', '', get_home_url() );   				
-				if ( isset($_POST['answer_to_email']) && $_POST['answer_to_email'] == true){	
-					$answer_to_email = "Here is my email: ".$_POST['admin_email']; 					
-				}
-				else $answer_to_email = "Email not provided";
-			wp_mail($plugin_author_email,'New feedback for SpeedGuard',$_POST['speedguard_feedback'].' <p>from '.$site_url.' <p>'.$answer_to_email, array('Content-Type: text/html; charset=UTF-8'));
-			$notices =  Speedguard_Admin::set_notice(__('Thank you for your honest opinion!','speedguard'),'success' );	 
+			
 		}
 		if ( ! empty( $_POST['speedguard'] ) && $_POST['speedguard'] == 'add_new_url' ) {
 			$notices = SpeedGuard_Tests::import_data($_POST);

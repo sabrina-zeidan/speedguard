@@ -35,12 +35,12 @@
 #settings-meta-box #speedguard_options[check_recurrence], #settings-meta-box #speedguard_options[critical_load_time] {max-width: 30px;text-align: center;}
 #settings-meta-box input[type="text"].numbers {max-width: 30px;text-align: center;}
 #settings-meta-box #speedguard_options[type="email_me_at"]{max-width: 70px;} 
-#settings-meta-box .note {font-size:0.8em; font-style:italic;}
+#settings-meta-box .note {font-size:0.8em; font-style:italic;} 
 /** Widgets**/
 .no-guarded-pages #speedguard-tips-meta-box {display:none;} 
 .no-guarded-pages #speedguard-speedresults-meta-box {display:none;} 
 .no-guarded-pages #speedguard_dashboard_widget {display:none;} 
-.no-guarded-pages #speedguard-site-speed-score {display:none;} 
+.no-guarded-pages #speedguard-site-speed-score {display:none;}  
 
 
 #speedguard-tips-meta-box{position:fixed; width: 280px;}
@@ -62,6 +62,14 @@
 
 /**Notices**/
 form #rate-speedguard  {display:inline;}
+#rate-speedguard button.already-rated{
+    border: 0;
+    background: transparent;
+    color: #0073aa;
+    cursor:pointer;
+    box-shadow: none;
+    text-decoration:underline;
+}
 #rate-speedguard  .link-styled{background: none; border: none;  padding: 0; font-size: inherit;color: inherit; text-decoration: inherit;}
 #rate-speedguard #feedback{display:none;}
 #rate-speedguard label[for="answer_to_email"]{font-size:0.9em;}

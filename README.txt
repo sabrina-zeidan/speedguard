@@ -101,6 +101,9 @@ You can run 65 tests per day. Will it 65 different URLs to test or 65 tests of t
 * Thanx to Baboon designs from the Noun Project for the timer icon.
 
 == Changelog ==
+= Version 1.3.1 =
+* Minor bugs fixed
+
 = Version 1.3 =
 * Pages and custom post types support added.
 

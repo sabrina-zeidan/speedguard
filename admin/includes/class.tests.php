@@ -18,7 +18,7 @@ class SpeedGuard_List_Table extends WP_List_Table{
      * @return Void
      */
 	public function no_items() {
-    _e('No pages guarded yet. Add new URL in the field above for the start.','speedguard');
+    _e('No pages guarded yet. Add something in the field above for the start.','speedguard');
 	}
     public function prepare_items()
     {
@@ -393,7 +393,28 @@ class SpeedGuard_Tests{
 				<?php
 		}		
 		add_action( 'admin_footer','autocomplete_search');  			
-			function autocomplete_search() {
+		function autocomplete_search() {
+				?>
+			<script type="text/javascript">
+					jQuery(document).ready(function($){
+					//	var posts = <?php echo json_encode( array_values( $source ) ); ?>;
+					//console.log("Posts :",posts);  
+						jQuery( 'input[name="speedguard_new_url"]' ).autocomplete({
+							source: posts,
+							minLength: 2,
+							select: function(event, ui) {
+								event.preventDefault();
+								$("#speedguard_new_url").val(ui.item.label);
+								console.log("Label :",ui.item.label);  
+								$("#speedguard_new_url_permalink").val(ui.item.permalink);
+								$("#speedguard_new_url_id").val(ui.item.ID);
+								$("#blog_id").val(ui.item.blog_id);
+								console.log("Blog id :",ui.item.blog_id);   
+							} 
+						});
+					}); 		
+				</script>	
+				<?
 			if (THIS_PLUGIN_NETWORK_ACTIVATED) {     
 				$sites = get_sites();				
 				foreach ($sites as $site ) {

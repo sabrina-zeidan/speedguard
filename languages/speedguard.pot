@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: SpeedGuard\n"
-"POT-Creation-Date: 2018-11-06 14:31+0300\n"
+"POT-Creation-Date: 2018-11-11 22:34+0300\n"
 "PO-Revision-Date: 2018-02-23 10:59+0200\n"
 "Last-Translator: Sabrina Zeidan <sabrinazeidan@gmail.com>\n"
 "Language-Team: \n"
@@ -22,35 +22,35 @@ msgstr ""
 "X-Poedit-SearchPathExcluded-0: *.js\n"
 
 #. Plugin Name of the plugin/theme
-#: admin/class-speedguard-admin.php:238
+#: admin/class-speedguard-admin.php:247
 msgid "SpeedGuard"
 msgstr ""
 
-#: admin/class-speedguard-admin.php:239
+#: admin/class-speedguard-admin.php:248
 msgid "Speed Tests"
 msgstr ""
 
-#: admin/class-speedguard-admin.php:240
+#: admin/class-speedguard-admin.php:249
 msgid "Settings"
 msgstr ""
 
-#: admin/class-speedguard-admin.php:252
+#: admin/class-speedguard-admin.php:261
 #, php-format
 msgid "To start monitoring your site load time, please %1$senter API Key%2$s!"
 msgstr ""
 
-#: admin/class-speedguard-admin.php:256
+#: admin/class-speedguard-admin.php:265
 msgid "API key you have entered is not valid."
 msgstr ""
 
-#: admin/class-speedguard-admin.php:259
+#: admin/class-speedguard-admin.php:268
 #, php-format
 msgid ""
 "Everything is ready to test your site speed! %1$sAdd some pages%2$s to start "
 "tests."
 msgstr ""
 
-#: admin/class-speedguard-admin.php:266
+#: admin/class-speedguard-admin.php:275
 #, php-format
 msgid ""
 "Awesome, you've been using SpeedGuard for more than 1 week. May I ask you to "
@@ -58,7 +58,7 @@ msgid ""
 "did%3$sNot good enough%4$s"
 msgstr ""
 
-#: admin/class-speedguard-admin.php:271
+#: admin/class-speedguard-admin.php:280
 #, php-format
 msgid ""
 "%1$sHow can I make SpeedGuard plugin better for you?%2$s %3$sI will be happy "
@@ -66,42 +66,42 @@ msgid ""
 "(Please include a detailed description)%4$s %5$sSend feedback%6$s"
 msgstr ""
 
-#: admin/class-speedguard-admin.php:285
+#: admin/class-speedguard-admin.php:293
 msgid "Thank you friend!"
 msgstr ""
 
-#: admin/class-speedguard-admin.php:295
+#: admin/class-speedguard-admin.php:303
 msgid "Thank you for your honest opinion!"
 msgstr ""
 
-#: admin/class-speedguard-admin.php:304
+#: admin/class-speedguard-admin.php:316
 msgid "Please wait. Tests are running..."
 msgstr ""
 
-#: admin/class-speedguard-admin.php:308
+#: admin/class-speedguard-admin.php:320
 #, php-format
 msgid ""
 "Test limit is reached. Please wait for tomorrow or get %1$sprivate instance"
 "%2$s."
 msgstr ""
 
-#: admin/class-speedguard-admin.php:313
+#: admin/class-speedguard-admin.php:325
 msgid "Please select the post you want to add."
 msgstr ""
 
-#: admin/class-speedguard-admin.php:316
+#: admin/class-speedguard-admin.php:328
 msgid "Settings are updated!"
 msgstr ""
 
-#: admin/class-speedguard-admin.php:320
+#: admin/class-speedguard-admin.php:332
 msgid "New URL is successfully added!"
 msgstr ""
 
-#: admin/class-speedguard-admin.php:324
+#: admin/class-speedguard-admin.php:336
 msgid "Results are successfully updated!"
 msgstr ""
 
-#: admin/class-speedguard-admin.php:327
+#: admin/class-speedguard-admin.php:339
 msgid "Selected pages are not guarded anymore!"
 msgstr ""
 
@@ -248,7 +248,7 @@ msgid "Save Settings"
 msgstr ""
 
 #: admin/includes/class.tests.php:21
-msgid "No pages guarded yet. Add new URL in the field above for the start."
+msgid "No pages guarded yet. Add something in the field above for the start."
 msgstr ""
 
 #: admin/includes/class.tests.php:54
@@ -335,7 +335,7 @@ msgid "Site Speed Results"
 msgstr ""
 
 #: admin/includes/class.widgets.php:114
-msgid "Add new URL"
+msgid "Add new"
 msgstr ""
 
 #: admin/includes/class.widgets.php:115
@@ -379,7 +379,7 @@ msgid ""
 msgstr ""
 
 #: admin/includes/class.widgets.php:157
-msgid "Start typing the title of the post"
+msgid "Start typing the title of the post, page or custom post type..."
 msgstr ""
 
 #: admin/includes/class.widgets.php:162
