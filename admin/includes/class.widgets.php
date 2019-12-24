@@ -101,7 +101,7 @@ class SpeedGuardWidgets{
 			add_meta_box( 'settings-meta-box', __('SpeedGuard Settings','speedguard'), array('SpeedGuard_Settings','settings_meta_box'), '', 'normal', 'core' );		
 			add_meta_box( 'speedguard-speedresults-meta-box', __('Site Speed Results','speedguard'), array('SpeedGuardWidgets', 'speedguard_dashboard_widget_function'			), '', 'main-content', 'core' );
 			add_meta_box( 'speedguard-add-new-url-meta-box', __('Add new URL','speedguard'), array('SpeedGuardWidgets', 'add_new_url_meta_box'), '', 'main-content', 'core' );
-			add_meta_box( 'tests-list-meta-box', __('Результаты тестов','speedguard'), array('SpeedGuard_Tests', 'tests_list_metabox' ), '', 'main-content', 'core' );
+			add_meta_box( 'tests-list-meta-box', __('Tests results','speedguard'), array('SpeedGuard_Tests', 'tests_list_metabox' ), '', 'main-content', 'core' );
 			add_meta_box( 'speed-score-legend-meta-box',__('Speed Score','speedguard'), array('SpeedGuardWidgets', 'speed_score_legend_meta_box'), '', 'main-content', 'core' );
 			
 			
