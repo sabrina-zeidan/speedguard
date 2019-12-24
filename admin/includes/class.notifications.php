@@ -8,7 +8,7 @@ class SpeedGuard_Notifications{
 	}    
 	function test_results_email($type) {	
 		if (SpeedGuard_AUTHORIZED){
-			$speedguard_options = get_option('speedguard_options' );	
+			$speedguard_options = Speedguard_Admin::get_this_plugin_option('speedguard_options' );	
 			$admin_email = $speedguard_options['email_me_at'];
 			$site_url = str_replace( 'http://', '', get_home_url() );   
 			$site_date = get_date_from_gmt(date('Y-m-d H:i:s',time()),'Y-m-d H:i:s');
@@ -29,16 +29,14 @@ class SpeedGuard_Notifications{
 														'type' => 'DECIMAL',
 												 )
 										),	);
-			$guarded_pages = get_posts( $query_args );	
-			$speedguard_page = admin_url('admin.php?page=speedguard');		
-			$speedguard_settings_page = admin_url('admin.php?page=speedguard_settings');	
+			$guarded_pages = get_posts( $query_args );				
 				if($guarded_pages){		
 					ob_start();
 							echo '<html><head><title>'.__('SpeedGuard Report','speedguard').'</title></head>
 									<body style="padding-top: 50px; padding-bottom: 50px;  background:#f5f5f5;" >
 										<table align="center" width="560" bgcolor="#fff" border="0" cellspacing="0" >  
 											<tr>
-												<td style="padding: 10px;" bgcolor="#c1e6fd" align="left"><p style="text-align:right; font-size: 1.2em; font-weight: bold;" >'.__('SpeedGuard Report for','speedguard').' '.$site_url.'<span style="font-weight:100;"> ['.$site_date.']</span></p><p style="text-align:right; font-size: 0.9em; color:#5f5a5a;">'.sprintf(__('You can stop guarding urls or add new on %1$sSpeedGuard Tests%2$s page','speedguard'),'<a href="'.$speedguard_page.'" target="_blank">','</a>').'</p></td> 
+												<td style="padding: 10px;" bgcolor="#c1e6fd" align="left"><p style="text-align:right; font-size: 1.2em; font-weight: bold;" >'.__('SpeedGuard Report for','speedguard').' '.$site_url.'<span style="font-weight:100;"> ['.$site_date.']</span></p><p style="text-align:right; font-size: 0.9em; color:#5f5a5a;">'.sprintf(__('You can stop guarding urls or add new on %1$sSpeedGuard Tests%2$s page','speedguard'),'<a href="'.Speedguard_Admin::speedguard_page_url('tests').'" target="_blank">','</a>').'</p></td> 
 											</tr>
 											<tr>
 												<td width="100%" style="padding: 0;">';
@@ -74,7 +72,7 @@ class SpeedGuard_Notifications{
 												</td> 
 											</tr>
 											<tr>
-												<td style="padding: 10px;" bgcolor="#e6e1e1" align="right"><p style="color:#5f5a5a; text-align:right; font-size: 0.9em;">'.sprintf(__('This report was requested by administrator of %1$s','speedguard'),$site_url).'<p style="color:#5f5a5a; text-align:right; font-size: 0.9em;">'.sprintf(__('You can change SpeedGuard notification settings %1$shere%2$s any time.','speedguard'),'<a href="'.$speedguard_settings_page.'" target="_blank">','</a>').'</td>
+												<td style="padding: 10px;" bgcolor="#e6e1e1" align="right"><p style="color:#5f5a5a; text-align:right; font-size: 0.9em;">'.sprintf(__('This report was requested by administrator of %1$s','speedguard'),$site_url).'<p style="color:#5f5a5a; text-align:right; font-size: 0.9em;">'.sprintf(__('You can change SpeedGuard notification settings %1$shere%2$s any time.','speedguard'),'<a href="'.Speedguard_Admin::speedguard_page_url('settings').'" target="_blank">','</a>').'</td>
 											</tr>
 										</table>
 									</body>

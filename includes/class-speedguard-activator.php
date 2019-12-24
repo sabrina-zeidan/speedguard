@@ -21,13 +21,22 @@
  * @author     Sabrina Zeidan <sabrinazeidan@gmail.com>
  */
 class Speedguard_Activator {
-	public static function activate() {	
-		$api_key = get_option('speedguard_api');
-		if (!isset($api_key)) update_option('speedguard_api', array('api_key' => ''));
-		set_transient( 'speedguard-notice-activation', true, 5 );
+	public static function activate() {
+		
 	
-	}
-			
+	$api_key = Speedguard_Admin::get_this_plugin_option('speedguard_api');
+			if (empty($api_key)){
+			Speedguard_Admin::update_this_plugin_option('speedguard_api', array('api_key' => ''));
+		}
+		set_transient( 'speedguard-notice-activation', true, 5 );
+
+
+
+
+
+		
+
+	}			
 			
 }	 
 

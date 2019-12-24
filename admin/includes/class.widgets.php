@@ -4,9 +4,11 @@
 *	Class responsible for adding CPT for SpeedGuard
 */
 class SpeedGuardWidgets{
-	function __construct(){
-		$options = get_option( 'speedguard_options' );
-		if ($options['show_dashboard_widget'] === 'on'){add_action( 'wp_dashboard_setup', array( &$this,'speedguard_dashboard_widget') );} 
+	function __construct(){ 
+		$options = Speedguard_Admin::get_this_plugin_option( 'speedguard_options' );
+			if ($options['show_dashboard_widget'] === 'on'){			
+			add_action( 'wp_'.(THIS_PLUGIN_NETWORK_ACTIVATED ? 'network_' : ''). 'dashboard_setup', array( &$this,'speedguard_dashboard_widget') ); 
+		} 
 		if ($options['show_ab_widget'] === 'on'){	add_action( 'admin_bar_menu', array( $this,'speedguard_admin_bar_widget'),710);}
 	}
 /** Admin Bar widget */
@@ -19,7 +21,7 @@ class SpeedGuardWidgets{
 					if ($page_load_speed !== 'waiting') { 
 						$title = $page_load_speed.'s';
 						$title = sprintf(__( '%1$ss', 'speedguard' ),$page_load_speed);	
-						$href = admin_url(Speedguard_Admin::$cpt_url).'#speedguard-add-new-url-meta-box';
+						$href = Speedguard_Admin::speedguard_page_url('tests').'#speedguard-add-new-url-meta-box';
 						$class = get_post_meta($speedguard_on[1],'load_time_score', true); 
 						$atitle = __('This page load time','speedguard');
 					}   
@@ -28,13 +30,15 @@ class SpeedGuardWidgets{
 					$add_url_link = add_query_arg( array(
 							'speedguard'=> 'add_new_url',
 							'new_url_id'=>$post->ID,
-							),admin_url(Speedguard_Admin::$cpt_url));	
+							),Speedguard_Admin::speedguard_page_url('tests')); 
+ 							
 					$title = '<form action="'.$add_url_link.'" method="post">
-						<input type="hidden" name="speedguard" value="add_new_url" />
+						<input type="hidden" name="speedguard" value="add_new_url" /> 
+						<input type="hidden" id="blog_id" name="blog_id" value="" />
 						<input type="hidden" name="speedguard_new_url_id" value="'.$post->ID.'" />
 						<input type="hidden" id="speedguard_new_url_permalink" name="speedguard_new_url_permalink" value="'.get_permalink($post).'"/>
 											<button style="border: 0;  background: transparent; color:inherit; cursor:pointer;">'.__('Test this page load time','speedguard').'</button></form>';
-					$href = admin_url(Speedguard_Admin::$cpt_url);
+					$href = Speedguard_Admin::speedguard_page_url('tests');
 					$class='';
 					$atitle='';
 					}
@@ -56,14 +60,15 @@ class SpeedGuardWidgets{
 		wp_add_dashboard_widget('speedguard_dashboard_widget', __('Site Speed Results [Speedguard]','speedguard'), array($this,'speedguard_dashboard_widget_function'),'',array( 'echo' => 'true'));	
 		//Widget position
 		global $wp_meta_boxes;
-		$normal_dashboard = $wp_meta_boxes['dashboard']['normal']['core']; 
+		$normal_dashboard = $wp_meta_boxes['dashboard'.(THIS_PLUGIN_NETWORK_ACTIVATED?'-network' :'')]['normal']['core']; 
 		$example_widget_backup = array( 'speedguard_dashboard_widget' => $normal_dashboard['speedguard_dashboard_widget'] );
 		unset( $normal_dashboard['speedguard_dashboard_widget'] ); 
 		$sorted_dashboard = array_merge( $example_widget_backup, $normal_dashboard );
 		$wp_meta_boxes['dashboard']['normal']['core'] = $sorted_dashboard;
 	}
+	
 	public static function speedguard_dashboard_widget_function($post = '', $args = '') {
-			$speedguard_average = get_option('speedguard_average' );	
+			$speedguard_average = Speedguard_Admin::get_this_plugin_option('speedguard_average' );	
 			$average_load_time = $speedguard_average['average_load_time'];
 					if (isset($average_load_time)){
 						$min_load_time = $speedguard_average['min_load_time'];
@@ -72,14 +77,13 @@ class SpeedGuardWidgets{
 						<div class='result-column'><p class='result-numbers'>$max_load_time</p>".__('Worst','speedguard')."</div>
 						<div class='result-column'><p class='result-numbers average'>$average_load_time</p>".__('Average Load Time','speedguard')."</div>
 						<div class='result-column'><p class='result-numbers'>$min_load_time</p>".__('Best','speedguard')."</div>	
-						<a href='".admin_url(Speedguard_Admin::$cpt_url)."#speedguard-tips-meta-box' class='button button-primary' target='_blank'>".__('Improve','speedguard')."</a>
+						<a href='".Speedguard_Admin::speedguard_page_url('tests')."#speedguard-tips-meta-box' class='button button-primary' target='_blank'>".__('Improve','speedguard')."</a> 
 						</div>
 						";						
 					}
 					else {
-					$add_new_url = admin_url(Speedguard_Admin::$cpt_url).'#speedguard-add-new-url-meta-box';
 					$content = sprintf(__( 'First %1$sadd URLs%2$s that should be guarded.', 'speedguard' ),
-					'<a href="' .$add_new_url. '">',
+					'<a href="' .Speedguard_Admin::speedguard_page_url('tests').'#speedguard-add-new-url-meta-box">',
 					'</a>'
 					);
 					}
@@ -88,7 +92,7 @@ class SpeedGuardWidgets{
 					else {return $content;}**/
 		}
 
-/*Meta boxes*/ 
+	/*Meta boxes*/ 
 	public static function add_meta_boxes(){
 		wp_nonce_field('closedpostboxes', 'closedpostboxesnonce', false ); 		
 		add_meta_box( 'api-meta-box', __('API Key','speedguard'), array('SpeedGuard_Settings','api_meta_box'), '', 'api', 'core' );
@@ -113,7 +117,7 @@ class SpeedGuardWidgets{
 		}
 					
 	}		
-/*Meta Boxes Widgets*/ 
+	/*Meta Boxes Widgets*/ 
 	public static function speed_score_legend_meta_box(){
 		$content = '<table>
 									<tr>
@@ -136,10 +140,12 @@ class SpeedGuardWidgets{
 	}
 	
 	
+	
 	public static function add_new_url_meta_box(){
 		$content = '<form name="speedguard_add_url" id="speedguard_add_url" action="" method="post">   
 		<input type="text" id="speedguard_new_url" name="speedguard_new_url" value="" placeholder="'.__('Start typing the title of the post','speedguard').'" autofocus="autofocus"/>
-		<input type="hidden" id="speedguard_new_url_permalink" name="speedguard_new_url_permalink" value=""/>
+		<input type="hidden" id="blog_id" name="blog_id" value="" />
+		<input type="hidden" id="speedguard_new_url_permalink" name="speedguard_new_url_permalink" value=""/> 
 		<input type="hidden" id="speedguard_new_url_id" name="speedguard_new_url_id" value=""/>
 		<input type="hidden" name="speedguard" value="add_new_url" />
 		<input type="submit" name="Submit" value="'.__('Add','speedguard').'" />

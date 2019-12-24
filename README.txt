@@ -33,6 +33,8 @@ Get the definite answer less than in 10 minutes with SpeedGuard plugin:
 
 Stop losing visitors because of slow site speed. No need to guess whether your website is really slow. Install SpeedGuard and get the definite answer in your WordPress Dashboard in 10 minutes.
 
+WordPress Multisite compatible. Take control over the websites load times across whole network.
+
 == Idea Behind ==
 Doing SEO for clients and my own projects for the past 10 years, I noticed that solution to the not-getting-traffic problem often can be found in quite basic things: sitemap, robots.txt, duplicates, redirections. But, first of all, page speed. 
  
@@ -99,6 +101,9 @@ You can run 65 tests per day. Will it 65 different urls to test or 65 tests of t
 * Thanx to Baboon designs from the Noun Project for the timer icon.
 
 == Changelog ==
+= Version 1.2 =
+* Multisite support added.
+
 = Version 1.1.0 =
 * Tests page view updated.
 

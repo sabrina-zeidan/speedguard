@@ -30,7 +30,13 @@ class Speedguard_Deactivator {
 	 * @since    1.0.0
 	 */
 	public static function deactivate() { 
-	set_transient( 'speedguard-notice-deactivation', true,  12*60 ); 
+		//Delete CRON events 
+		$speedguard_events = array ('speedguard_update_results','speedguard_rate_this_plugin','speedguard_email_test_results');
+		foreach ($speedguard_events as $speedguard_event){
+			wp_clear_scheduled_hook($speedguard_event);
+		}
+		
+		set_transient( 'speedguard-notice-deactivation', true,  12*60 ); 
 	}
 
 }

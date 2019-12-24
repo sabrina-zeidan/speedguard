@@ -1,5 +1,4 @@
 <?php
-
 /**
  * The file that defines the core plugin class
  *
@@ -72,14 +71,26 @@ class Speedguard {
 		} else {
 			$this->version = '1.0.0';
 		}
+		
+		if (!function_exists('is_plugin_active_for_network')) require_once( ABSPATH . '/wp-admin/includes/plugin.php' );
+		if ( is_plugin_active_for_network( 'speedguard/speedguard.php' ) ) {
+			define("THIS_PLUGIN_NETWORK_ACTIVATED", true);
+		} 
+		else {
+			define("THIS_PLUGIN_NETWORK_ACTIVATED", false);
+		}
+		
+	
 		$this->plugin_name = 'speedguard';
-
 		$this->load_dependencies();
-		$this->set_locale();
-		$this->define_admin_hooks();
-	//	$this->define_public_hooks();
+		$this->define_admin_hooks();		
+	//	$this->define_public_hooks(); 
+	
+		
+		
 
-	}
+	} 
+	
 
 	/**
 	 * Load the required dependencies for this plugin.

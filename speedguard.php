@@ -1,12 +1,11 @@
 <?php
-
 /**
  * The plugin bootstrap file
  *
  * This file is read by WordPress to generate the plugin information in the plugin
  * admin area. This file also includes all of the dependencies used by the plugin,
  * registers the activation and deactivation functions, and defines a function
- * that starts the plugin.
+ * that starts the plugin. * Network:       true
  *
  * @link              http://sabrinazeidan.com/
  * @since             1.0.0
@@ -16,13 +15,14 @@
  * Plugin Name:       SpeedGuard
  * Plugin URI:		  http://wordpress.org/plugins/speedguard/
  * Description:       Monitors load time of 65 most important pages of your website. Every single day. For free.
- * Version:           1.1.0
+ * Version:           1.2
  * Author:            Sabrina Zeidan
  * Author URI:        http://sabrinazeidan.com/
  * License:           GPL-2.0+
  * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
  * Text Domain:       speedguard
  * Domain Path:       /languages
+ * Network:       true
  */
 
 // If this file is called directly, abort.
@@ -35,7 +35,7 @@ if ( ! defined( 'WPINC' ) ) {
  * Start at version 1.0.0 and use SemVer - https://semver.org
  * Rename this for your plugin and update it as you release new versions.
  */
-define( 'SpeedGuard', '1.1.0' );
+define( 'SpeedGuard', '1.2' );
 
 /**
  * The code that runs during plugin activation.

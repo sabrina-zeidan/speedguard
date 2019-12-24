@@ -9,7 +9,7 @@ class SpeedGuard_WebPageTest{
 	/** New Test */
 	public static function webpagetest_new_test($guarded_page_id) {
 		$guarded_page_url = get_the_title($guarded_page_id);
-		$api_key = get_option( 'speedguard_api' )['api_key'];
+		$api_key = Speedguard_Admin::get_this_plugin_option( 'speedguard_api' )['api_key'];
 		$gtmetrix_request = add_query_arg( array(
 							'url'=> $guarded_page_url,
 							'f'=>'json',
@@ -29,8 +29,9 @@ class SpeedGuard_WebPageTest{
 		} 
 		else if ($json_response['statusCode'] == 400){
 			$notice = $json_response['statusText'];
-			return $notice;	
-		}
+		//	$redirect_to = add_query_arg( 'speedguard', 'limit_is_reached');
+		}  
+		
 	}
 	
 	/** Update waitind test results */
@@ -42,21 +43,21 @@ class SpeedGuard_WebPageTest{
 			$gtmetrix_test_results = wp_remote_retrieve_body( $gtmetrix_test_results);
 			$gtmetrix_test_results = json_decode($gtmetrix_test_results, true);		
 				if ($gtmetrix_test_results["statusCode"] != 200){
-					$update_field = update_post_meta( $guarded_page_id, 'load_time', 'waiting');	
+					$updated = update_post_meta( $guarded_page_id, 'load_time', 'waiting');	 
 				}
 				else { 
 					$average_full_load_time = round(($gtmetrix_test_results["data"]["average"]["firstView"]["fullyLoaded"]/1000),1);  
 					update_post_meta( $guarded_page_id, 'load_time', $average_full_load_time);	 
 					$completed_date = $gtmetrix_test_results["data"]["completed"];										
-					update_post_meta( $guarded_page_id, 'gtmetrix_test_result_date', $completed_date);										
+					$updated = update_post_meta( $guarded_page_id, 'gtmetrix_test_result_date', $completed_date);										
 				}
-				$notice =  Speedguard_Admin::set_notice(__('Please wait. Tests are running...','speedguard'),'success' );	 
-				return $notice;	
+				//$notice =  Speedguard_Admin::set_notice(__('Please wait. Tests are running...','speedguard'),'success' );	 
+				return $updated; 	
 		}
 	/** API credits usage */
 	public static function credits_usage() {		
 			if (SpeedGuard_AUTHORIZED){
-				$api_key = get_option( 'speedguard_api' )['api_key'];
+				$api_key = Speedguard_Admin::get_this_plugin_option( 'speedguard_api' )['api_key'];
 				$gtmetrix_request = add_query_arg( array('k'=> $api_key),'https://www.webpagetest.org/usage.php' );							
 				$response = wp_safe_remote_post($gtmetrix_request);
 				if ( is_wp_error( $response) ) {return false;}
