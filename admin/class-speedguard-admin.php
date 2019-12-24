@@ -193,13 +193,11 @@ class Speedguard_Admin {
 		return $return;	
 	}
 	public static function speedguard_cpt() {
-		$labels = array( 'name' => __('Speedguard :: Guarded pages','speedguard'), 'not_found' => __('No pages guarded yet. Add new URL in field above for the start.','speedguard'));
 		$args = array( 			
 			'public'      => false, 
 			'exclude_from_search'      => true, 
 			'publicly_queryable'      => true, 
 			'show_ui'      => false, 
-			'labels'      => $labels,
 			'supports' => array('title','custom-fields'),	
 		); 			
 		register_post_type( 'guarded-page', $args );	

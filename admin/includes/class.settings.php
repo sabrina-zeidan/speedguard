@@ -242,7 +242,8 @@ class SpeedGuard_Settings{
 		$field_name = esc_attr( $args['label_for'] );
 		$days =_n(' day',' days',$options[$field_name],'speedguard');
 		$string = "<input id='speedguard_options[".$field_name."]' name='speedguard_options[".$field_name."]' type='text' class='numbers' size='2' value='".$options[$field_name]."'/> ".$days;
-		echo $string;
+		$instructions = '<div class="note">'.__( 'If you don\'t want any automatic tests place "0".','speedguard').'</div>';  
+		echo $string.$instructions;
 }
 	function email_me_at_fn( $args ) {
 		$options = Speedguard_Admin::get_this_plugin_option('speedguard_options');

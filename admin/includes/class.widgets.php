@@ -12,19 +12,30 @@ class SpeedGuardWidgets{
 		if ($options['show_ab_widget'] === 'on'){	add_action( 'admin_bar_menu', array( $this,'speedguard_admin_bar_widget'),710);}
 	}
 /** Admin Bar widget */
-	function speedguard_admin_bar_widget($wp_admin_bar ) {  
-		if((current_user_can('update_core'))&&(get_current_screen()->base == 'post') || (is_single())) {
+	function speedguard_admin_bar_widget($wp_admin_bar ) { 
+		if((current_user_can('update_core'))&&(is_singular('post'))) {
 			global $post; 
+		
 				$speedguard_on = get_post_meta($post->ID,'speedguard_on', true);
 				if ($speedguard_on && $speedguard_on[0] == 'true'){
+						//var_dump($post);
 					$page_load_speed = get_post_meta($speedguard_on[1],'load_time', true);
-					if ($page_load_speed !== 'waiting') { 
-						$title = $page_load_speed.'s';
+					var_dump($page_load_speed);
+					if ($page_load_speed != "waiting") { 					
 						$title = sprintf(__( '%1$ss', 'speedguard' ),$page_load_speed);	
 						$href = Speedguard_Admin::speedguard_page_url('tests').'#speedguard-add-new-url-meta-box';
 						$class = get_post_meta($speedguard_on[1],'load_time_score', true); 
 						$atitle = __('This page load time','speedguard');
-					}   
+					}
+					else {
+						$title = sprintf(__( 'In process', 'speedguard' ),$page_load_speed);	
+						$href = Speedguard_Admin::speedguard_page_url('tests').'#speedguard-add-new-url-meta-box';
+						$class = get_post_meta($speedguard_on[1],'load_time_score', true); 
+						$atitle = __('Results are currently being updated','speedguard');
+					}
+					
+					
+					
 				}
 				else {
 					$add_url_link = add_query_arg( array(
@@ -123,12 +134,12 @@ class SpeedGuardWidgets{
 									<tr>
 									<td><span class="speedguard-score score-green"></span></td>
 									<td>1s — 4.9'.__('s','speedguard').'</td>
-									<td>'.__('Better than average. Probably, your site speed has no direct negative impact on search ranking. Yet, you may significantly improve user experience (which is another important search ranking factor) by reducing site load time. This is especially true for ecommerce websites. In most cases load time can be improved to 2 seconds.','speedguard').'</td>
+									<td>'.__('Better than average. Probably, your site speed has no direct negative impact on search ranking. Yet, you may significantly improve user experience (which is another important search ranking factor) by reducing site load time. This is especially true for e-commerce websites. In most cases, load time can be improved to 2 seconds.','speedguard').'</td>
 									</tr>
 									<tr>
 									<td><span class="speedguard-score score-yellow"></span></td>
 									<td>5s — 7.9'.__('s','speedguard').'</td>
-									<td>'.__('Not bad, but not good either. World average full load time is 6.5s [2018], so this is mediocre result. Reducing your site load time at least to 4 seconds will help you to outrank your competitors on Google.','speedguard').'</td>
+									<td>'.__('Not bad, but not good either. World average full load time is 6.5s [2018], so this a is mediocre result. Reducing your site load time at least to 4 seconds will help you to outrank your competitors on Google.','speedguard').'</td>
 									</tr>
 									<tr>
 									<td><span class="speedguard-score score-red"></span></td>

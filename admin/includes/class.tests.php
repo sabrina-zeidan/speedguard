@@ -17,6 +17,9 @@ class SpeedGuard_List_Table extends WP_List_Table{
      *
      * @return Void
      */
+	public function no_items() {
+    _e('No pages guarded yet. Add new URL in the field above for the start.','speedguard');
+	}
     public function prepare_items()
     {
         $columns = $this->get_columns();
