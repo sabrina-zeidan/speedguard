@@ -392,7 +392,7 @@ class SpeedGuard_Tests{
 				</script>
 				<?php
 		}		
-		add_action( 'admin_footer','autocomplete_search'); 			
+		add_action( 'admin_footer','autocomplete_search');  			
 			function autocomplete_search() {
 			if (THIS_PLUGIN_NETWORK_ACTIVATED) {     
 				$sites = get_sites();				
@@ -402,16 +402,16 @@ class SpeedGuard_Tests{
 						//$get_posts = array();  
 							$already_guarded_posts = array();
 							$args = array(
-								'post_type' => 'post',
+								'post_type' => SpeedGuard_Admin::supported_post_types(),
 								'post_status' => 'publish',
 								'posts_per_page'   => -1, 
 								'fields'   => 'ids',
 								'meta_query' => array(array('key' => 'speedguard_on','value' => 'true','compare' => 'LIKE'))								
 							);
-							$already_guarded_posts = get_posts( $args );
+							$already_guarded_posts = get_posts( $args );								
 							$get_site_posts = array();
 								$args = array(  
-								'post_type' => 'post',
+								'post_type' => SpeedGuard_Admin::supported_post_types(),
 								'post_status' => 'publish',
 								'posts_per_page'   => -1, // all posts
 								'fields'   => 'ids',
@@ -432,7 +432,7 @@ class SpeedGuard_Tests{
 			else {
 				$already_guarded_posts = array();
 							$args = array(
-								'post_type' => 'post',
+								'post_type' => SpeedGuard_Admin::supported_post_types(),
 								'post_status' => 'publish',
 								'posts_per_page'   => -1, 
 								'fields'   => 'ids',
@@ -440,7 +440,7 @@ class SpeedGuard_Tests{
 							);
 				$already_guarded_posts = get_posts( $args );
 				$args = array(
-				'post_type' => 'post',
+				'post_type' => SpeedGuard_Admin::supported_post_types(),
 				'post_status' => 'publish',
 				'posts_per_page'   => -1,
 				'fields'   => 'ids',

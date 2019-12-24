@@ -1,5 +1,5 @@
 <?php
-/**
+/** 
 *
 *	Class responsible for adding CPT for SpeedGuard
 */
@@ -13,7 +13,7 @@ class SpeedGuardWidgets{
 	}
 /** Admin Bar widget */
 	function speedguard_admin_bar_widget($wp_admin_bar ) { 
-		if((current_user_can('update_core'))&&(is_singular('post'))) {
+		if((current_user_can('update_core'))&&(is_singular(SpeedGuard_Admin::supported_post_types()))) {
 			global $post; 
 		
 				$speedguard_on = get_post_meta($post->ID,'speedguard_on', true);

@@ -85,6 +85,15 @@ class Speedguard_Admin {
 	ob_start();
 	}
 	
+	public static function supported_post_types() {
+		$args = array('publicly_queryable'   => true);
+		$output = 'names'; 
+		$operator = 'and'; 
+		$supported_post_types = get_post_types( $args, $output, $operator ); 
+		unset($supported_post_types['attachment']);
+		$supported_post_types['page'] = 'page';
+		return $supported_post_types;
+	}
 	public static function before_delete_test_hook( $postid ) {
 		//When test is deleted
 		if  (get_post_type($postid) == Speedguard_Admin::$cpt_name){
@@ -196,7 +205,7 @@ class Speedguard_Admin {
 		$args = array( 			
 			'public'      => false, 
 			'exclude_from_search'      => true, 
-			'publicly_queryable'      => true, 
+			'publicly_queryable'      => false, 
 			'show_ui'      => false, 
 			'supports' => array('title','custom-fields'),	
 		); 			

@@ -57,7 +57,7 @@ if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 					$blog_id = $site->blog_id;				
 						switch_to_blog( $blog_id );
 						$args = array(
-							'post_type'      => 'any',
+							'post_type'      => 'any', 
 							'posts_per_page' => -1,
 							'post_status'    => 'any',
 							'fields' => 'ids',
