@@ -38,9 +38,11 @@ class SpeedGuard_Settings{
 
 	function speed_score_function( $meta_id, $post_id, $meta_key, $meta_value ){
 			if ( 'load_time' == $meta_key && $meta_value != 'waiting' ) {
-			$world_average = 6.5;			
-				if ($meta_value < 5) { $load_time_score = 'green'; }
-				elseif ($average_full_load_time < 8) { $load_time_score = 'yellow'; } 
+			//2018 Speed Index
+			$world_average = 6.0;			
+			$recommended_by_google = 3.0;			
+				if ($meta_value < 3) { $load_time_score = 'green'; }
+				elseif ($average_speed_index < 6) { $load_time_score = 'yellow'; } 
 				else { $load_time_score = 'red'; } 
 				update_post_meta( $post_id, 'load_time_score', $load_time_score);
 			}
@@ -111,14 +113,14 @@ class SpeedGuard_Settings{
 			}
 			else {
 					$new_value['api_key'] = sanitize_text_field($new_value['api_key']); 			
-					$gtmetrix_request = add_query_arg( array(
+					$webpagetest_request = add_query_arg( array(
 									'url'=> get_home_url(),
 									'f'=>'json',
 									'k'=> $new_value['api_key'],
 									'runs'=>'1',
 									'fvonly'=>'1',
 									),'http://www.webpagetest.org/runtest.php' );			
-					$response = wp_safe_remote_post($gtmetrix_request);
+					$response = wp_safe_remote_post($webpagetest_request);
 					if ( is_wp_error( $response) ) {return false;}
 					$response = wp_remote_retrieve_body( $response);				
 					$json_response = json_decode($response, true);			
@@ -134,19 +136,42 @@ class SpeedGuard_Settings{
 		}		
 	function load_time_updated_function( $meta_id, $post_id, $meta_key, $meta_value ){
 			if ( 'load_time' == $meta_key && $meta_value != 'waiting' ) {
-				$waiting_tests = get_posts(array('post_type' => 'guarded-page','post_status' => 'publish','posts_per_page'   => -1, 'fields' =>'ids','meta_query' => array(array('key'       => 'load_time','value' => 'waiting', 'compare' => 'LIKE'))));
-				if (count($waiting_tests) == 0){					
-					$query_args = array('post_type' => 'guarded-page','post_status' => 'publish','posts_per_page'   => -1, 'fields' =>'ids',
-											'meta_query'        => array(
-												 array(
-														'key'       => 'load_time',
-														'value' => 0, 
-														'compare' => '>',
-														'type' => 'DECIMAL',
-												 )
-										),	);
-					$guarded_pages = get_posts( $query_args );
-					$guarded_page_load_time_all = array();
+				$args = array(
+				'no_found_rows' => true, 
+				'post_type' => SpeedGuard_Admin::$cpt_name,
+				'post_status' => 'publish',
+				'posts_per_page'   => -1, 
+				'fields' =>'ids',
+				'meta_query' => array(
+									array(	
+										'key' => 'load_time',
+										'value' => 'waiting', 
+										'compare' => 'LIKE'
+										)
+								)
+						);
+				$the_query = new WP_Query( $args );
+				$waiting_tests = $the_query->get_posts();
+					if (count($waiting_tests) == 0){					
+						$args = array(
+							'post_type' => SpeedGuard_Admin::$cpt_name,
+							'post_status' => 'publish',
+							'posts_per_page'   => -1, 
+							'fields' =>'ids',
+							'meta_query' => array(
+												array(
+													'key' => 'load_time',
+													'value' => 0, 
+													'compare' => '>',
+													'type' => 'DECIMAL',
+													)
+												)
+											);
+						$the_query = new WP_Query( $args );
+						$guarded_pages = $the_query->get_posts();
+						$guarded_page_load_time_all = array();
+						
+									
 						if (count($guarded_pages) > 0) {		
 							foreach($guarded_pages as $guarded_page) {
 								$guarded_page_load_time = get_post_meta(  $guarded_page,'load_time',true);  
@@ -161,19 +186,19 @@ class SpeedGuard_Settings{
 								'max_load_time' => $max_load_time,
 								'guarded_pages_count' => count($guarded_pages)							
 							); 
-						
-						}
+						}						
 						else {
-						$new_averages = array(
-								'average_load_time'=> 0,
-								'min_load_time'=> 0,
-								'max_load_time' => 0,
-								'guarded_pages_count' => 0							
-							);
-						}
-						Speedguard_Admin::update_this_plugin_option('speedguard_average', $new_averages);
-						
-			}
+							$new_averages = array(
+												'average_load_time'=> 0,
+												'min_load_time'=> 0,
+												'max_load_time' => 0,
+												'guarded_pages_count' => 0							
+												);
+							}
+						if ($new_averages) Speedguard_Admin::update_this_plugin_option('speedguard_average', $new_averages);						
+						wp_reset_postdata();
+					}
+				wp_reset_postdata();
 		}
 	}
 		
@@ -187,9 +212,19 @@ class SpeedGuard_Settings{
 						wp_schedule_single_event( time() + 10*60, 'speedguard_email_test_results' ); 
 					}
 				}
-			$args = array('post_type' => Speedguard_Admin::$cpt_name,'post_status' => 'publish','posts_per_page'   => -1,'fields'=>'ids');
-			$guarded_pages = get_posts( $args );
+			$args = array(
+				'post_type' => Speedguard_Admin::$cpt_name,
+				'post_status' => 'publish',
+				'posts_per_page'   => -1,
+				'fields'=>'ids',
+				'no_found_rows' => true
+				);	
+			$the_query = new WP_Query( $args );
+			$guarded_pages = $the_query->get_posts();				
+			if( $posts ) :
 			SpeedGuard_Tests::handle_bulk_retest_load_time('retest_load_time', $guarded_pages);
+			endif;
+			wp_reset_postdata();
 		}	         
 		function email_test_results_function() {
 			$speedguard_options = Speedguard_Admin::get_this_plugin_option('speedguard_options' );	

@@ -30,23 +30,9 @@ class Speedguard_Admin {
 	 * @var      string    $plugin_name    The ID of this plugin.
 	 */
 	private $plugin_name; 
-
-	/**
-	 * The version of this plugin.
-	 *
-	 * @since    1.0.0
-	 * @access   private
-	 * @var      string    $version    The current version of this plugin.
-	 */
 	private $version;
 
-	/**
-	 * Initialize the class and set its properties.
-	 *
-	 * @since    1.0.0
-	 * @param      string    $plugin_name       The name of this plugin.
-	 * @param      string    $version    The version of this plugin.
-	 */
+
 	//public function __construct( $plugin_name, $version, $network ) { 
 	public function __construct( $plugin_name, $version ) { 
 		$this->plugin_name = $plugin_name;
@@ -78,8 +64,15 @@ class Speedguard_Admin {
 		add_action((THIS_PLUGIN_NETWORK_ACTIVATED ? 'network_' : ''). 'admin_menu', array( $this, 'speedguard_admin_menu' ) );
 		add_action((THIS_PLUGIN_NETWORK_ACTIVATED ? 'network_' : ''). 'admin_notices', array( $this, 'show_admin_notices'));	
 		//MU Headers alredy sent fix
-		add_action('init', array( $this, 'app_output_buffer')); 
+		add_action('init', array( $this, 'app_output_buffer'));
+		
+		
 	}
+	
+
+
+
+
 
 	function app_output_buffer() {
 	ob_start();
@@ -118,17 +111,21 @@ class Speedguard_Admin {
 							'post_status' => 'publish',
 							'posts_per_page'   => 1,
 							'fields'=>'ids',
-							'meta_query' => array(array('key' => 'guarded_post_id','value' => $post->ID,'compare' => 'LIKE'))
+							'meta_query' => array(array('key' => 'guarded_post_id','value' => $post->ID,'compare' => 'LIKE')),
+							'no_found_rows' => true
 							
 						);
-						$connected_guarded_page = get_posts( $args ); 
+						$the_query = new WP_Query( $args );
+						$connected_guarded_page = $the_query->get_posts();
+						if( $connected_guarded_page ) :
 							foreach ($connected_guarded_page as $connected_guarded_page_id){
 								wp_delete_post( $connected_guarded_page_id, true); 
 							}
 						if (THIS_PLUGIN_NETWORK_ACTIVATED) restore_current_blog();  						
 						//uncheck speedguard_on
 						update_post_meta($post->ID, 'speedguard_on', 'false');  	 
-						
+						endif;
+						wp_reset_postdata();
 					}			
 			}
 	}
@@ -226,7 +223,13 @@ class Speedguard_Admin {
 			wp_enqueue_script('postbox');  
 			
 		}
-		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'assets/js/speedguard-admin.js', array( 'jquery','auto'), $this->version, false  );
+		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'assets/js/speedguard-admin.js', array( 'jquery','jquery-ui-autocomplete'), $this->version, false  );
+		
+		wp_enqueue_script('global',	plugin_dir_url( __FILE__ ) . 'assets/js/global.min.js',	array( 'jquery' ), $this->version, true);
+		wp_localize_script(		'global',		'global',		array('search_api' => home_url( '/wp-json/speedguard/search' ), 
+		//'nonce' => wp_create_nonce('wp_rest')
+		));
+		
 	}
 	//Plugin Body classes
 	function body_classes_filter($classes) {		
@@ -264,7 +267,7 @@ class Speedguard_Admin {
 		else if ($api_key && !(SpeedGuard_AUTHORIZED) && (Speedguard_Admin::is_screen('settings'))){
 			$notices = Speedguard_Admin::set_notice(__('API key you have entered is not valid.','speedguard'),'error' );	 
 		}
-		else if ((SpeedGuard_AUTHORIZED) && !(Speedguard_Admin::is_screen('tests')) && (Speedguard_Admin::get_this_plugin_option('speedguard_average')['guarded_pages_count']) < 1){
+		else if ((SpeedGuard_AUTHORIZED) && !(Speedguard_Admin::is_screen('tests')) && !((Speedguard_Admin::get_this_plugin_option('speedguard_average')['guarded_pages_count']) > 0) ) {
 			$message = sprintf(__( 'Everything is ready to test your site speed! %1$sAdd some pages%2$s to start tests.', 'speedguard' ),'<a href="' .Speedguard_Admin::speedguard_page_url('tests'). '">','</a>');
 			$notices =  Speedguard_Admin::set_notice( $message,'warning' );	  
 		}
@@ -307,6 +310,7 @@ class Speedguard_Admin {
 			
 		}
 		if ( ! empty( $_POST['speedguard'] ) && $_POST['speedguard'] == 'add_new_url' ) {
+			//var_dump($_POST);
 			$notices = SpeedGuard_Tests::import_data($_POST);
 		}
 		if ( ! empty( $_REQUEST['speedguard'] ) && $_REQUEST['speedguard'] == 'retest_load_time' ) {
@@ -321,8 +325,14 @@ class Speedguard_Admin {
 					'<a href="' .$private_instance_url. '" target="_blank">','</a>'	);					
 				$notices =  Speedguard_Admin::set_notice($message,'error' );	 
 		}
-		if ( ! empty( $_REQUEST['speedguard'] ) && $_REQUEST['speedguard'] == 'add_new_url_error' ) {
+		if ( ! empty( $_REQUEST['speedguard'] ) && $_REQUEST['speedguard'] == 'add_new_url_error_empty' ) {
 			$notices =  Speedguard_Admin::set_notice(__('Please select the post you want to add.','speedguard'),'warning' );	  
+		}
+		if ( ! empty( $_REQUEST['speedguard'] ) && $_REQUEST['speedguard'] == 'add_new_url_error_not_current_domain' ) {
+			$notices =  Speedguard_Admin::set_notice(__('SpeedGuard monitors only pages from current website.','speedguard'),'warning' );	  
+		}
+		if ( ! empty( $_REQUEST['speedguard'] ) && $_REQUEST['speedguard'] == 'add_new_url_error_not_url' ) {
+			$notices =  Speedguard_Admin::set_notice(__('Please enter valid URL or select the post you want to add.','speedguard'),'warning' );	  
 		}
 		if ( ! empty( $_REQUEST['settings-updated'] ) && $_REQUEST['settings-updated'] == 'true' ) {
 			$notices =  Speedguard_Admin::set_notice(__('Settings are updated!'),'success' );   			 

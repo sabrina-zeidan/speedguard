@@ -20,17 +20,24 @@ class SpeedGuard_Notifications{
 			else {
 				$subject = sprintf(__('%1$s speed report [SpeedGuard]','speedguard'),$site_url);
 			}
-			$query_args = array('post_type' => 'guarded-page','post_status' => 'publish','posts_per_page'   => -1, 'fields' =>'ids',
-											'meta_query'        => array(
-												 array(
-														'key'       => 'load_time',
-														'value' => 0, 
-														'compare' => '>',
-														'type' => 'DECIMAL',
-												 )
-										),	);
-			$guarded_pages = get_posts( $query_args );				
-				if($guarded_pages){		
+			$args = array(
+				'post_type' => SpeedGuard_Admin::$cpt_name ,
+				'post_status' => 'publish',
+				'posts_per_page'   => -1, 
+				'fields' =>'ids',
+					'meta_query'        => array(
+						array(
+							'key'       => 'load_time',
+							'value' => 0, 
+							'compare' => '>',
+							'type' => 'DECIMAL',
+						 )
+					),
+				'no_found_rows' => true 
+			);
+			$the_query = new WP_Query( $args );
+			$guarded_pages = $the_query->get_posts();			
+				if( $guarded_pages ) :	
 					ob_start();
 							echo '<html><head><title>'.__('SpeedGuard Report','speedguard').'</title></head>
 									<body style="padding-top: 50px; padding-bottom: 50px;  background:#f5f5f5;" >
@@ -52,8 +59,8 @@ class SpeedGuard_Notifications{
 														foreach($guarded_pages as $guarded_page_id) {  
 															$guarded_page_url = get_the_title($guarded_page_id);
 															$guarded_page_load_time = get_post_meta($guarded_page_id, 'load_time',true );
-															$report_link = 'https://www.webpagetest.org/result/'.get_post_meta($guarded_page_id,'gtmetrix_test_result_id',true);		
-															$gmt_report_date = date('Y-m-d H:i:s',get_post_meta($guarded_page_id,'gtmetrix_test_result_date',true)); 
+															$report_link = 'https://www.webpagetest.org/result/'.get_post_meta($guarded_page_id,'webpagetest_request_test_result_id',true);		
+															$gmt_report_date = date('Y-m-d H:i:s',get_post_meta($guarded_page_id,'webpagetest_request_test_result_date',true)); 
 															$updated = get_date_from_gmt($gmt_report_date,'Y-m-d H:i:s');							
 														echo '<tr style="border: 1px solid #ccc;">
 															<td>'.$guarded_page_url.'</td>
@@ -81,7 +88,8 @@ class SpeedGuard_Notifications{
 					   ob_end_clean();		
 					$headers = array('Content-Type: text/html; charset=UTF-8');
 					wp_mail( $admin_email, $subject, $message, $headers);
-				}			
+				endif;	
+				wp_reset_postdata();				
 			}
 	}
  

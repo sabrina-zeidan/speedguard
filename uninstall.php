@@ -43,11 +43,16 @@ if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 			'posts_per_page' => -1,
 			'post_status'    => 'any',
 			'fields' => 'ids',
+			'no_found_rows' => true, 
 		);
-		$guarded_pages = get_posts( $args );
+	$the_query = new WP_Query( $args );
+	$guarded_pages = $the_query->get_posts();
+	if( $guarded_pages ) :	
 		foreach ($guarded_pages as $guarded_page_id){
 			wp_delete_post( $guarded_page_id, true);  
 		}
+	endif;
+	wp_reset_postdata();			
 	if  ( is_multisite()) restore_current_blog();
 	
 	//Delete post_meta
@@ -68,32 +73,42 @@ if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 									'compare' => 'EXISTS',
 								),
 							),
+							'no_found_rows' => true, 
 						);
-						$guarded_posts = get_posts( $args );
-						foreach ($guarded_posts as $guarded_post_id){
-						delete_post_meta($guarded_post_id, 'speedguard_on');
-						}
+						$the_query = new WP_Query( $args );
+						$guarded_posts = $the_query->get_posts(); 
+						if( $guarded_posts) :
+							foreach ($guarded_posts as $guarded_post_id){
+							delete_post_meta($guarded_post_id, 'speedguard_on');
+							}
+						endif;
+						wp_reset_postdata();
 						restore_current_blog();		
 				}//endforeach				
 	}
 	else { 
 		$args = array(
-							'post_type'      => 'any',
-							'posts_per_page' => -1,
-							'post_status'    => 'any',
-							'fields' => 'ids',
-							'meta_query'     => array(
-								'relation' => 'AND',
-								array(
-									'key'     => 'speedguard_on',
-									'compare' => 'EXISTS',
-								),
-							),
-						);
-						$guarded_posts = get_posts( $args );
-						foreach ($guarded_posts as $guarded_post_id){
-						delete_post_meta($guarded_post_id, 'speedguard_on');
-						}
+					'post_type'      => 'any',
+					'posts_per_page' => -1,
+					'post_status'    => 'any',
+					'fields' => 'ids',
+					'meta_query'     => array(
+											'relation' => 'AND',
+												array(
+													'key'     => 'speedguard_on',
+													'compare' => 'EXISTS',
+												),
+											),
+					'no_found_rows' => true, 
+					);
+		$the_query = new WP_Query( $args );
+		$guarded_posts = $the_query->get_posts();
+		if( $guarded_posts ) :
+			foreach ($guarded_posts as $guarded_post_id){
+				delete_post_meta($guarded_post_id, 'speedguard_on');
+			}
+		endif;
+		wp_reset_postdata();
 	}
 
 

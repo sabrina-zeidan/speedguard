@@ -15,14 +15,13 @@
  * Plugin Name:       SpeedGuard
  * Plugin URI:		  http://wordpress.org/plugins/speedguard/
  * Description:       Monitors load time of 65 most important pages of your website. Every single day. For free.
- * Version:           1.3.1
+ * Version:           1.4
  * Author:            Sabrina Zeidan
  * Author URI:        http://sabrinazeidan.com/
  * License:           GPL-2.0+
  * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
  * Text Domain:       speedguard
  * Domain Path:       /languages
- * Network:       true
  */
 
 // If this file is called directly, abort.
@@ -30,18 +29,30 @@ if ( ! defined( 'WPINC' ) ) {
 	die;
 }
 
-/**
- * Currently pligin version.
- * Start at version 1.0.0 and use SemVer - https://semver.org
- * Rename this for your plugin and update it as you release new versions.
- */
-define( 'SPEEDGUARD_VERSION', '1.3.1' );
+
+define( 'SPEEDGUARD_VERSION', '1.4' );
+define( 'SPEEDGUARD_PRO', false );
 
 /**
  * The code that runs during plugin activation.
  * This action is documented in includes/class-speedguard-activator.php
  */
-function activate_speedguard() {
+function activate_speedguard($network_wide) {
+	//Multisite + Network Wide + not PRO version
+	if (is_multisite()) {
+		deactivate_plugins( plugin_basename( __FILE__ ) );
+		if ( isset( $_GET['activate'] ) ) {
+                    unset( $_GET['activate'] );
+           }
+		wp_die( __( 'This plugin is not compatible with Multisite at the moment, but will be soon.', 'speedguard' ) );
+	}
+	if (is_multisite() && $network_wide && !(SPEEDGUARD_PRO)) {
+		deactivate_plugins( plugin_basename( __FILE__ ) );
+		if ( isset( $_GET['activate'] ) ) {
+                    unset( $_GET['activate'] );
+           }
+		wp_die( __( 'Network activation is only available in PRO version', 'speedguard' ) );
+	}
 	require_once plugin_dir_path( __FILE__ ) . 'includes/class-speedguard-activator.php';
 	Speedguard_Activator::activate();
 }

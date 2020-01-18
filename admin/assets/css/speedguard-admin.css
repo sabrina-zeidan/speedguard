@@ -18,7 +18,7 @@
 .toplevel_page_speedguard_tests .autocomplete-suggestion b { font-weight: normal; color: #1f8dd6; }
 .autocomplete-suggestion.selected { background: #f0f0f0; }
 .toplevel_page_speedguard_tests #tests-list-meta-box .column-guarded_page_title{   min-width:300px;}
-.toplevel_page_speedguard_tests #tests-list-meta-box .column-load_time, #tests-list-meta-box .column-report_link{text-align: center; width:70px; vertical-align: middle; }
+.toplevel_page_speedguard_tests #tests-list-meta-box .column-load_time, #tests-list-meta-box .column-report_link{text-align: center; width:90px; vertical-align: middle; }
 .toplevel_page_speedguard_tests #tests-list-meta-box .column-report_date{  width:150px;     text-align: center;}
 #speed-score-legend-meta-box table td {padding: 1.2em 0.5em; min-width: 80px; border:0px;}
 #speed-score-legend-meta-box .speedguard-score {font-size: 2em; margin-left:1em;}
@@ -43,7 +43,7 @@
 .no-guarded-pages #speedguard-site-speed-score {display:none;}  
 
 
-#speedguard-tips-meta-box{position:fixed; width: 280px;}
+#speedguard-tips-meta-box{ width: 280px;}
 #speedguard-tips-meta-box ul{list-style:circle; margin-left:2em;}
 .speedguard-results{width: 100%; margin: 2.6em 0; text-align: center;}
 .speedguard-results .result-column{width: 30%; display:inline-block;}

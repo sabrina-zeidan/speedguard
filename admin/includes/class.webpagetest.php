@@ -10,21 +10,21 @@ class SpeedGuard_WebPageTest{
 	public static function webpagetest_new_test($guarded_page_id) {
 		$guarded_page_url = get_the_title($guarded_page_id);
 		$api_key = Speedguard_Admin::get_this_plugin_option( 'speedguard_api' )['api_key'];
-		$gtmetrix_request = add_query_arg( array(
+		$webpagetest_request_request = add_query_arg( array(
 							'url'=> $guarded_page_url,
 							'f'=>'json',
 							'k'=> $api_key,
 			  				'runs'=>'3',
 							'fvonly'=>'1',
 							),'http://www.webpagetest.org/runtest.php' );			
-		$response = wp_safe_remote_post($gtmetrix_request);
+		$response = wp_safe_remote_post($webpagetest_request_request);
 		if ( is_wp_error( $response) ) {return false;}
 		$response = wp_remote_retrieve_body( $response);				
 		$json_response = json_decode($response, true);			
 		if ($json_response['statusCode'] == 200){
 			$test_data = $json_response['data'];					
 			$testId = $test_data['testId'];								
-			update_post_meta($guarded_page_id, 'gtmetrix_test_result_id', $testId );												
+			update_post_meta($guarded_page_id, 'webpagetest_request_test_result_id', $testId );												
 			update_post_meta($guarded_page_id, 'load_time', 'waiting' );	
 		} 
 		else if ($json_response['statusCode'] == 400){
@@ -36,20 +36,20 @@ class SpeedGuard_WebPageTest{
 	
 	/** Update waitind test results */
 	public static function update_waiting_pageload($guarded_page_id) { 
-			$gtmetrix_test_result_id = get_post_meta($guarded_page_id,'gtmetrix_test_result_id', true);
-			$gtmetrix_test_results_link = 'http://www.webpagetest.org/jsonResult.php?test='.$gtmetrix_test_result_id; 
-			$gtmetrix_test_results = wp_safe_remote_get($gtmetrix_test_results_link);							
-			if ( is_wp_error( $gtmetrix_test_results ) ) {return false;}
-			$gtmetrix_test_results = wp_remote_retrieve_body( $gtmetrix_test_results);
-			$gtmetrix_test_results = json_decode($gtmetrix_test_results, true);		
-				if ($gtmetrix_test_results["statusCode"] != 200){
+			$webpagetest_request_test_result_id = get_post_meta($guarded_page_id,'webpagetest_request_test_result_id', true);
+			$webpagetest_request_test_results_link = 'http://www.webpagetest.org/jsonResult.php?test='.$webpagetest_request_test_result_id; 
+			$webpagetest_request_test_results = wp_safe_remote_get($webpagetest_request_test_results_link);							
+			if ( is_wp_error( $webpagetest_request_test_results ) ) {return false;}
+			$webpagetest_request_test_results = wp_remote_retrieve_body( $webpagetest_request_test_results);
+			$webpagetest_request_test_results = json_decode($webpagetest_request_test_results, true);		
+				if ($webpagetest_request_test_results["statusCode"] != 200){
 					$updated = update_post_meta( $guarded_page_id, 'load_time', 'waiting');	 
 				}
 				else { 
-					$average_full_load_time = round(($gtmetrix_test_results["data"]["average"]["firstView"]["fullyLoaded"]/1000),1);  
-					update_post_meta( $guarded_page_id, 'load_time', $average_full_load_time);	 
-					$completed_date = $gtmetrix_test_results["data"]["completed"];										
-					$updated = update_post_meta( $guarded_page_id, 'gtmetrix_test_result_date', $completed_date);										
+					$average_speedindex = round(($webpagetest_request_test_results["data"]["average"]["firstView"]["SpeedIndex"]/1000),1);   
+					update_post_meta( $guarded_page_id, 'load_time', $average_speedindex);	 
+					$completed_date = $webpagetest_request_test_results["data"]["completed"];										
+					$updated = update_post_meta( $guarded_page_id, 'webpagetest_request_test_result_date', $completed_date);										
 				}
 				//$notice =  Speedguard_Admin::set_notice(__('Please wait. Tests are running...','speedguard'),'success' );	 
 				return $updated; 	
@@ -58,8 +58,8 @@ class SpeedGuard_WebPageTest{
 	public static function credits_usage() {		
 			if (SpeedGuard_AUTHORIZED){
 				$api_key = Speedguard_Admin::get_this_plugin_option( 'speedguard_api' )['api_key'];
-				$gtmetrix_request = add_query_arg( array('k'=> $api_key),'https://www.webpagetest.org/usage.php' );							
-				$response = wp_safe_remote_post($gtmetrix_request);
+				$webpagetest_request_request = add_query_arg( array('k'=> $api_key),'https://www.webpagetest.org/usage.php' );							
+				$response = wp_safe_remote_post($webpagetest_request_request);
 				if ( is_wp_error( $response) ) {return false;}
 				$response = wp_remote_retrieve_body( $response);	
 					preg_match_all("'<tr>(.*?)</tr>'si", $response, $match);

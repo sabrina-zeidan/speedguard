@@ -2,7 +2,7 @@
 Contributors: sabrinazeidan
 Tags: speed, page load time, site speed, performance, optimization, SEO, page speed, search engine optimization
 Requires at least: 4.7
-Tested up to: 4.9.4 
+Tested up to: 5.3.2
 Stable tag: trunk 
 Requires PHP: 5.4
 License: GPLv2 or later 
@@ -32,8 +32,6 @@ Get the definite answer less than in 10 minutes with SpeedGuard plugin:
 * <strong>It's free</strong>
 
 Stop losing visitors because of slow site speed. No need to guess whether your website is really slow. Install SpeedGuard and get the definite answer in your WordPress Dashboard in 10 minutes.
-
-WordPress Multisite compatible. Take control over the websites load times across the whole network.
 
 == Idea Behind ==
 Doing SEO for clients and my own projects for the past 10 years, I noticed that solution to the not-getting-traffic problem often can be found in quite basic things: sitemap, robots.txt, duplicates, redirections. But, first of all, page speed. 
@@ -101,6 +99,14 @@ You can run 65 tests per day. Will it 65 different URLs to test or 65 tests of t
 * Thanx to Baboon designs from the Noun Project for the timer icon.
 
 == Changelog ==
+
+= Version 1.4 =
+* Any URLs from current website can be added directly to the input field
+* Fully Loaded in reports changed Speed Index to reflect user experience better https://sites.google.com/a/webpagetest.org/docs/using-webpagetest/metrics/speed-index
+* Admin-ajax.php is relaced with WP REST API
+* WordPress Multisite support is paused in in this version, but will be provide in the next one with better performance-wise solution for the large networks
+* Minor bugs fixed
+
 = Version 1.3.1 =
 * Minor bugs fixed
 
@@ -114,7 +120,7 @@ You can run 65 tests per day. Will it 65 different URLs to test or 65 tests of t
 * Language bug fixed.
 
 = Version 1.2 =
-* Multisite support added.
+* Multisite support added. 
 
 = Version 1.1.0 =
 * Tests page view updated.

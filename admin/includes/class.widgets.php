@@ -20,7 +20,7 @@ class SpeedGuardWidgets{
 				if ($speedguard_on && $speedguard_on[0] == 'true'){
 						//var_dump($post);
 					$page_load_speed = get_post_meta($speedguard_on[1],'load_time', true);
-					var_dump($page_load_speed);
+					//var_dump($page_load_speed);
 					if ($page_load_speed != "waiting") { 					
 						$title = sprintf(__( '%1$ss', 'speedguard' ),$page_load_speed);	
 						$href = Speedguard_Admin::speedguard_page_url('tests').'#speedguard-add-new-url-meta-box';
@@ -133,28 +133,27 @@ class SpeedGuardWidgets{
 		$content = '<table>
 									<tr>
 									<td><span class="speedguard-score score-green"></span></td>
-									<td>1s — 4.9'.__('s','speedguard').'</td>
-									<td>'.__('Better than average. Probably, your site speed has no direct negative impact on search ranking. Yet, you may significantly improve user experience (which is another important search ranking factor) by reducing site load time. This is especially true for e-commerce websites. In most cases, load time can be improved to 2 seconds.','speedguard').'</td>
+									<td>0 — 2.9'.__('s','speedguard').'</td>
+									<td>'.__('Better than average. Probably, your site speed has no direct negative impact on search ranking. Yet, you may significantly improve user experience (which is another important search ranking factor) by reducing site load time. This is especially true for e-commerce websites. In most cases for WordPress websites Speed Index can be improved to 2 seconds without significant changes.','speedguard').'</td>
 									</tr>
 									<tr>
 									<td><span class="speedguard-score score-yellow"></span></td>
-									<td>5s — 7.9'.__('s','speedguard').'</td>
-									<td>'.__('Not bad, but not good either. World average full load time is 6.5s [2018], so this a is mediocre result. Reducing your site load time at least to 4 seconds will help you to outrank your competitors on Google.','speedguard').'</td>
+									<td>3 — 5.9'.__('s','speedguard').'</td>
+									<td>'.__('Not bad, but not good either. Average Speed Index is 6s [2018], so this a is mediocre result. Reducing your site speed index at least to 3 seconds will help you to outrank your competitors on Google.','speedguard').'</td>
 									</tr>
 									<tr>
 									<td><span class="speedguard-score score-red"></span></td>
-									<td>8'.__('s','speedguard').' '.__('and more','speedguard').'</td>
+									<td>6'.__('s','speedguard').' '.__('and more','speedguard').'</td>
 									<td>'.__('Worse than the average. Your SE rankings are definitely harmed by your site speed. There might be a long list of reasons why your website is slow and a lot of work to do. But the good news is, you may see first positive results as soon as you start.','speedguard').'</td>  
 									</tr> 
-									</table>';
+									</table>
+									<p>* Tests are performed from Dulles, VA using Chrome browser and Cable connection (5/1 Mbps, 28ms RTT)</p>';
 		echo $content;
 	}
 	
-	
-	
 	public static function add_new_url_meta_box(){
-		$content = '<form name="speedguard_add_url" id="speedguard_add_url" action="" method="post">   
-		<input type="text" id="speedguard_new_url" name="speedguard_new_url" value="" placeholder="'.__('Start typing the title of the post, page or custom post type...','speedguard').'" autofocus="autofocus"/>
+		$content = '<form name="speedguard_add_url" id="speedguard_add_url"  method="post" action="">   
+		<input class="form-control"  type="text" id="speedguard_new_url" name="speedguard_new_url" value="" placeholder="'.__('Start typing the title of the post, page or custom post type...','speedguard').'" autofocus="autofocus"/>
 		<input type="hidden" id="blog_id" name="blog_id" value="" />
 		<input type="hidden" id="speedguard_new_url_permalink" name="speedguard_new_url_permalink" value=""/> 
 		<input type="hidden" id="speedguard_new_url_id" name="speedguard_new_url_id" value=""/>
@@ -163,6 +162,7 @@ class SpeedGuardWidgets{
 		</form>';
 		echo $content;
 	}
+	
 	public static function credits_meta_box($post = '', $args = ''){
 		$content = Speedguard_WebPageTest::credits_usage(); 
 		echo $content;
