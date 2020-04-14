@@ -32,13 +32,35 @@ class Speedguard_Admin {
 	private $plugin_name; 
 	private $version;
 
-
 	//public function __construct( $plugin_name, $version, $network ) { 
 	public function __construct( $plugin_name, $version ) { 
 		$this->plugin_name = $plugin_name;
 		$this->version = $version;
 		
-		//Only on main site of the Multisite network or for regular WP install
+		
+		//Constants
+		$speedguard_api = Speedguard_Admin::get_this_plugin_option('speedguard_api');		 
+		 if (isset( $speedguard_api['authorized'] ) && $speedguard_api['authorized'] === true) define( 'SPEEDGUARD_WPT_API', true);
+		
+		
+		//Multisite
+		
+		if (!function_exists('is_plugin_active_for_network')) require_once( ABSPATH . '/wp-admin/includes/plugin.php' );
+						 
+		if (is_plugin_active_for_network( 'speedguard/speedguard.php' )) define( 'SPEEDGUARD_MU_NETWORK', true);
+						 
+		if (is_multisite() && !(is_plugin_active_for_network('speedguard/speedguard.php'))) define( 'SPEEDGUARD_MU_PER_SITE', true);
+
+  
+		//Menu items and Admin notices
+		add_action((defined('SPEEDGUARD_MU_NETWORK') ? 'network_' : ''). 'admin_menu', array( $this, 'speedguard_admin_menu' ) );
+  
+		add_action((defined('SPEEDGUARD_MU_NETWORK') ? 'network_' : ''). 'admin_notices', array( $this, 'show_admin_notices'));			
+  
+		
+		
+		
+		//If Network activated don't load stuff on subsites. Load on the main site of the Multisite network or for regular WP install
 		global $blog_id;		
 		if (!(is_plugin_active_for_network( 'speedguard/speedguard.php' )) || (is_plugin_active_for_network( 'speedguard/speedguard.php' )) && (is_main_site($blog_id) )) {
 		require_once plugin_dir_path( __FILE__ ) . '/includes/class.widgets.php';
@@ -46,26 +68,23 @@ class Speedguard_Admin {
 		require_once plugin_dir_path( __FILE__ ) . '/includes/class.tests.php'; 
 		require_once plugin_dir_path( __FILE__ ) . '/includes/class.webpagetest.php'; 
 		require_once plugin_dir_path( __FILE__ ) . '/includes/class.notifications.php'; 		
-		
 		add_action('admin_init', array($this,'speedguard_cpt') );	
 		add_filter('admin_body_class', array( $this, 'body_classes_filter'));
-		add_action( 'load-toplevel_page_speedguard_tests', array( $this, 'not_authorized_redirect' ) );		
-		}		
-			
+		add_action( 'load-toplevel_page_speedguard_tests', array( $this, 'not_authorized_redirect' ) );	
 		
-		//Constants
-		$speedguard_api = Speedguard_Admin::get_this_plugin_option('speedguard_api');	
-        define( 'SpeedGuard_AUTHORIZED', isset( $speedguard_api['authorized'] ) && $speedguard_api['authorized'] ? true : false );
+		}	
+		
+		
+		//???
 		
 		add_action('transition_post_status', array( $this,'guarded_page_unpublished_hook'),10,3);
 		add_action('before_delete_post', array( $this,'before_delete_test_hook'), 10, 1);	
 		
-		//Menu items and Admin notices
-		add_action((THIS_PLUGIN_NETWORK_ACTIVATED ? 'network_' : ''). 'admin_menu', array( $this, 'speedguard_admin_menu' ) );
-		add_action((THIS_PLUGIN_NETWORK_ACTIVATED ? 'network_' : ''). 'admin_notices', array( $this, 'show_admin_notices'));	
+		
 		//MU Headers alredy sent fix
 		add_action('init', array( $this, 'app_output_buffer'));
-		
+
+
 		
 	}
 	
@@ -73,9 +92,13 @@ class Speedguard_Admin {
 
 
 
-
 	function app_output_buffer() {
 	ob_start();
+	}
+	
+	public static function capability() {
+		$capability = 'manage_options';
+		return $capability;
 	}
 	
 	public static function supported_post_types() {
@@ -91,12 +114,12 @@ class Speedguard_Admin {
 		//When test is deleted
 		if  (get_post_type($postid) == Speedguard_Admin::$cpt_name){
 			$guarded_post_id = get_post_meta($postid,'guarded_post_id', true);
-			if (THIS_PLUGIN_NETWORK_ACTIVATED){ 
+			if (defined('SPEEDGUARD_MU_NETWORK')){ 
 				$blog_id = get_post_meta($postid,'guarded_post_blog_id', true); 				
 				switch_to_blog($blog_id);
 			}				
 				update_post_meta($guarded_post_id, 'speedguard_on', 'false');  	 
-			if (THIS_PLUGIN_NETWORK_ACTIVATED) switch_to_blog(get_network()->site_id); 
+			if (defined('SPEEDGUARD_MU_NETWORK')) switch_to_blog(get_network()->site_id); 
 		}
 	}
 	public static function guarded_page_unpublished_hook( $new_status, $old_status, $post ) {
@@ -105,7 +128,7 @@ class Speedguard_Admin {
 					$speedguard_on = get_post_meta($post->ID,'speedguard_on', true);
 					if ($speedguard_on && $speedguard_on[0] == 'true'){						
 						//delete test on the main blog
-						if (THIS_PLUGIN_NETWORK_ACTIVATED) switch_to_blog(1);    
+						if (defined('SPEEDGUARD_MU_NETWORK')) switch_to_blog(1);    
 						$args = array(
 							'post_type' => Speedguard_Admin::$cpt_name,   
 							'post_status' => 'publish',
@@ -121,7 +144,7 @@ class Speedguard_Admin {
 							foreach ($connected_guarded_page as $connected_guarded_page_id){
 								wp_delete_post( $connected_guarded_page_id, true); 
 							}
-						if (THIS_PLUGIN_NETWORK_ACTIVATED) restore_current_blog();  						
+						if (defined('SPEEDGUARD_MU_NETWORK')) restore_current_blog();  						
 						//uncheck speedguard_on
 						update_post_meta($post->ID, 'speedguard_on', 'false');  	 
 						endif;
@@ -132,10 +155,10 @@ class Speedguard_Admin {
 
 	public static function speedguard_page_url($page) {
 		if ($page == 'tests'){
-			$admin_page_url = THIS_PLUGIN_NETWORK_ACTIVATED ? network_admin_url('admin.php?page=speedguard_tests'): admin_url('admin.php?page=speedguard_tests');
+			$admin_page_url = defined('SPEEDGUARD_MU_NETWORK') ? network_admin_url('admin.php?page=speedguard_tests'): admin_url('admin.php?page=speedguard_tests');
 		}
 		else if ($page == 'settings'){ 
-			$admin_page_url = THIS_PLUGIN_NETWORK_ACTIVATED ? network_admin_url('admin.php?page=speedguard_settings'): admin_url('admin.php?page=speedguard_settings');
+			$admin_page_url = defined('SPEEDGUARD_MU_NETWORK') ? network_admin_url('admin.php?page=speedguard_settings'): admin_url('admin.php?page=speedguard_settings');
 		} 
 		return $admin_page_url;
 	}	 
@@ -143,7 +166,7 @@ class Speedguard_Admin {
 	 
 	// Wordpress functions 'get_site_option' and 'get_option'
 	public static function get_this_plugin_option($option_name) {
-		if('THIS_PLUGIN_NETWORK_ACTIVATED'== true) {
+		if(defined('SPEEDGUARD_MU_NETWORK')) {
 			return get_site_option($option_name);
 		}
 		else {  
@@ -152,7 +175,7 @@ class Speedguard_Admin {
 	}
 	// Wordpress functions 'update_site_option' and 'update_option'
 	public static function update_this_plugin_option($option_name, $option_value) {
-		if('THIS_PLUGIN_NETWORK_ACTIVATED'== true) {
+		if(defined('SPEEDGUARD_MU_NETWORK')) {
 			return update_site_option($option_name, $option_value);
 		}
 		else {
@@ -161,7 +184,7 @@ class Speedguard_Admin {
 	}
 	// Wordpress functions 'delete_site_option' and 'delete_option'
 	public static function delete_this_plugin_option($option_name) {
-		if('THIS_PLUGIN_NETWORK_ACTIVATED' === true) {
+		if(defined('SPEEDGUARD_MU_NETWORK')) {
 			return delete_site_option($option_name);
 		}
 		else {
@@ -170,7 +193,7 @@ class Speedguard_Admin {
 	}
 	
 	function not_authorized_redirect() { 		
-		if (!SpeedGuard_AUTHORIZED){			
+		if (! defined('SPEEDGUARD_WPT_API')){			
 			wp_safe_redirect(Speedguard_Admin::speedguard_page_url('settings')); 
 			exit;
 		}
@@ -211,7 +234,8 @@ class Speedguard_Admin {
 	//Plugin Styles
 	public function enqueue_styles() { 
 		if (Speedguard_Admin::is_screen('dashboard,settings,tests')){		
-			wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'assets/css/speedguard-admin.css', array(), $this->version ); 
+			//wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'assets/css/speedguard-admin.css', array(), $this->version ); 
+			wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'assets/css/speedguard-admin.css', array(), date('h:i:s') ); 
 		}
 	}
 	//Plugin Scripts 
@@ -235,7 +259,7 @@ class Speedguard_Admin {
 	function body_classes_filter($classes) {		
 		if (Speedguard_Admin::is_screen('settings,tests,dashboard')){	
 			$speedguard_average = Speedguard_Admin::get_this_plugin_option('speedguard_average' );
-			if ( ($speedguard_average['guarded_pages_count'] < 1) ) $classes = $classes.' no-guarded-pages'; 		
+			if ( isset($speedguard_average['guarded_pages_count']) && ($speedguard_average['guarded_pages_count'] < 1) ) $classes = $classes.' no-guarded-pages'; 		
 		} 
 		if (Speedguard_Admin::is_screen('plugins')){	
 			if (get_transient('speedguard-notice-activation')){
@@ -247,27 +271,26 @@ class Speedguard_Admin {
 	}
 	//Plugin Item in Admin Menu
 	function speedguard_admin_menu() {
-		$this->main_page = add_menu_page(__( 'SpeedGuard', 'speedguard' ), __( 'SpeedGuard', 'speedguard' ), 'update_core', 'speedguard_tests', array( 'SpeedGuard_Tests', 'tests_page'),'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz48IURPQ1RZUEUgc3ZnIFs8IUVOVElUWSBuc19mbG93cyAiaHR0cDovL25zLmFkb2JlLmNvbS9GbG93cy8xLjAvIj5dPjxzdmcgdmVyc2lvbj0iMS4yIiBiYXNlUHJvZmlsZT0idGlueSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgeG1sbnM6YT0iaHR0cDovL25zLmFkb2JlLmNvbS9BZG9iZVNWR1ZpZXdlckV4dGVuc2lvbnMvMy4wLyIgeD0iMHB4IiB5PSIwcHgiIHdpZHRoPSI5MXB4IiBoZWlnaHQ9IjkxcHgiIHZpZXdCb3g9Ii0wLjUgLTAuNSA5MSA5MSIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+PGRlZnM+PC9kZWZzPjxwYXRoIGZpbGw9IiM4Mjg3OEMiIGQ9Ik04NS42NDYsNDAuNjQ1Yy0yLjQwNCwwLTQuMzU1LDEuOTUyLTQuMzU1LDQuMzU1YzAsMjAuMDEzLTE2LjI3NywzNi4yOS0zNi4yOSwzNi4yOUMyNC45ODgsODEuMjksOC43MDksNjUuMDEzLDguNzA5LDQ1QzguNzA5LDI0Ljk4OCwyNC45ODgsOC43MDksNDUsOC43MDljMi40MDQsMCw0LjM1NC0xLjk1MSw0LjM1NC00LjM1NFM0Ny40MDQsMCw0NSwwQzIwLjE4NywwLDAsMjAuMTg3LDAsNDVjMCwyNC44MTQsMjAuMTg3LDQ1LDQ1LDQ1YzI0LjgxNCwwLDQ1LTIwLjE4Niw0NS00NUM5MCw0Mi41OTcsODguMDQ5LDQwLjY0NSw4NS42NDYsNDAuNjQ1eiIvPjxwYXRoIGZpbGw9IiM4Mjg3OEMiIGQ9Ik00Ny4zMiwzMC42MjRjLTEuMjM2LDEuODA1LTEuOTIzLDMuODA5LTIuMzkzLDUuNjc1Yy00Ljc3NiwwLjA0MS04LjYzNywzLjkyLTguNjM3LDguNzAxYzAsNC44MDcsMy45MDIsOC43MSw4LjcwOSw4LjcxYzQuODA3LDAsOC43MS0zLjkwMyw4LjcxLTguNzFjMC0xLjE1OC0wLjIzOC0yLjI1OS0wLjY0OC0zLjI3MmMxLjU0My0xLjE0OSwzLjEyOC0yLjU1NSw0LjMyNC00LjM5NmMxLjI5MS0yLjA4MywxLjkyNS00LjgwOCwzLjA5NC03LjE3N2MxLjExOS0yLjM5OCwyLjI4NC00Ljc3MSwzLjIzNi03LjA3OGMxLjAwNi0yLjI3OSwxLjg3Ny00LjQ1LDIuNjMxLTYuMzA5YzEuNDg3LTMuNzI1LDIuMzYxLTYuMjg2LDIuMzYxLTYuMjg2YzAuMDY3LTAuMTk3LDAuMDMyLTAuNDI0LTAuMTE2LTAuNTkyYy0wLjIyMS0wLjI1LTAuNjAyLTAuMjczLTAuODQ4LTAuMDU2YzAsMC0yLjAyNiwxLjc5NC00Ljg5Nyw0LjYwMmMtMS40MjMsMS40MDgtMy4wOTIsMy4wNTItNC44MTEsNC44NTRjLTEuNzY3LDEuNzY5LTMuNTA0LDMuNzU3LTUuMjkxLDUuNzEzQzUxLjAxOSwyNi45OTQsNDguNzQ4LDI4LjYyNiw0Ny4zMiwzMC42MjR6Ii8+PC9zdmc+','81');
-    $this->tests_page_hook = add_submenu_page('speedguard_tests', __('Speed Tests','speedguard'), __('Speed Tests','speedguard'), 'update_core', 'speedguard_tests' ); 
-    $this->settings_page_hook = add_submenu_page('speedguard_tests',  __( 'Settings', 'speedguard' ),  __( 'Settings', 'speedguard' ), 'update_core', 'speedguard_settings',array( 'SpeedGuard_Settings', 'my_settings_page_function') );		
+		$this->main_page = add_menu_page(__( 'SpeedGuard', 'speedguard' ), __( 'SpeedGuard', 'speedguard' ), 'manage_options', 'speedguard_tests', array( 'SpeedGuard_Tests', 'tests_page'),'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz48IURPQ1RZUEUgc3ZnIFs8IUVOVElUWSBuc19mbG93cyAiaHR0cDovL25zLmFkb2JlLmNvbS9GbG93cy8xLjAvIj5dPjxzdmcgdmVyc2lvbj0iMS4yIiBiYXNlUHJvZmlsZT0idGlueSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgeG1sbnM6YT0iaHR0cDovL25zLmFkb2JlLmNvbS9BZG9iZVNWR1ZpZXdlckV4dGVuc2lvbnMvMy4wLyIgeD0iMHB4IiB5PSIwcHgiIHdpZHRoPSI5MXB4IiBoZWlnaHQ9IjkxcHgiIHZpZXdCb3g9Ii0wLjUgLTAuNSA5MSA5MSIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+PGRlZnM+PC9kZWZzPjxwYXRoIGZpbGw9IiM4Mjg3OEMiIGQ9Ik04NS42NDYsNDAuNjQ1Yy0yLjQwNCwwLTQuMzU1LDEuOTUyLTQuMzU1LDQuMzU1YzAsMjAuMDEzLTE2LjI3NywzNi4yOS0zNi4yOSwzNi4yOUMyNC45ODgsODEuMjksOC43MDksNjUuMDEzLDguNzA5LDQ1QzguNzA5LDI0Ljk4OCwyNC45ODgsOC43MDksNDUsOC43MDljMi40MDQsMCw0LjM1NC0xLjk1MSw0LjM1NC00LjM1NFM0Ny40MDQsMCw0NSwwQzIwLjE4NywwLDAsMjAuMTg3LDAsNDVjMCwyNC44MTQsMjAuMTg3LDQ1LDQ1LDQ1YzI0LjgxNCwwLDQ1LTIwLjE4Niw0NS00NUM5MCw0Mi41OTcsODguMDQ5LDQwLjY0NSw4NS42NDYsNDAuNjQ1eiIvPjxwYXRoIGZpbGw9IiM4Mjg3OEMiIGQ9Ik00Ny4zMiwzMC42MjRjLTEuMjM2LDEuODA1LTEuOTIzLDMuODA5LTIuMzkzLDUuNjc1Yy00Ljc3NiwwLjA0MS04LjYzNywzLjkyLTguNjM3LDguNzAxYzAsNC44MDcsMy45MDIsOC43MSw4LjcwOSw4LjcxYzQuODA3LDAsOC43MS0zLjkwMyw4LjcxLTguNzFjMC0xLjE1OC0wLjIzOC0yLjI1OS0wLjY0OC0zLjI3MmMxLjU0My0xLjE0OSwzLjEyOC0yLjU1NSw0LjMyNC00LjM5NmMxLjI5MS0yLjA4MywxLjkyNS00LjgwOCwzLjA5NC03LjE3N2MxLjExOS0yLjM5OCwyLjI4NC00Ljc3MSwzLjIzNi03LjA3OGMxLjAwNi0yLjI3OSwxLjg3Ny00LjQ1LDIuNjMxLTYuMzA5YzEuNDg3LTMuNzI1LDIuMzYxLTYuMjg2LDIuMzYxLTYuMjg2YzAuMDY3LTAuMTk3LDAuMDMyLTAuNDI0LTAuMTE2LTAuNTkyYy0wLjIyMS0wLjI1LTAuNjAyLTAuMjczLTAuODQ4LTAuMDU2YzAsMC0yLjAyNiwxLjc5NC00Ljg5Nyw0LjYwMmMtMS40MjMsMS40MDgtMy4wOTIsMy4wNTItNC44MTEsNC44NTRjLTEuNzY3LDEuNzY5LTMuNTA0LDMuNzU3LTUuMjkxLDUuNzEzQzUxLjAxOSwyNi45OTQsNDguNzQ4LDI4LjYyNiw0Ny4zMiwzMC42MjR6Ii8+PC9zdmc+','81');
+    $this->tests_page_hook = add_submenu_page('speedguard_tests', __('Speed Tests','speedguard'), __('Speed Tests','speedguard'), 'manage_options', 'speedguard_tests' ); 
+    $this->settings_page_hook = add_submenu_page('speedguard_tests',  __( 'Settings', 'speedguard' ),  __( 'Settings', 'speedguard' ), 'manage_options', 'speedguard_settings',array( 'SpeedGuard_Settings', 'my_settings_page_function') );		
 	}   
 	//Plugin Admin Notices	
 	public static function set_notice( $message, $class) {  return "<div class='notice notice-$class is-dismissible'><p>$message</p></div>"; }
-	public static function show_admin_notices() {	
-
-		if (!current_user_can('update_core')) return;
-	 
+	public static function show_admin_notices() {
+	$speedguard_average = Speedguard_Admin::get_this_plugin_option('speedguard_average' );	
+		if (!current_user_can('manage_options')) return;
 			$speedguard_options = Speedguard_Admin::get_this_plugin_option('speedguard_options' );
 			$speedguard_api_key = Speedguard_Admin::get_this_plugin_option('speedguard_api' );
 			$api_key = $speedguard_api_key['api_key'];		
-		if (!(SpeedGuard_AUTHORIZED) && !(Speedguard_Admin::is_screen('settings'))){
-			$message = sprintf(__( 'To start monitoring your site load time, please %1$senter API Key%2$s!', 'speedguard' ),'<a href="' .Speedguard_Admin::speedguard_page_url('settings'). '" target="_blank">','</a>'); 			
+		if (!defined('SPEEDGUARD_WPT_API') && !(Speedguard_Admin::is_screen('settings'))){
+			$message = sprintf(__( 'To start monitoring your site load time, please %1$senter API Key%2$s!', 'speedguard' ),'<a href="' .Speedguard_Admin::speedguard_page_url('settings'). '">','</a>'); 			
 			$notices =  Speedguard_Admin::set_notice( $message,'warning' );	  
 		}
-		else if ($api_key && !(SpeedGuard_AUTHORIZED) && (Speedguard_Admin::is_screen('settings'))){
+		else if ($api_key && (!defined('SPEEDGUARD_WPT_API')) && (Speedguard_Admin::is_screen('settings'))){
 			$notices = Speedguard_Admin::set_notice(__('API key you have entered is not valid.','speedguard'),'error' );	 
 		}
-		else if ((SpeedGuard_AUTHORIZED) && !(Speedguard_Admin::is_screen('tests')) && !((Speedguard_Admin::get_this_plugin_option('speedguard_average')['guarded_pages_count']) > 0) ) {
+		else if (defined('SPEEDGUARD_WPT_API') && !(Speedguard_Admin::is_screen('tests')) && (!isset($speedguard_average['guarded_pages_count']) )) {
 			$message = sprintf(__( 'Everything is ready to test your site speed! %1$sAdd some pages%2$s to start testing.', 'speedguard' ),'<a href="' .Speedguard_Admin::speedguard_page_url('tests'). '">','</a>');
 			$notices =  Speedguard_Admin::set_notice( $message,'warning' );	  
 		}

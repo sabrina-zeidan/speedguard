@@ -221,46 +221,53 @@ class SpeedGuard_Tests{
  function speedguard_rest_api_search( $request ) {
 		if ( empty( $request['term'] ) ) {
 			return;
-		}
-		$already_guarded_posts_titles = array();				
+		}		
+		function speedguard_search($request){
 			$args = array(
-				'post_type' => 'guarded-page',
-				'post_status' => 'publish',
-				'posts_per_page'   => -1, 
-				'no_found_rows' => true
-			);		
-			$the_query = new WP_Query( $args );
-			$already_guarded_posts = $the_query->get_posts();
-			wp_reset_postdata();
-		$already_guarded_posts_titles = wp_list_pluck( $already_guarded_posts, 'post_title' );		
-		
-				$args = array(
 				'post_type' => SpeedGuard_Admin::supported_post_types(),
 				'post_status' => 'publish',
 				'posts_per_page'   => -1,
 				'fields'   => 'ids',
 				's'             => $request['term'],
-				'no_found_rows' => true, 
+				'no_found_rows' => true,  
+				'update_post_meta_cache' => false,
+				'update_post_term_cache' => false
 				);
-				$the_query = new WP_Query( $args );
-				$posts = $the_query->get_posts();
-				if( $posts ) :
-						foreach( $posts as $k => $p ) {	
-							$permalink = get_permalink($p);						
-							if (!in_array($permalink, $already_guarded_posts_titles)) {
-								if (THIS_PLUGIN_NETWORK_ACTIVATED) switch_to_blog($p['blog_id']);
-								if (THIS_PLUGIN_NETWORK_ACTIVATED) $source[$k]['blog_id'] = $p['blog_id'];
-								$source[$k]['ID'] = THIS_PLUGIN_NETWORK_ACTIVATED ? $p['ID'] : $p ;
-								$source[$k]['permalink'] = get_permalink( $source[$k]['ID']);
-								$source[$k]['label'] = get_the_title( $source[$k]['ID']);
-								if (THIS_PLUGIN_NETWORK_ACTIVATED) restore_current_blog();
-							}		
-							
-						} 	
-				endif;
-				wp_reset_postdata();
-			return $source;
-				
+			$the_query = new WP_Query( $args );								
+			$this_blog_found_posts = $the_query->get_posts();
+				$temp = array();
+				foreach( $this_blog_found_posts as $key => $post_id) { 
+					$key = 'ID';
+					$temp = array(
+						'ID' => $post_id,
+						'permalink' => get_permalink($post_id),
+						'blog_id' =>  get_current_blog_id(),
+						'label' => get_the_title($post_id)
+						);
+					$posts[] = $temp;											
+				}				
+			return $posts;
+		}
+
+		//search all blogs if Network Activated
+		if (defined('SPEEDGUARD_MU_NETWORK')) {     
+				$sites = get_sites();
+				$posts = array();				
+				foreach ($sites as $site ) {
+					$blog_id = $site->blog_id;				
+					switch_to_blog( $blog_id );
+						$this_blog_posts = speedguard_search($request);
+						$posts = array_merge($posts, $this_blog_posts);
+					restore_current_blog();	 				
+				}//endforeach					
+		}//endif network
+		else {		
+			$posts = speedguard_search($request);
+		}
+ 		
+		return $posts;	
+
+	
 	}
 
 	public static function handle_bulk_retest_load_time($doaction,$post_ids) {
@@ -286,7 +293,7 @@ class SpeedGuard_Tests{
 		}
 	}
 	
-	function webpagetest_update_waiting_ajax_function() {
+	public static function webpagetest_update_waiting_ajax_function() {
 		$post_ids = json_decode(stripslashes($_POST['post_ids']));
 		  $results = array();
 			foreach($post_ids as $guarded_page_id){
@@ -313,7 +320,7 @@ class SpeedGuard_Tests{
 					'html' => $guarded_page_id,
 					'test_link' => $webpagetest_request_test_results_link,
 					'status' => $webpagetest_request_test_results["statusCode"],
-					'average_speed_index' => $average_speed_index,
+					'average_speed_index' => isset($average_speed_index) ? $average_speed_index : '' ,
 				));	
 			}//foreach
 			echo json_encode ( $results );
@@ -333,9 +340,10 @@ class SpeedGuard_Tests{
 					}
 					//if it IS an url
 					else {
-						//if it belongs to the current domain? !!what about MU?						
 						$entered_domain = parse_url($direct_input);
-						if ($_SERVER['SERVER_NAME'] != $entered_domain['host']){
+						//if it belongs to the current domain and it's not PRO		
+						
+						if (($_SERVER['SERVER_NAME'] != $entered_domain['host']) && !defined('SPEEDGUARD_PRO')) {
 							//if no					
 							$redirect_to = add_query_arg( 'speedguard', 'add_new_url_error_not_current_domain');
 						}
@@ -363,16 +371,16 @@ class SpeedGuard_Tests{
 						'post_type'   => SpeedGuard_Admin::$cpt_name,	 
 						);												
 						
-						if (THIS_PLUGIN_NETWORK_ACTIVATED) switch_to_blog(get_network()->site_id);   
+						if (defined('SPEEDGUARD_MU_NETWORK')) switch_to_blog(get_network()->site_id);   
 						$target_page_id = wp_insert_post( $new_target_page );  
 						if ($guarded_post_blog_id) $update_field = update_post_meta($target_page_id, 'guarded_post_blog_id', $guarded_post_blog_id);  
 						if ($guarded_post_id) $update_field = update_post_meta($target_page_id, 'guarded_post_id', $guarded_post_id);   
-						if (THIS_PLUGIN_NETWORK_ACTIVATED) restore_current_blog(); 
+						if (defined('SPEEDGUARD_MU_NETWORK')) restore_current_blog(); 
 													
-						if (THIS_PLUGIN_NETWORK_ACTIVATED) switch_to_blog($guarded_post_blog_id);   
+						if (defined('SPEEDGUARD_MU_NETWORK')) switch_to_blog($guarded_post_blog_id);   
 						//check url as guarded
 						$update_field = update_post_meta($guarded_post_id, 'speedguard_on', array('true',$target_page_id) );
-						if (THIS_PLUGIN_NETWORK_ACTIVATED) restore_current_blog(); 
+						if (defined('SPEEDGUARD_MU_NETWORK')) restore_current_blog(); 
 						//start test 
 						$start_test = SpeedGuard_WebPageTest::webpagetest_new_test($target_page_id);	
 						$redirect_to = add_query_arg( 'speedguard', 'new_url_added');	 	

@@ -7,11 +7,14 @@ class SpeedGuard_Notifications{
 	function __construct(){
 	}    
 	function test_results_email($type) {	
-		if (SpeedGuard_AUTHORIZED){
+		if (defined ('SPEEDGUARD_WPT_API')){
 			$speedguard_options = Speedguard_Admin::get_this_plugin_option('speedguard_options' );	
-			$admin_email = $speedguard_options['email_me_at'];
-			$site_url = str_replace( 'http://', '', get_home_url() );   
-			$site_date = get_date_from_gmt(date('Y-m-d H:i:s',time()),'Y-m-d H:i:s');
+			$admin_email = $speedguard_options['email_me_at']; 
+			$site_url = parse_url(get_home_url());							
+			$site_url = $site_url['host'];					
+			//$site_date = get_date_from_gmt(date('Y-m-d H:i:s',time()),'Y-m-d H:i:s');
+			$average_site_speed = Speedguard_Admin::get_this_plugin_option('speedguard_average');
+			$average_site_speed = $average_site_speed['average_load_time'];
 			$critical_load_time = $speedguard_options['critical_load_time'];
 			if ($type == 'critical_load_time'){
 				$subject = sprintf(__('%1$s is slow [SpeedGuard]','speedguard'),$site_url); 
@@ -30,7 +33,7 @@ class SpeedGuard_Notifications{
 							'key'       => 'load_time',
 							'value' => 0, 
 							'compare' => '>',
-							'type' => 'DECIMAL',
+							'type' => 'DECIMAL', 
 						 )
 					),
 				'no_found_rows' => true 
@@ -39,21 +42,27 @@ class SpeedGuard_Notifications{
 			$guarded_pages = $the_query->get_posts();			
 				if( $guarded_pages ) :	
 					ob_start();
-							echo '<html><head><title>'.__('SpeedGuard Report','speedguard').'</title></head>
-									<body style="padding-top: 50px; padding-bottom: 50px;  background:#f5f5f5;" >
-										<table align="center" width="560" bgcolor="#fff" border="0" cellspacing="0" >  
+							echo '<html><head>
+							<title>'.__('SpeedGuard Report','speedguard').'</title>
+							<style>
+							table {border-collapse: collapse;width: 560px; margin-top: 2em;}
+							th, td {text-align: left; padding: 8px;	}
+							tr:nth-child(even) {background-color: #f2f2f2;}
+							</style>
+							</head>
+									<body style="padding-top: 50px; padding-bottom: 50px;  background:#fff; color:#000;" >
+										<table align="center">  
 											<tr>
-												<td style="padding: 10px;" bgcolor="#c1e6fd" align="left"><p style="text-align:right; font-size: 1.2em; font-weight: bold;" >'.__('SpeedGuard Report for','speedguard').' '.$site_url.'<span style="font-weight:100;"> ['.$site_date.']</span></p><p style="text-align:right; font-size: 0.9em; color:#5f5a5a;">'.sprintf(__('You can stop guarding URLs or add new on %1$sSpeedGuard Tests%2$s page','speedguard'),'<a href="'.Speedguard_Admin::speedguard_page_url('tests').'" target="_blank">','</a>').'</p></td> 
+												<td style="padding: 10px;" bgcolor="#f7f7f7"><p style="text-align:center; font-size: 1.2em; font-weight: bold;" >'.__('Average site speed is','speedguard').' '.$average_site_speed.'s</p></td> 
 											</tr>
-											<tr>
+											<tr> 
 												<td width="100%" style="padding: 0;">';
 													if (isset($note)) echo '<br>'.$note;						
-													echo '<table width="100%" style="margin-top: 2em; border-collapse: collapse;">  
+													echo '<table>  
 													<thead><tr style="border: 1px solid #ccc;" >
 													<td>'. __( 'URL', 'speedguard' ).'</td>
 													<td>'. __( 'Load time', 'speedguard' ).'</td>
 													<td>'. __( 'Report', 'speedguard' ).'</td>
-													<td>'. __( 'Updated', 'speedguard' ).'</td>
 													</tr></thead><tbody>';			
 													
 														foreach($guarded_pages as $guarded_page_id) {  
@@ -64,22 +73,22 @@ class SpeedGuard_Notifications{
 															$updated = get_date_from_gmt($gmt_report_date,'Y-m-d H:i:s');							
 														echo '<tr style="border: 1px solid #ccc;">
 															<td>'.$guarded_page_url.'</td>
-															<td style="padding: 1em 0;">'.$guarded_page_load_time.'</td> 
-															<td><a href="'.$report_link.'" target="_blank">'.__('Report','speedguard').'</a></td>
-															<td style="font-size:0.8em;">'.$updated.'</td>
+															<td>'.$guarded_page_load_time.'</td> 
+															<td><a href="'.$report_link.'" target="_blank">'.__('Report','speedguard').'</a></td>															
 															</tr>';
 														} 
 													
 													echo '</tbody>
-													</table>
+													</table>													
 													<div style="padding: 1em; color:#000;"> 
-													<p style="font-size: 1.2em; font-weight: bold;" >'.__('Why is my website so slow?','speedguard').'</p>
-													'.str_replace( "utm_medium=sidebar", "utm_medium=email_report", SpeedGuardWidgets::tips_meta_box()).'
+													<p style="font-size: 1.2em; font-weight: bold;" >'.__('Why is my website so slow?','speedguard').'</p>';											
+													str_replace( "utm_medium=sidebar", "utm_medium=email_report", SpeedGuardWidgets::tips_meta_box()); 		
+													echo '
 													</div>
 												</td> 
 											</tr>
 											<tr>
-												<td style="padding: 10px;" bgcolor="#e6e1e1" align="right"><p style="color:#5f5a5a; text-align:right; font-size: 0.9em;">'.sprintf(__('This report was requested by administrator of %1$s','speedguard'),$site_url).'<p style="color:#5f5a5a; text-align:right; font-size: 0.9em;">'.sprintf(__('You can change SpeedGuard notification settings %1$shere%2$s any time.','speedguard'),'<a href="'.Speedguard_Admin::speedguard_page_url('settings').'" target="_blank">','</a>').'</td>
+												<td style="padding: 10px;color:#5f5a5a; text-align:right; font-size: 0.9em;" bgcolor="#e6e1e1" align="right">'.sprintf(__('This report was requested by administrator of %1$s','speedguard'),$site_url).'. '.sprintf(__('You can change SpeedGuard notification settings %1$shere%2$s any time.','speedguard'),'<a href="'.Speedguard_Admin::speedguard_page_url('settings').'" target="_blank">','</a>').'</td>
 											</tr>
 										</table>
 									</body>

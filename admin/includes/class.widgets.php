@@ -6,21 +6,16 @@
 class SpeedGuardWidgets{
 	function __construct(){ 
 		$options = Speedguard_Admin::get_this_plugin_option( 'speedguard_options' );
-			if ($options['show_dashboard_widget'] === 'on'){			
-			add_action( 'wp_'.(THIS_PLUGIN_NETWORK_ACTIVATED ? 'network_' : ''). 'dashboard_setup', array( &$this,'speedguard_dashboard_widget') ); 
-		} 
-		if ($options['show_ab_widget'] === 'on'){	add_action( 'admin_bar_menu', array( $this,'speedguard_admin_bar_widget'),710);}
+		if ($options['show_dashboard_widget'] === 'on')	add_action( 'wp_'.(defined('SPEEDGUARD_MU_NETWORK') ? 'network_' : ''). 'dashboard_setup', array( &$this,'speedguard_dashboard_widget') ); 
+		if ($options['show_ab_widget'] === 'on') add_action( 'admin_bar_menu', array( $this,'speedguard_admin_bar_widget'),710);
 	}
-/** Admin Bar widget */
+
 	function speedguard_admin_bar_widget($wp_admin_bar ) { 
-		if((current_user_can('update_core'))&&(is_singular(SpeedGuard_Admin::supported_post_types()))) {
-			global $post; 
-		
+		if((current_user_can('manage_options'))&&(is_singular(SpeedGuard_Admin::supported_post_types()))) {
+			global $post; 		
 				$speedguard_on = get_post_meta($post->ID,'speedguard_on', true);
 				if ($speedguard_on && $speedguard_on[0] == 'true'){
-						//var_dump($post);
 					$page_load_speed = get_post_meta($speedguard_on[1],'load_time', true);
-					//var_dump($page_load_speed);
 					if ($page_load_speed != "waiting") { 					
 						$title = sprintf(__( '%1$ss', 'speedguard' ),$page_load_speed);	
 						$href = Speedguard_Admin::speedguard_page_url('tests').'#speedguard-add-new-url-meta-box';
@@ -32,10 +27,7 @@ class SpeedGuardWidgets{
 						$href = Speedguard_Admin::speedguard_page_url('tests').'#speedguard-add-new-url-meta-box';
 						$class = get_post_meta($speedguard_on[1],'load_time_score', true); 
 						$atitle = __('Results are currently being updated','speedguard');
-					}
-					
-					
-					
+					}					
 				}
 				else {
 					$add_url_link = add_query_arg( array(
@@ -52,7 +44,8 @@ class SpeedGuardWidgets{
 					$href = Speedguard_Admin::speedguard_page_url('tests');
 					$class='';
 					$atitle='';
-					}
+				}
+			
 			$args = array( 
 				'id'    => 'speedguard_ab',
 				'title' => $title,
@@ -66,21 +59,20 @@ class SpeedGuardWidgets{
 			$wp_admin_bar->add_node( $args );
 		}
 	}
-/** Dashboard widget */
 	function speedguard_dashboard_widget() {  
 		wp_add_dashboard_widget('speedguard_dashboard_widget', __('Site Speed Results [Speedguard]','speedguard'), array($this,'speedguard_dashboard_widget_function'),'',array( 'echo' => 'true'));	
 		//Widget position
-		global $wp_meta_boxes;
-		$normal_dashboard = $wp_meta_boxes['dashboard'.(THIS_PLUGIN_NETWORK_ACTIVATED?'-network' :'')]['normal']['core']; 
-		$example_widget_backup = array( 'speedguard_dashboard_widget' => $normal_dashboard['speedguard_dashboard_widget'] );
-		unset( $normal_dashboard['speedguard_dashboard_widget'] ); 
-		$sorted_dashboard = array_merge( $example_widget_backup, $normal_dashboard );
-		$wp_meta_boxes['dashboard']['normal']['core'] = $sorted_dashboard;
-	}
-	
+			global $wp_meta_boxes;
+			$normal_dashboard = $wp_meta_boxes['dashboard'.(defined('SPEEDGUARD_MU_NETWORK') ?'-network' :'')]['normal']['core']; 
+			$example_widget_backup = array( 'speedguard_dashboard_widget' => $normal_dashboard['speedguard_dashboard_widget'] );
+			unset( $normal_dashboard['speedguard_dashboard_widget'] ); 
+			$sorted_dashboard = array_merge( $example_widget_backup, $normal_dashboard );
+			$wp_meta_boxes['dashboard']['normal']['core'] = $sorted_dashboard;
+	}	
 	public static function speedguard_dashboard_widget_function($post = '', $args = '') {
 			$speedguard_average = Speedguard_Admin::get_this_plugin_option('speedguard_average' );	
-			$average_load_time = $speedguard_average['average_load_time'];
+			//var_dump($speedguard_average);	
+			if (is_array($speedguard_average)) 	$average_load_time = $speedguard_average['average_load_time'];
 					if (isset($average_load_time)){
 						$min_load_time = $speedguard_average['min_load_time'];
 						$max_load_time = $speedguard_average['max_load_time'];			
@@ -99,8 +91,6 @@ class SpeedGuardWidgets{
 					);
 					}
 					echo $content;
-					/**if (isset($args['args']['echo'])){ echo $content; } 
-					else {return $content;}**/
 		}
 
 	/*Meta boxes*/ 
@@ -108,17 +98,15 @@ class SpeedGuardWidgets{
 		wp_nonce_field('closedpostboxes', 'closedpostboxesnonce', false ); 		
 		add_meta_box( 'api-meta-box', __('API Key','speedguard'), array('SpeedGuard_Settings','api_meta_box'), '', 'api', 'core' );
 		
-		if (SpeedGuard_AUTHORIZED){			
+		if (defined('SPEEDGUARD_WPT_API')){			
 			add_meta_box( 'settings-meta-box', __('SpeedGuard Settings','speedguard'), array('SpeedGuard_Settings','settings_meta_box'), '', 'normal', 'core' );		
 			add_meta_box( 'speedguard-speedresults-meta-box', __('Site Speed Results','speedguard'), array('SpeedGuardWidgets', 'speedguard_dashboard_widget_function'			), '', 'main-content', 'core' );
 			add_meta_box( 'speedguard-add-new-url-meta-box', __('Add new','speedguard'), array('SpeedGuardWidgets', 'add_new_url_meta_box'), '', 'main-content', 'core' );
 			add_meta_box( 'tests-list-meta-box', __('Test results','speedguard'), array('SpeedGuard_Tests', 'tests_list_metabox' ), '', 'main-content', 'core' );
-			add_meta_box( 'speed-score-legend-meta-box',__('Speed Score','speedguard'), array('SpeedGuardWidgets', 'speed_score_legend_meta_box'), '', 'main-content', 'core' );
-			
-			
-			
+			add_meta_box( 'speed-score-legend-meta-box',__('Speed Score','speedguard'), array('SpeedGuardWidgets', 'speed_score_legend_meta_box'), '', 'main-content', 'core' );	
 			add_meta_box( 'speedguard-api-credits-meta-box', __('API Credits','speedguard'), array('SpeedGuard_Settings','credits_meta_box'),'','side','core'); 
-			add_meta_box( 'speedguard-tips-meta-box', __('Why is my website so slow?','speedguard'), array('SpeedGuard_Settings', 'tips_meta_box' ), '', 'side', 'core' ); 			
+			add_meta_box( 'speedguard-tips-meta-box', __('Why is my website so slow?','speedguard'), array('SpeedGuard_Settings', 'tips_meta_box' ), '', 'side', 'core' ); 	
+			add_meta_box( 'speedguard-about-meta-box', __('Do you like this plugin?','speedguard'), array('SpeedGuardWidgets', 'about_meta_box' ), '', 'side', 'core' );			
 			add_filter( "postbox_classes_speedguard_page_speedguard_settings_api-meta-box", 'minify_my_metabox' );						
 						function minify_my_metabox( $classes ) {
 							array_push( $classes, 'closed' );
@@ -147,10 +135,9 @@ class SpeedGuardWidgets{
 									<td>'.__('Worse than the average. Your SE rankings are definitely harmed by your site speed. There might be a long list of reasons why your website is slow, and potentially a lot of work to do. But the good news is, you may see the first positive results as soon as you start.','speedguard').'</td>  
 									</tr> 
 									</table>
-									<p>* Tests are performed from Dulles, VA using Chrome browser and Cable connection (5/1 Mbps, 28ms RTT)</p>';
+									';
 		echo $content;
 	}
-	
 	public static function add_new_url_meta_box(){
 		$content = '<form name="speedguard_add_url" id="speedguard_add_url"  method="post" action="">   
 		<input class="form-control"  type="text" id="speedguard_new_url" name="speedguard_new_url" value="" placeholder="'.__('Start typing the title of the post, page or custom post type...','speedguard').'" autofocus="autofocus"/>
@@ -162,18 +149,12 @@ class SpeedGuardWidgets{
 		</form>';
 		echo $content;
 	}
-	
 	public static function credits_meta_box($post = '', $args = ''){
 		$content = Speedguard_WebPageTest::credits_usage(); 
 		echo $content;
-		/**
-		if (isset($args['args']['echo'])){ echo $content; } 
-		else {return $content;}	
-		**/
 	}
-	
 	public static function tips_meta_box(){
-	$nonce = wp_nonce_field('closedpostboxes', 'closedpostboxesnonce', false ); 
+		$nonce = wp_nonce_field('closedpostboxes', 'closedpostboxesnonce', false ); 
 		$response = wp_safe_remote_post('http://sabrinazeidan.com/speedguard/tips/',array(
 			'method'      => 'POST',
 			'body'        => array(
@@ -188,12 +169,16 @@ class SpeedGuardWidgets{
 		$link = '<p>'.$json_response['tips']['link'].'</p>';
 		$content = $nonce.$title.$description.$link;
 		echo $content;
-		/**
-		if (isset($args['args']['echo'])){ echo $content; } 
-		else {return $content;}	
-		**/
+	}
+	public static function about_meta_box(){
+		$rate_link = 'https://wordpress.org/support/plugin/speedguard/reviews/?rate=5#new-post';
+		$rate_it = sprintf(__( 'Add your %1$s★★★★★%2$s to spread the love.', 'speedguard' ),
+					'<a href="' .$rate_link. '" target="_blank">','</a>'	);	
+		$translate_link = 'https://translate.wordpress.org/projects/wp-plugins/speedguard/';
+		$translate_it = sprintf(__( 'Help to %1$stranslate it to your language%2$s so that more people will be able to use it ❤︎', 'speedguard' ),
+					'<a href="' .$translate_link. '" target="_blank">','</a>');	
+		$content = '<p>'.$rate_it.'</p><p>'.$translate_it.'</p>'; 
+		echo $content;
 	}	
-
-
 }
 new SpeedGuardWidgets;

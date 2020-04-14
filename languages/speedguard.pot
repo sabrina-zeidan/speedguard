@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: SpeedGuard\n"
-"POT-Creation-Date: 2020-02-25 13:21+0200\n"
+"POT-Creation-Date: 2020-04-11 17:29+0300\n"
 "PO-Revision-Date: 2018-02-23 10:59+0200\n"
 "Last-Translator: Sabrina Zeidan <sabrinazeidan@gmail.com>\n"
 "Language-Team: \n"
@@ -22,35 +22,35 @@ msgstr ""
 "X-Poedit-SearchPathExcluded-0: *.js\n"
 
 #. Plugin Name of the plugin/theme
-#: admin/class-speedguard-admin.php:250
+#: admin/class-speedguard-admin.php:274
 msgid "SpeedGuard"
 msgstr ""
 
-#: admin/class-speedguard-admin.php:251
+#: admin/class-speedguard-admin.php:275
 msgid "Speed Tests"
 msgstr ""
 
-#: admin/class-speedguard-admin.php:252
+#: admin/class-speedguard-admin.php:276
 msgid "Settings"
 msgstr ""
 
-#: admin/class-speedguard-admin.php:264
+#: admin/class-speedguard-admin.php:287
 #, php-format
 msgid "To start monitoring your site load time, please %1$senter API Key%2$s!"
 msgstr ""
 
-#: admin/class-speedguard-admin.php:268
+#: admin/class-speedguard-admin.php:291
 msgid "API key you have entered is not valid."
 msgstr ""
 
-#: admin/class-speedguard-admin.php:271
+#: admin/class-speedguard-admin.php:294
 #, php-format
 msgid ""
 "Everything is ready to test your site speed! %1$sAdd some pages%2$s to start "
 "testing."
 msgstr ""
 
-#: admin/class-speedguard-admin.php:278
+#: admin/class-speedguard-admin.php:301
 #, php-format
 msgid ""
 "Awesome, you've been using SpeedGuard for more than 1 week. May I ask you to "
@@ -58,7 +58,7 @@ msgid ""
 "did%3$sNot good enough%4$s"
 msgstr ""
 
-#: admin/class-speedguard-admin.php:283
+#: admin/class-speedguard-admin.php:306
 #, php-format
 msgid ""
 "%1$sHow can I make SpeedGuard plugin better for you?%2$s %3$sI will be happy "
@@ -66,114 +66,105 @@ msgid ""
 "(Please include a detailed description)%4$s %5$sSend feedback%6$s"
 msgstr ""
 
-#: admin/class-speedguard-admin.php:296
+#: admin/class-speedguard-admin.php:319
 msgid "Thank you friend!"
 msgstr ""
 
-#: admin/class-speedguard-admin.php:306
+#: admin/class-speedguard-admin.php:329
 msgid "Thank you for your honest opinion!"
 msgstr ""
 
-#: admin/class-speedguard-admin.php:320
+#: admin/class-speedguard-admin.php:343
 msgid "Please wait. Tests are running..."
 msgstr ""
 
-#: admin/class-speedguard-admin.php:324
+#: admin/class-speedguard-admin.php:347
 #, php-format
 msgid ""
 "Test limit is reached. Please wait for tomorrow or get %1$sprivate instance"
 "%2$s."
 msgstr ""
 
-#: admin/class-speedguard-admin.php:329
+#: admin/class-speedguard-admin.php:352
 msgid "Please select the post you want to add."
 msgstr ""
 
-#: admin/class-speedguard-admin.php:332
+#: admin/class-speedguard-admin.php:355
 msgid "SpeedGuard only monitors pages from current website."
 msgstr ""
 
-#: admin/class-speedguard-admin.php:335
+#: admin/class-speedguard-admin.php:358
 msgid "Please enter valid URL or select the post you want to add."
 msgstr ""
 
-#: admin/class-speedguard-admin.php:338
+#: admin/class-speedguard-admin.php:361
 msgid "Settings have been updated!"
 msgstr ""
 
-#: admin/class-speedguard-admin.php:342
+#: admin/class-speedguard-admin.php:365
 msgid "New URL is successfully added!"
 msgstr ""
 
-#: admin/class-speedguard-admin.php:346
+#: admin/class-speedguard-admin.php:369
 msgid "Results have been successfully updated!"
 msgstr ""
 
-#: admin/class-speedguard-admin.php:349
+#: admin/class-speedguard-admin.php:372
 msgid "Selected pages are not guarded anymore!"
 msgstr ""
 
-#: admin/includes/class.notifications.php:17
+#: admin/includes/class.notifications.php:20
 #, php-format
 msgid "%1$s is slow [SpeedGuard]"
 msgstr ""
 
-#: admin/includes/class.notifications.php:18
+#: admin/includes/class.notifications.php:21
 #, php-format
 msgid "%1$s takes more than %2$s seconds to load"
 msgstr ""
 
-#: admin/includes/class.notifications.php:21
+#: admin/includes/class.notifications.php:24
 #, php-format
 msgid "%1$s speed report [SpeedGuard]"
 msgstr ""
 
-#: admin/includes/class.notifications.php:42
+#: admin/includes/class.notifications.php:46
 msgid "SpeedGuard Report"
 msgstr ""
 
-#: admin/includes/class.notifications.php:46
-msgid "SpeedGuard Report for"
+#: admin/includes/class.notifications.php:56
+msgid "Average site speed is"
 msgstr ""
 
-#: admin/includes/class.notifications.php:46
-#, php-format
-msgid "You can stop guarding URLs or add new on %1$sSpeedGuard Tests%2$s page"
-msgstr ""
-
-#: admin/includes/class.notifications.php:53 admin/includes/class.tests.php:52
+#: admin/includes/class.notifications.php:63 admin/includes/class.tests.php:52
 msgid "URL"
 msgstr ""
 
-#: admin/includes/class.notifications.php:54
+#: admin/includes/class.notifications.php:64
 msgid "Load time"
 msgstr ""
 
-#: admin/includes/class.notifications.php:55
-#: admin/includes/class.notifications.php:68 admin/includes/class.tests.php:117
+#: admin/includes/class.notifications.php:65
+#: admin/includes/class.notifications.php:77 admin/includes/class.tests.php:117
 msgid "Report"
 msgstr ""
 
-#: admin/includes/class.notifications.php:56 admin/includes/class.tests.php:55
-msgid "Updated"
-msgstr ""
-
-#: admin/includes/class.notifications.php:76
-#: admin/includes/class.widgets.php:121
+#: admin/includes/class.notifications.php:84
+#: admin/includes/class.widgets.php:108
 msgid "Why is my website so slow?"
 msgstr ""
 
-#: admin/includes/class.notifications.php:82
+#: admin/includes/class.notifications.php:91
 #, php-format
 msgid "This report was requested by administrator of %1$s"
 msgstr ""
 
-#: admin/includes/class.notifications.php:82
+#: admin/includes/class.notifications.php:91
 #, php-format
 msgid "You can change SpeedGuard notification settings %1$shere%2$s any time."
 msgstr ""
 
-#: admin/includes/class.settings.php:253
+#: admin/includes/class.settings.php:257
 msgid "SpeedGuard check interval"
 msgstr ""
 
@@ -199,59 +190,99 @@ msgstr ""
 msgid "never"
 msgstr ""
 
-#: admin/includes/class.settings.php:314 admin/includes/class.widgets.php:136
-#: admin/includes/class.widgets.php:141 admin/includes/class.widgets.php:146
-msgid "s"
+#: admin/includes/class.settings.php:316
+msgid "Dulles, VA"
 msgstr ""
 
-#: admin/includes/class.settings.php:326
-msgid "Enter API key:"
+#: admin/includes/class.settings.php:317
+msgid "California, USA"
 msgstr ""
 
-#: admin/includes/class.settings.php:330
-msgid "Show site average load time on Dashboard"
+#: admin/includes/class.settings.php:318
+msgid "London, UK"
+msgstr ""
+
+#: admin/includes/class.settings.php:319
+msgid "Mumbai, India"
 msgstr ""
 
 #: admin/includes/class.settings.php:332
-msgid "Show current page load time in Admin Bar"
+msgid "Cable"
+msgstr ""
+
+#: admin/includes/class.settings.php:333
+msgid "4G"
 msgstr ""
 
 #: admin/includes/class.settings.php:334
-msgid "Check pageload speed every"
+msgid "3G"
 msgstr ""
 
 #: admin/includes/class.settings.php:335
+msgid "3GSlow"
+msgstr ""
+
+#: admin/includes/class.settings.php:348 admin/includes/class.widgets.php:124
+#: admin/includes/class.widgets.php:129 admin/includes/class.widgets.php:134
+msgid "s"
+msgstr ""
+
+#: admin/includes/class.settings.php:390
+msgid "Enter API key:"
+msgstr ""
+
+#: admin/includes/class.settings.php:394
+msgid "Show site average load time on Dashboard"
+msgstr ""
+
+#: admin/includes/class.settings.php:396
+msgid "Show current page load time in Admin Bar"
+msgstr ""
+
+#: admin/includes/class.settings.php:398
+msgid "Check pageload speed every"
+msgstr ""
+
+#: admin/includes/class.settings.php:399
 msgid "Send me report at"
 msgstr ""
 
-#: admin/includes/class.settings.php:378
+#: admin/includes/class.settings.php:402
+msgid "Test server location"
+msgstr ""
+
+#: admin/includes/class.settings.php:403
+msgid "Test connection type"
+msgstr ""
+
+#: admin/includes/class.settings.php:417
 msgid "SpeedGuard :: Settings"
 msgstr ""
 
-#: admin/includes/class.settings.php:411
+#: admin/includes/class.settings.php:451
 msgid "Save API Key"
 msgstr ""
 
-#: admin/includes/class.settings.php:416
+#: admin/includes/class.settings.php:456
 #, php-format
 msgid "Fill out this %1$sshort form%2$s."
 msgstr ""
 
-#: admin/includes/class.settings.php:420
+#: admin/includes/class.settings.php:460
 msgid "To obtain API key and start monitor your site speed for free:"
 msgstr ""
 
-#: admin/includes/class.settings.php:421
+#: admin/includes/class.settings.php:461
 msgid "Check your email and confirm request"
 msgstr ""
 
-#: admin/includes/class.settings.php:421
+#: admin/includes/class.settings.php:461
 msgid ""
 "You will receive email with \"WebPagetest API Key\" subject. Copy your API "
 "key from this email into the field and press \"Save API Key\"."
 msgstr ""
 
-#: admin/includes/class.settings.php:425
+#: admin/includes/class.settings.php:465
 msgid "Save Settings"
 msgstr ""
 
@@ -267,6 +298,10 @@ msgstr ""
 msgid "Report link"
 msgstr ""
 
+#: admin/includes/class.tests.php:55
+msgid "Updated"
+msgstr ""
+
 #: admin/includes/class.tests.php:100
 msgid "test is running..."
 msgstr ""
@@ -279,90 +314,94 @@ msgstr ""
 msgid "Retest Speed Index"
 msgstr ""
 
-#: admin/includes/class.tests.php:401
+#: admin/includes/class.tests.php:408
 msgid "Speedguard :: Guarded pages"
 msgstr ""
 
-#: admin/includes/class.webpagetest.php:70
+#: admin/includes/class.webpagetest.php:73
 #, php-format
 msgid "%1$s of %2$s tests used today"
 msgstr ""
 
-#: admin/includes/class.widgets.php:25
+#: admin/includes/class.widgets.php:20
 #, php-format
 msgid "%1$ss"
 msgstr ""
 
-#: admin/includes/class.widgets.php:28
+#: admin/includes/class.widgets.php:23
 msgid "This page load time"
 msgstr ""
 
-#: admin/includes/class.widgets.php:31
+#: admin/includes/class.widgets.php:26
 msgid "In process"
 msgstr ""
 
-#: admin/includes/class.widgets.php:34
+#: admin/includes/class.widgets.php:29
 msgid "Results are currently being updated"
 msgstr ""
 
-#: admin/includes/class.widgets.php:51
+#: admin/includes/class.widgets.php:43
 msgid "Test this page load time"
 msgstr ""
 
-#: admin/includes/class.widgets.php:71
+#: admin/includes/class.widgets.php:63
 msgid "Site Speed Results [Speedguard]"
 msgstr ""
 
-#: admin/includes/class.widgets.php:88
+#: admin/includes/class.widgets.php:80
 msgid "Worst"
 msgstr ""
 
-#: admin/includes/class.widgets.php:89
+#: admin/includes/class.widgets.php:81
 msgid "Average Load Time"
 msgstr ""
 
-#: admin/includes/class.widgets.php:90
+#: admin/includes/class.widgets.php:82
 msgid "Best"
 msgstr ""
 
-#: admin/includes/class.widgets.php:91
+#: admin/includes/class.widgets.php:83
 msgid "Improve"
 msgstr ""
 
-#: admin/includes/class.widgets.php:96
+#: admin/includes/class.widgets.php:88
 #, php-format
 msgid "First %1$sadd URLs%2$s that should be guarded."
 msgstr ""
 
-#: admin/includes/class.widgets.php:109
+#: admin/includes/class.widgets.php:99
 msgid "API Key"
 msgstr ""
 
-#: admin/includes/class.widgets.php:112
+#: admin/includes/class.widgets.php:102
 msgid "SpeedGuard Settings"
 msgstr ""
 
-#: admin/includes/class.widgets.php:113
+#: admin/includes/class.widgets.php:103
 msgid "Site Speed Results"
 msgstr ""
 
-#: admin/includes/class.widgets.php:114
+#: admin/includes/class.widgets.php:104
 msgid "Add new"
 msgstr ""
 
-#: admin/includes/class.widgets.php:115
+#: admin/includes/class.widgets.php:105
 msgid "Test results"
 msgstr ""
 
-#: admin/includes/class.widgets.php:116
+#: admin/includes/class.widgets.php:106
 msgid "Speed Score"
 msgstr ""
 
-#: admin/includes/class.widgets.php:120
+#: admin/includes/class.widgets.php:107
 msgid "API Credits"
 msgstr ""
 
-#: admin/includes/class.widgets.php:137
+#: admin/includes/class.widgets.php:109
+msgid "Do you like this plugin?"
+msgstr ""
+
+#: admin/includes/class.widgets.php:125
 msgid ""
 "Better than average. Your site speed propably has no direct negative impact "
 "on search ranking. However, you may improve user experience significantly "
@@ -372,18 +411,18 @@ msgid ""
 "significant changes."
 msgstr ""
 
-#: admin/includes/class.widgets.php:142
+#: admin/includes/class.widgets.php:130
 msgid ""
 "Not bad, but not good either. Average Speed Index is 6s [2018], so this a is "
 "mediocre result. Reducing your site speed index to at least to 3 seconds "
 "will help you to outrank your competitors on Google."
 msgstr ""
 
-#: admin/includes/class.widgets.php:146
+#: admin/includes/class.widgets.php:134
 msgid "and more"
 msgstr ""
 
-#: admin/includes/class.widgets.php:147
+#: admin/includes/class.widgets.php:135
 msgid ""
 "Worse than the average. Your SE rankings are definitely harmed by your site "
 "speed. There might be a long list of reasons why your website is slow, and "
@@ -391,21 +430,27 @@ msgid ""
 "positive results as soon as you start."
 msgstr ""
 
-#: admin/includes/class.widgets.php:156
+#: admin/includes/class.widgets.php:143
 msgid "Start typing the title of the post, page or custom post type..."
 msgstr ""
 
-#: admin/includes/class.widgets.php:161
+#: admin/includes/class.widgets.php:148
 msgid "Add"
 msgstr ""
 
-#: speedguard.php:47
-msgid ""
-"This plugin is not compatible with Multisite at the moment, but it will be "
-"soon."
+#: admin/includes/class.widgets.php:175
+#, php-format
+msgid "Add your %1$s★★★★★%2$s to spread the love."
 msgstr ""
 
-#: speedguard.php:54
+#: admin/includes/class.widgets.php:178
+#, php-format
+msgid ""
+"Help to %1$stranslate it to your language%2$s so that more people will be "
+"able to use it ❤︎"
+msgstr ""
+
+#: speedguard.php:44
 msgid "Network activation is only available in PRO version"
 msgstr ""
 
@@ -415,8 +460,8 @@ msgstr ""
 
 #. Description of the plugin/theme
 msgid ""
-"Monitors load time of 65 most important pages of your website. Every single "
-"day. For free."
+"Monitors load time of the 65 most important pages of your website; every "
+"single day for free."
 msgstr ""
 
 #. Author of the plugin/theme

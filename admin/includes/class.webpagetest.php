@@ -10,12 +10,15 @@ class SpeedGuard_WebPageTest{
 	public static function webpagetest_new_test($guarded_page_id) {
 		$guarded_page_url = get_the_title($guarded_page_id);
 		$api_key = Speedguard_Admin::get_this_plugin_option( 'speedguard_api' )['api_key'];
+		$location = Speedguard_Admin::get_this_plugin_option( 'speedguard_options' )['test_server_location'];
+		$connection = Speedguard_Admin::get_this_plugin_option( 'speedguard_options' )['test_connection_type'];
 		$webpagetest_request_request = add_query_arg( array(
 							'url'=> $guarded_page_url,
 							'f'=>'json',
 							'k'=> $api_key,
 			  				'runs'=>'3',
 							'fvonly'=>'1',
+							'location'=> $location.'.'.$connection,
 							),'http://www.webpagetest.org/runtest.php' );			
 		$response = wp_safe_remote_post($webpagetest_request_request);
 		if ( is_wp_error( $response) ) {return false;}
@@ -56,7 +59,7 @@ class SpeedGuard_WebPageTest{
 		}
 	/** API credits usage */
 	public static function credits_usage() {		
-			if (SpeedGuard_AUTHORIZED){
+			if (defined ('SPEEDGUARD_WPT_API')){
 				$api_key = Speedguard_Admin::get_this_plugin_option( 'speedguard_api' )['api_key'];
 				$webpagetest_request_request = add_query_arg( array('k'=> $api_key),'https://www.webpagetest.org/usage.php' );							
 				$response = wp_safe_remote_post($webpagetest_request_request);

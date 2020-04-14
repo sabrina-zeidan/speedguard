@@ -33,9 +33,11 @@
 #settings-meta-box #submit{ margin:1em 0 3em  320px ; }
 #settings-meta-box .form-table th {width: 300px;}
 #settings-meta-box #speedguard_options[check_recurrence], #settings-meta-box #speedguard_options[critical_load_time] {max-width: 30px;text-align: center;}
-#settings-meta-box input[type="text"].numbers {max-width: 30px;text-align: center;}
+#settings-meta-box input[type="text"].numbers {max-width: 40px;text-align: center;}
 #settings-meta-box #speedguard_options[type="email_me_at"]{max-width: 70px;} 
+#settings-meta-box td label{line-height:2.8;}
 #settings-meta-box .note {font-size:0.8em; font-style:italic;} 
+
 /** Widgets**/
 .no-guarded-pages #speedguard-tips-meta-box {display:none;} 
 .no-guarded-pages #speedguard-speedresults-meta-box {display:none;} 

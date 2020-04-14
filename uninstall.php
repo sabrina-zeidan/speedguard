@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Fired when the plugin is uninstalled.
  *
@@ -29,39 +28,27 @@
 if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 	exit;
 }
-	///Delete options
-	$speedguard_options = array ('speedguard_options','speedguard_api','speedguard_average');
-		foreach ($speedguard_options as $option_name){
-			if  ( is_multisite()) delete_site_option($option_name);
-			else delete_option($option_name);
-		}
-		
-	//Delete cpt 
-	if  ( is_multisite()) switch_to_blog(get_network()->site_id);
-	$args = array(
-			'post_type'      => 'guarded-page',
-			'posts_per_page' => -1,
-			'post_status'    => 'any',
-			'fields' => 'ids',
-			'no_found_rows' => true, 
-		);
-	$the_query = new WP_Query( $args );
-	$guarded_pages = $the_query->get_posts();
-	if( $guarded_pages ) :	
-		foreach ($guarded_pages as $guarded_page_id){
-			wp_delete_post( $guarded_page_id, true);  
-		}
-	endif;
-	wp_reset_postdata();			
-	if  ( is_multisite()) restore_current_blog();
 	
-	//Delete post_meta
-	if  ( is_multisite()) {     
-				$sites = get_sites();				
-				foreach ($sites as $site ) {
-					$blog_id = $site->blog_id;				
-						switch_to_blog( $blog_id );
-						$args = array(
+		function speedguard_delete_data(){
+			//Delete CPTs
+			$args = array(
+				'post_type'      => 'guarded-page',
+				'posts_per_page' => -1,
+				'post_status'    => 'any',
+				'fields' => 'ids',
+				'no_found_rows' => true, 
+			);
+			$the_query = new WP_Query( $args );
+			$guarded_pages = $the_query->get_posts();
+			if( $guarded_pages ) :	
+				foreach ($guarded_pages as $guarded_page_id){
+					wp_delete_post( $guarded_page_id, true);  
+				}
+			endif;
+			wp_reset_postdata();
+			
+			//Delete post meta
+			$args = array(
 							'post_type'      => 'any', 
 							'posts_per_page' => -1,
 							'post_status'    => 'any',
@@ -83,32 +70,34 @@ if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 							}
 						endif;
 						wp_reset_postdata();
-						restore_current_blog();		
-				}//endforeach				
-	}
-	else { 
-		$args = array(
-					'post_type'      => 'any',
-					'posts_per_page' => -1,
-					'post_status'    => 'any',
-					'fields' => 'ids',
-					'meta_query'     => array(
-											'relation' => 'AND',
-												array(
-													'key'     => 'speedguard_on',
-													'compare' => 'EXISTS',
-												),
-											),
-					'no_found_rows' => true, 
-					);
-		$the_query = new WP_Query( $args );
-		$guarded_posts = $the_query->get_posts();
-		if( $guarded_posts ) :
-			foreach ($guarded_posts as $guarded_post_id){
-				delete_post_meta($guarded_post_id, 'speedguard_on');
-			}
-		endif;
-		wp_reset_postdata();
-	}
+						
+						
+			//Delete options			
+			$speedguard_options = array ('speedguard_options','speedguard_api','speedguard_average');
+				foreach ($speedguard_options as $option_name){
+					delete_option($option_name);
+					if  ( is_multisite()) delete_site_option($option_name);
+				}
+				
+			//Delete CRON jobs	
+			wp_clear_scheduled_hook('speedguard_update_results');
+			wp_clear_scheduled_hook('speedguard_email_test_results');
+			
+		}
+
+		//search all blogs if Multisite
+		if (is_multisite()) {     
+				$sites = get_sites();		
+				foreach ($sites as $site ) {
+					$blog_id = $site->blog_id;				
+					switch_to_blog( $blog_id );
+						speedguard_delete_data();	
+					restore_current_blog();	 				
+				}//endforeach					
+		}//endif network
+		else {		
+			speedguard_delete_data();	
+		}
+ 		
 
 

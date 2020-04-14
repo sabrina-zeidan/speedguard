@@ -65,22 +65,15 @@ class Speedguard {
 	 *
 	 * @since    1.0.0
 	 */
-	public function __construct() {
+	public function __construct() { 
+		//after activation, define everything about this plugin
+		//version
 		if ( defined( 'SPEEDGUARD_VERSION' ) ) {
-			$this->version = SPEEDGUARD_VERSION;
+			$this->version = SPEEDGUARD_VERSION; 
 		} else {
 			$this->version = '1.0.0';
 		}
 		
-		if (!function_exists('is_plugin_active_for_network')) require_once( ABSPATH . '/wp-admin/includes/plugin.php' );
-		if ( is_plugin_active_for_network( 'speedguard/speedguard.php' ) ) {
-			define("THIS_PLUGIN_NETWORK_ACTIVATED", true);
-		} 
-		else {
-			define("THIS_PLUGIN_NETWORK_ACTIVATED", false);
-		}
-		
-	
 		$this->plugin_name = 'speedguard';
 		$this->load_dependencies();
 		$this->define_admin_hooks();		
@@ -202,5 +195,5 @@ class Speedguard {
 	public function get_version() {
 		return $this->version;
 	}
-
+	
 }

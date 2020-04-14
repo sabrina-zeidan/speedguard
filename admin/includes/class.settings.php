@@ -1,24 +1,28 @@
 <?php
 /**
 * 
-*	Class responsible for SpeedGuard settings
+*	Class responsible for the SpeedGuard settings 
 */
 class SpeedGuard_Settings{
 	static  $settings_page_hook = 'speedguard_page_speedguard_settings';
 	static public $speedguard_options = 'speedguard_options'; 
 		function __construct(){
-		//WPT API ket verification		
-		add_action('pre_update_option_speedguard_api', array( $this, 'verify_api_key'),10,3); 		
-		add_action('pre_update_site_option_speedguard_api', array( $this, 'verify_api_key'),10,3); 		
-		//Set default plugin settings
-		add_action('pre_update_option_speedguard_options', array( $this, 'default_options_set'),10,2);
-		add_action('pre_update_site_option_speedguard_options', array( $this, 'default_options_set'),10,2);
-		add_action('added_option', array( $this, 'default_options_added'),10,2);	
-		add_action('add_site_option', array( $this, 'default_options_added'),10,2);	
-		add_action('update_site_option', array( $this, 'default_options_added'),10,2);	
-		add_action('updated_option', array( $this, 'speedguard_options_updated'),10,3);	
 		//Register Settings sections
 		add_action( 'admin_init', array( $this, 'speedguard_settings') );
+		
+		//This is Single Install or Multisite PER SITE
+		add_action('pre_update_option_speedguard_api', array( $this, 'verify_api_key'),10,3); 		
+		add_action('added_option', array( $this, 'default_options_added'),10,2);
+		add_action('updated_option', array( $this, 'speedguard_options_updated'),10,3);	
+		add_action('pre_update_option_speedguard_options', array( $this, 'default_options_set'),10,2);
+		add_action('pre_update_option_speedguard_api', array( $this, 'verify_api_key'),10,3); 		
+		
+		//For NETWORK ACTIVATED only 
+		add_action('pre_update_site_option_speedguard_api', array( $this, 'verify_api_key'),10,3); 		
+		add_action('add_site_option', array( $this, 'default_options_added'),10,2);	
+		add_action('update_site_option', array( $this, 'default_options_added'),10,2);	
+		//Set default plugin settings
+		add_action('pre_update_site_option_speedguard_options', array( $this, 'default_options_set'),10,2);
 		//Update options action function for Multisite
 		add_action('network_admin_edit_speedguard_update_settings', array($this, 'speedguard_update_settings'));
 		add_action('network_admin_edit_speedguard_update_api', array($this, 'speedguard_update_api'));
@@ -33,21 +37,9 @@ class SpeedGuard_Settings{
 		//send report when load_time is updated by cron automatically
 		add_action('speedguard_update_results',  array( $this,'update_results_cron_function')); 
 		add_action( 'speedguard_email_test_results', array( $this,'email_test_results_function') );	
+
 		}
 
-
-	function speed_score_function( $meta_id, $post_id, $meta_key, $meta_value ){
-			if ( 'load_time' == $meta_key && $meta_value != 'waiting' ) {
-			//2018 Speed Index
-			$world_average = 6.0;			
-			$recommended_by_google = 3.0;			
-				if ($meta_value < 3) { $load_time_score = 'green'; }
-				elseif ($average_speed_index < 6) { $load_time_score = 'yellow'; } 
-				else { $load_time_score = 'red'; } 
-				update_post_meta( $post_id, 'load_time_score', $load_time_score);
-			}
-		}
-	
 	function default_options_set($new_value = '', $old_value = ''){		
 				$admin_email = Speedguard_Admin::get_this_plugin_option('admin_email');
 				if (empty($new_value['show_dashboard_widget'])) $new_value['show_dashboard_widget'] = 'on';
@@ -55,7 +47,9 @@ class SpeedGuard_Settings{
 				if (empty($new_value['check_recurrence'])) $new_value['check_recurrence'] = '1';
 				if (empty($new_value['email_me_at'])) $new_value['email_me_at'] = $admin_email;
 				if (empty($new_value['email_me_case'])) $new_value['email_me_case'] = 'just in case average speed worse than';
-				if (empty($new_value['critical_load_time'])) $new_value['critical_load_time'] = '4';				
+				if (empty($new_value['critical_load_time'])) $new_value['critical_load_time'] = '3';				
+				if (empty($new_value['test_server_location'])) $new_value['test_server_location'] = 'Dulles';				
+				if (empty($new_value['test_connection_type'])) $new_value['test_connection_type'] = 'Cable';							
 				if (empty($new_value['plugin_rated'])) $new_value['plugin_rated'] = false;		 		
 				return $new_value;				
 		}
@@ -63,7 +57,7 @@ class SpeedGuard_Settings{
 				if ($option == 'speedguard_api'){			
 					//if API key not entered 
 					if (!isset($new_value))	return;						
-					//if API key is valid SpeedGuard_AUTHORIZED
+					//if API key is valid SPEEDGUARD_WPT_API
 						if (Speedguard_Admin::get_this_plugin_option('speedguard_api')['authorized'] == true){   
 							$new_value = $this->default_options_set(array());	 	
 						}				
@@ -76,6 +70,8 @@ class SpeedGuard_Settings{
 								'email_me_at' => false,
 								'email_me_case' => false,
 								'critical_load_time' => false,
+								'test_server_location' => false,
+								'test_connection_type' => false,
 								'plugin_rated' => false,
 								);
 						} 
@@ -92,7 +88,7 @@ class SpeedGuard_Settings{
 											
 				}
 				
-		} 
+		} 		
 	function speedguard_options_updated ($option, $old_value, $value ){
 			if ($option == 'speedguard_options'){
 					$speedguard_options = Speedguard_Admin::get_this_plugin_option('speedguard_options' );	
@@ -106,7 +102,17 @@ class SpeedGuard_Settings{
 				}
 	}
 		
-		/** API key verification */
+	function speed_score_function( $meta_id, $post_id, $meta_key, $meta_value ){
+			if ( 'load_time' == $meta_key && $meta_value != 'waiting' ) {
+			//2018 Speed Index
+			$world_average = '6';			
+			$recommended_by_google = '3';			
+				if ($meta_value < $recommended_by_google) { $load_time_score = 'green'; }
+				else if ($meta_value < $world_average) { $load_time_score = 'yellow'; } 
+				else { $load_time_score = 'red'; } 
+				update_post_meta( $post_id, 'load_time_score', $load_time_score);
+			}
+		}
 	function verify_api_key($new_value, $old_value, $option){ 
 			if(!(isset($new_value['api_key'])) || !($new_value['api_key'])) {
 					$new_value['authorized'] = false;
@@ -200,8 +206,7 @@ class SpeedGuard_Settings{
 					}
 				wp_reset_postdata();
 		}
-	}
-		
+	}	
 	function update_results_cron_function() {					
 			//if send report on: schedule cron job 
 			$speedguard_options = Speedguard_Admin::get_this_plugin_option('speedguard_options' );	
@@ -226,8 +231,9 @@ class SpeedGuard_Settings{
 			endif;
 			wp_reset_postdata();
 		}	         
-		function email_test_results_function() {
+	function email_test_results_function() {
 			$speedguard_options = Speedguard_Admin::get_this_plugin_option('speedguard_options' );	
+			var_dump($speedguard_options);
 			$email_me_case = $speedguard_options['email_me_case'];
 			if ($email_me_case == 'every time after tests are executed'){
 				SpeedGuard_Notifications::test_results_email('regular');
@@ -240,13 +246,11 @@ class SpeedGuard_Settings{
 				}
 			}
 			
-		}
-		
-
+		}		
 	function speedguard_cron_schedules($schedules){
 					$speedguard_options = Speedguard_Admin::get_this_plugin_option('speedguard_options' );	
 					$check_recurrence = $speedguard_options['check_recurrence'];
-							$value = constant( 'DAY_IN_SECONDS' ); 
+							$value = constant( 'DAY_IN_SECONDS' );
 							$interval = (int)$check_recurrence*$value;
 							$schedules['speedguard_interval'] = array(
 								'interval' => $interval, // user input integer in second 
@@ -255,11 +259,7 @@ class SpeedGuard_Settings{
 							
 						return $schedules; 
 	}				
-	
-	function speedguard_settings_general() { 
 		
-	}
-	
 	function show_dashboard_widget_fn( $args ) {
 		$options = Speedguard_Admin::get_this_plugin_option('speedguard_options');
 		$field_name = esc_attr( $args['label_for'] );
@@ -302,10 +302,44 @@ class SpeedGuard_Settings{
 	
 			echo "<input ".$checked." type='radio' name='speedguard_options[".$field_name."]' id='".$item."' value='".$item."' /><label for='".$item."'>".$item_label."</label>";
 			$critical_load_time = $options['critical_load_time'];
-			if ($item == 'just in case average speed is worse than') $this->critical_load_time_fn(array('label_for'=>'critical_load_time', 'show'=>true));
+			if ($item == 'just in case average speed worse than') 
+				$this->critical_load_time_fn(array('label_for'=>'critical_load_time', 'show'=>true));
 			echo "</label><br />";
 		
 		}
+	}
+	
+	function test_server_location_fn( $args ) {
+		$options = Speedguard_Admin::get_this_plugin_option('speedguard_options');
+		$field_name = esc_attr( $args['label_for'] );
+		$items = array(
+			'Dulles' => __('Dulles, VA','speedguard'),
+			'ec2-us-west-1' => __('California, USA','speedguard'),
+			'London_EC2' => __('London, UK','speedguard'),
+			'ap-south-1' => __('Mumbai, India','speedguard')
+			);
+		echo "<select id='speedguard_options[".$field_name."]' name='speedguard_options[".$field_name."]' >";
+		foreach($items as $item=>$item_label) {
+			$selected = ($options[$field_name] == $item) ? ' selected="selected" ' : '';		
+			echo "<option ".$selected." value='$item'>$item_label</option>";		
+		}
+		echo "</select>";
+	}
+	function test_connection_type_fn( $args ) {
+		$options = Speedguard_Admin::get_this_plugin_option('speedguard_options');
+		$field_name = esc_attr( $args['label_for'] );
+		$items = array(
+			'Cable' => __('Cable','speedguard'),
+			'4G' => __('4G','speedguard'),
+			'3G' => __('3G','speedguard'),
+			'3GSlow' => __('3GSlow','speedguard'),			
+			);
+		echo "<select id='speedguard_options[".$field_name."]' name='speedguard_options[".$field_name."]' >";
+		foreach($items as $item=>$item_label) {
+			$selected = ($options[$field_name] == $item) ? ' selected="selected" ' : '';	
+			echo "<option ".$selected." value='$item'>$item_label</option>";		
+		}
+		echo "</select>";
 	}
 	function critical_load_time_fn( $args ) { 
 	if ( isset($args['show']) && $args['show'] == true){
@@ -319,32 +353,12 @@ class SpeedGuard_Settings{
 		$field_name = esc_attr( $args['label_for'] );
 		echo "<input type='hidden' name='speedguard_options[".$field_name."]' value='".$options['plugin_rated']."' />";
 	}
-	function speedguard_settings() {
-		//API
-		register_setting( 'speedguard_api', 'speedguard_api' ); 
-		add_settings_section( 'speedguard_api_section','','', 'speedguard_api'); 
-		add_settings_field('speedguard_api_key',  __( 'Enter API key:', 'speedguard' ),  array($this,'speedguard_field_api'), 'speedguard_api', 'speedguard_api_section');
-		//General Settings
-		register_setting( 'speedguard', 'speedguard_options' ); 
-		add_settings_section( 'speedguard_widget_settings_section','','','speedguard');	  
-		add_settings_field( 'speedguard_options', __( 'Show site average load time on Dashboard', 'speedguard' ), array($this,'show_dashboard_widget_fn'), 'speedguard', 'speedguard_widget_settings_section',['label_for' => 'show_dashboard_widget']);
-		
-		add_settings_field( 'speedguard_ab_widget', __( 'Show current page load time in Admin Bar', 'speedguard' ), array($this,'show_ab_widget_fn'), 'speedguard', 'speedguard_widget_settings_section',['label_for' => 'show_ab_widget']);
-		add_settings_section( 'speedguard_reports_section', '','','speedguard');	  
-		add_settings_field( 'speedguard_check_recurrence', __( 'Check pageload speed every', 'speedguard' ),array($this,'check_recurrence_fn'), 'speedguard','speedguard_reports_section',['label_for' => 'check_recurrence']);
-		add_settings_field( 'speedguard_email_me_at', __( 'Send me report at', 'speedguard' ),array($this,'email_me_at_fn'), 'speedguard','speedguard_reports_section',['label_for' => 'email_me_at']);
-		add_settings_field( 'speedguard_email_me_case', '',array($this,'email_me_case_fn'), 'speedguard','speedguard_reports_section',['label_for' => 'email_me_case']);
-		add_settings_field( 'speedguard_critical_load_time', '',array($this,'critical_load_time_fn'), 'speedguard','speedguard_hidden_section',['label_for' => 'critical_load_time']); 
-		add_settings_field( 'speedguard_plugin_rated', '',array($this,'plugin_rated_fn'), 'speedguard','speedguard_hidden_section',['label_for' => 'plugin_rated']); 	
-	} 
 	
 	function speedguard_field_api( $args ) {	
-
 		$options = Speedguard_Admin::get_this_plugin_option('speedguard_api');
 		$api_key = $options['api_key'];
 		echo "<input id='speedguard_api_key' name='speedguard_api[api_key]' size='40' type='text' value='{$api_key}' />";
-	} 
-			
+	} 			
 	function speedguard_update_api() {
 		check_admin_referer('speedguard_api-options');
 		global $new_whitelist_options;
@@ -369,6 +383,31 @@ class SpeedGuard_Settings{
 		wp_redirect(add_query_arg(array('page' => 'speedguard_settings','settings-updated' => 'true'), network_admin_url('admin.php')));
 		exit;
 	}
+	function speedguard_settings() {
+		//API
+		register_setting( 'speedguard_api', 'speedguard_api' ); 
+		add_settings_section( 'speedguard_api_section','','', 'speedguard_api'); 
+		add_settings_field('speedguard_api_key',  __( 'Enter API key:', 'speedguard' ),  array($this,'speedguard_field_api'), 'speedguard_api', 'speedguard_api_section');
+		//General Settings
+		register_setting( 'speedguard', 'speedguard_options' ); 
+		add_settings_section( 'speedguard_widget_settings_section','','','speedguard');	  
+		add_settings_field( 'speedguard_options', __( 'Show site average load time on Dashboard', 'speedguard' ), array($this,'show_dashboard_widget_fn'), 'speedguard', 'speedguard_widget_settings_section',['label_for' => 'show_dashboard_widget']);
+		
+		add_settings_field( 'speedguard_ab_widget', __( 'Show current page load time in Admin Bar', 'speedguard' ), array($this,'show_ab_widget_fn'), 'speedguard', 'speedguard_widget_settings_section',['label_for' => 'show_ab_widget']);
+		add_settings_section( 'speedguard_reports_section', '','','speedguard');	  
+		add_settings_field( 'speedguard_check_recurrence', __( 'Check pageload speed every', 'speedguard' ),array($this,'check_recurrence_fn'), 'speedguard','speedguard_reports_section',['label_for' => 'check_recurrence']);
+		add_settings_field( 'speedguard_email_me_at', __( 'Send me report at', 'speedguard' ),array($this,'email_me_at_fn'), 'speedguard','speedguard_reports_section',['label_for' => 'email_me_at']);
+		add_settings_field( 'speedguard_email_me_case', '',array($this,'email_me_case_fn'), 'speedguard','speedguard_reports_section',['label_for' => 'email_me_case']);
+		
+		add_settings_field( 'speedguard_test_server_location', __( 'Test server location', 'speedguard' ) ,array($this,'test_server_location_fn'), 'speedguard','speedguard_reports_section',['label_for' => 'test_server_location']);
+		add_settings_field( 'speedguard_test_connection_type', __( 'Test connection type', 'speedguard' ) ,array($this,'test_connection_type_fn'), 'speedguard','speedguard_reports_section',['label_for' => 'test_connection_type']);
+		
+		
+		add_settings_field( 'speedguard_critical_load_time', '',array($this,'critical_load_time_fn'), 'speedguard','speedguard_hidden_section',['label_for' => 'critical_load_time']); 
+		add_settings_field( 'speedguard_plugin_rated', '',array($this,'plugin_rated_fn'), 'speedguard','speedguard_hidden_section',['label_for' => 'plugin_rated']); 	
+	} 
+	function speedguard_settings_general() { 	
+	}
 
 	public static function my_settings_page_function() {
 		if (Speedguard_Admin::is_screen('settings')){	
@@ -383,11 +422,11 @@ class SpeedGuard_Settings{
 							</div>
 							<div id="post-body" class="has-sidebar">
 								<div id="post-body-content" class="has-sidebar-content">
-								 <form method="post" action="<?php print_r( THIS_PLUGIN_NETWORK_ACTIVATED ? 'edit.php?action=speedguard_update_api' : 'options.php' ); ?>">
+								 <form method="post" action="<?php print_r( defined('SPEEDGUARD_MU_NETWORK') ? 'edit.php?action=speedguard_update_api' : 'options.php' ); ?>">
 								<?php	
 				do_meta_boxes( '', 'api', 0);	?>
 								</form> 
-								<form method="post" action="<?php print_r( THIS_PLUGIN_NETWORK_ACTIVATED ? 'edit.php?action=speedguard_update_settings' : 'options.php' ); ?>">
+								<form method="post" action="<?php print_r( defined('SPEEDGUARD_MU_NETWORK') ? 'edit.php?action=speedguard_update_settings' : 'options.php' ); ?>">
 								<?php   // wp_nonce_field( 'update-options' );
 								do_meta_boxes( '', 'normal', 0 );
 								//settings_fields('speedguard');
@@ -404,26 +443,26 @@ class SpeedGuard_Settings{
 			</div>
 			<?php 
 			}
-		}			 
-		public static function credits_meta_box(){echo SpeedGuardWidgets::credits_meta_box();}	
-		public static function tips_meta_box(){echo SpeedGuardWidgets::tips_meta_box();}			
-		public static function api_meta_box(){
-			settings_fields( 'speedguard_api' );do_settings_sections('speedguard_api'); submit_button(__( 'Save API Key','speedguard'),'primary','submit',false );
-			$options = Speedguard_Admin::get_this_plugin_option('speedguard_api');
-			$api_key = $options['api_key'];
-			if (!SpeedGuard_AUTHORIZED){			
-			$get_api_key_url = 'http://www.webpagetest.org/getkey.php';
-			$get_api_key_link = sprintf(__( 'Fill out this %1$sshort form%2$s.', 'speedguard' ),
-					'<a href="' .$get_api_key_url. '" target="_blank">',
-					'</a>'
-					);
-			$instructions = '<div id="api-instructions"><b>'.__( 'To obtain API key and start monitor your site speed for free:','speedguard').'</b></p><ol><li>'.$get_api_key_link.'
-			</li><li>'.__( 'Check your email and confirm request','speedguard').'</li><li>'.__('You will receive email with "WebPagetest API Key" subject. Copy your API key from this email into the field and press "Save API Key".','speedguard').'</li></ol></div>';  
-			echo $instructions;
-			}
-		}	 
-		public static function settings_meta_box(){settings_fields('speedguard');do_settings_sections( 'speedguard' );  submit_button( __( 'Save Settings','speedguard'),'primary','submit',false );}
-
+	}	
+	
+	public static function credits_meta_box(){echo SpeedGuardWidgets::credits_meta_box();}	
+	public static function tips_meta_box(){echo SpeedGuardWidgets::tips_meta_box();}			
+	public static function api_meta_box(){
+		settings_fields( 'speedguard_api' );do_settings_sections('speedguard_api'); submit_button(__( 'Save API Key','speedguard'),'primary','submit',false );
+		$options = Speedguard_Admin::get_this_plugin_option('speedguard_api');
+		$api_key = $options['api_key'];
+		if (!defined('SPEEDGUARD_WPT_API')){			
+		$get_api_key_url = 'http://www.webpagetest.org/getkey.php';
+		$get_api_key_link = sprintf(__( 'Fill out this %1$sshort form%2$s.', 'speedguard' ),
+				'<a href="' .$get_api_key_url. '" target="_blank">',
+				'</a>'
+				);
+		$instructions = '<div id="api-instructions"><b>'.__( 'To obtain API key and start monitor your site speed for free:','speedguard').'</b></p><ol><li>'.$get_api_key_link.'
+		</li><li>'.__( 'Check your email and confirm request','speedguard').'</li><li>'.__('You will receive email with "WebPagetest API Key" subject. Copy your API key from this email into the field and press "Save API Key".','speedguard').'</li></ol></div>';  
+		echo $instructions;
+		}
+	}	 
+	public static function settings_meta_box(){settings_fields('speedguard');do_settings_sections( 'speedguard' );  submit_button( __( 'Save Settings','speedguard'),'primary','submit',false );}
 		
 }
 new SpeedGuard_Settings; 

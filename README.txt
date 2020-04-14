@@ -3,7 +3,7 @@ Contributors: sabrinazeidan
 Tags: speed, site speed, performance, optimization, SEO
 Requires at least: 4.7
 Tested up to: 5.4
-Stable tag: 1.4.1
+Stable tag: 1.5
 Requires PHP: 5.4
 License: GPLv2 or later 
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -24,6 +24,7 @@ Get the definite answer in less than 10 minutes with SpeedGuard plugin:
 * speed tests of the <strong>65 most important pages of your website</strong>
 * <strong>reliable results</strong> — every page is tested 3 times to ensure accurate load data tracking
 * <strong>up-to-date information</strong> — tests are run and results are updated every single day
+* <strong>real users experience</strong> — you can choose both the location and Internet connection speed
 * <strong>daily reports</strong> about your site speed health are delivered straight to your inbox. If site performance gets worse, you'll be able to prevent big problems asap
 * <strong>detailed data for every test with just one click</strong> which you can pass to the performance engineer to improve your site speed
 * <strong>tests are completely automated</strong> since first time setup is done
@@ -79,10 +80,19 @@ SpeedGuard is using [WebPageTest](https://www.webpagetest.org/) API, to get reli
 Each test is run 3 times (cache disabled), then the average is calculated and displayed in order to get accurate results.
  
 = Where the site speed is tested from? =
-Currently, SpeedGuard runs all tests from the server in Dulles, VA, USA. Soon I'll add the ability to choose the custom location.
+You can choose one of the following locations to test:
+* Dulles, VA
+* California, USA
+* London, UK
+* Mumbai, India
+
 
 = Are the speed results for desktop or mobile users? =
-Currently, SpeedGuard runs all tests for the desktop users using a cable Internet connection. Soon I'll add the ability to monitor load time for mobile devices as well.
+You can choose the type of Internet connection to test:
+* Cable - 5 Mbps down, 1 Mbps up, 28ms first-hop RTT, 0% packet loss
+* 3GSlow - 400 Kbps down and up, 400 ms first-hop RTT, 0% packet loss
+* 3G - 1.6 Mbps down, 768 Kbps up, 300 ms first-hop RTT, 0% packet loss
+* 4G - 9 Mbps down and up, 170 ms first-hop RTT, 0% packet loss
 
 = How many tests I can perform per day? =
 You can run up to 65 tests per day. It can be 65 different URLs from your website tested once per day or 65 tests of one specific page — it’s up to you. There is a widget on SpeedGuard pages that shows how many tests you have already used.
@@ -100,6 +110,14 @@ You can run up to 65 tests per day. It can be 65 different URLs from your websit
 * Thanx to Baboon designs from the Noun Project for the timer icon.
 
 == Changelog ==
+
+= Version 1.5 =
+* WordPress Multisite support (per site activation)
+* Choice of connection type
+* Choice of location
+* Better report email styling
+* Minor bugs fixed
+
 = Version 1.4.1 =
 * Language packs update
 
