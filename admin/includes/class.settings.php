@@ -302,7 +302,7 @@ class SpeedGuard_Settings{
 	
 			echo "<input ".$checked." type='radio' name='speedguard_options[".$field_name."]' id='".$item."' value='".$item."' /><label for='".$item."'>".$item_label."</label>";
 			$critical_load_time = $options['critical_load_time'];
-			if ($item == 'just in case average speed worse than') $this->critical_load_time_fn(array('label_for'=>'critical_load_time', 'show'=>true));
+			if ($item == 'just in case average speed is worse than') $this->critical_load_time_fn(array('label_for'=>'critical_load_time', 'show'=>true));
 			echo "</label><br />";
 		
 		}

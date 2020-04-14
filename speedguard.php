@@ -9,19 +9,17 @@
  *
  * @link              http://sabrinazeidan.com/
  * @since             1.0.0
- * @package           Speedguard
- *
+ * @package           SpeedGuard
  * @wordpress-plugin
  * Plugin Name:       SpeedGuard
  * Plugin URI:		  http://wordpress.org/plugins/speedguard/
- * Description:       Monitors load time of 65 most important pages of your website. Every single day. For free.
- * Version:           1.4
+ * Description:       Monitors load time of the 65 most important pages of your website; every single day for free.
+ * Version:           1.4.1
  * Author:            Sabrina Zeidan
  * Author URI:        http://sabrinazeidan.com/
  * License:           GPL-2.0+
  * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
  * Text Domain:       speedguard
- * Domain Path:       /languages
  */
 
 // If this file is called directly, abort.
@@ -30,7 +28,7 @@ if ( ! defined( 'WPINC' ) ) {
 }
 
 
-define( 'SPEEDGUARD_VERSION', '1.4' );
+define( 'SPEEDGUARD_VERSION', '1.4.1' );
 define( 'SPEEDGUARD_PRO', false );
 
 /**
@@ -44,7 +42,7 @@ function activate_speedguard($network_wide) {
 		if ( isset( $_GET['activate'] ) ) {
                     unset( $_GET['activate'] );
            }
-		wp_die( __( 'This plugin is not compatible with Multisite at the moment, but will be soon.', 'speedguard' ) );
+		wp_die( __( 'This plugin is not compatible with Multisite at the moment, but it will be soon.', 'speedguard' ) );
 	}
 	if (is_multisite() && $network_wide && !(SPEEDGUARD_PRO)) {
 		deactivate_plugins( plugin_basename( __FILE__ ) );

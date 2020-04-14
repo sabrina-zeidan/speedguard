@@ -112,7 +112,7 @@ class SpeedGuardWidgets{
 			add_meta_box( 'settings-meta-box', __('SpeedGuard Settings','speedguard'), array('SpeedGuard_Settings','settings_meta_box'), '', 'normal', 'core' );		
 			add_meta_box( 'speedguard-speedresults-meta-box', __('Site Speed Results','speedguard'), array('SpeedGuardWidgets', 'speedguard_dashboard_widget_function'			), '', 'main-content', 'core' );
 			add_meta_box( 'speedguard-add-new-url-meta-box', __('Add new','speedguard'), array('SpeedGuardWidgets', 'add_new_url_meta_box'), '', 'main-content', 'core' );
-			add_meta_box( 'tests-list-meta-box', __('Tests results','speedguard'), array('SpeedGuard_Tests', 'tests_list_metabox' ), '', 'main-content', 'core' );
+			add_meta_box( 'tests-list-meta-box', __('Test results','speedguard'), array('SpeedGuard_Tests', 'tests_list_metabox' ), '', 'main-content', 'core' );
 			add_meta_box( 'speed-score-legend-meta-box',__('Speed Score','speedguard'), array('SpeedGuardWidgets', 'speed_score_legend_meta_box'), '', 'main-content', 'core' );
 			
 			
@@ -134,17 +134,17 @@ class SpeedGuardWidgets{
 									<tr>
 									<td><span class="speedguard-score score-green"></span></td>
 									<td>0 — 2.9'.__('s','speedguard').'</td>
-									<td>'.__('Better than average. Probably, your site speed has no direct negative impact on search ranking. Yet, you may significantly improve user experience (which is another important search ranking factor) by reducing site load time. This is especially true for e-commerce websites. In most cases for WordPress websites Speed Index can be improved to 2 seconds without significant changes.','speedguard').'</td>
+									<td>'.__('Better than average. Your site speed propably has no direct negative impact on search ranking. However, you may improve user experience significantly (which is another important search ranking factor) by reducing site load time. This is especially true for e-commerce websites. In most cases for WordPress websites Speed Index can be improved to 2 seconds without significant changes.','speedguard').'</td>
 									</tr>
 									<tr>
 									<td><span class="speedguard-score score-yellow"></span></td>
 									<td>3 — 5.9'.__('s','speedguard').'</td>
-									<td>'.__('Not bad, but not good either. Average Speed Index is 6s [2018], so this a is mediocre result. Reducing your site speed index at least to 3 seconds will help you to outrank your competitors on Google.','speedguard').'</td>
+									<td>'.__('Not bad, but not good either. Average Speed Index is 6s [2018], so this a is mediocre result. Reducing your site speed index to at least to 3 seconds will help you to outrank your competitors on Google.','speedguard').'</td>
 									</tr>
 									<tr>
 									<td><span class="speedguard-score score-red"></span></td>
 									<td>6'.__('s','speedguard').' '.__('and more','speedguard').'</td>
-									<td>'.__('Worse than the average. Your SE rankings are definitely harmed by your site speed. There might be a long list of reasons why your website is slow and a lot of work to do. But the good news is, you may see first positive results as soon as you start.','speedguard').'</td>  
+									<td>'.__('Worse than the average. Your SE rankings are definitely harmed by your site speed. There might be a long list of reasons why your website is slow, and potentially a lot of work to do. But the good news is, you may see the first positive results as soon as you start.','speedguard').'</td>  
 									</tr> 
 									</table>
 									<p>* Tests are performed from Dulles, VA using Chrome browser and Cable connection (5/1 Mbps, 28ms RTT)</p>';

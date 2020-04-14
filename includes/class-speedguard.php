@@ -98,7 +98,6 @@ class Speedguard {
 	 * Include the following files that make up the plugin:
 	 *
 	 * - Speedguard_Loader. Orchestrates the hooks of the plugin.
-	 * - Speedguard_i18n. Defines internationalization functionality.
 	 * - Speedguard_Admin. Defines all hooks for the admin area.
 	 * - Speedguard_Public. Defines all hooks for the public side of the site.
 	 *
@@ -117,12 +116,6 @@ class Speedguard {
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-speedguard-loader.php';
 
 		/**
-		 * The class responsible for defining internationalization functionality
-		 * of the plugin.
-		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-speedguard-i18n.php';
-
-		/**
 		 * The class responsible for defining all actions that occur in the admin area.
 		 */
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-speedguard-admin.php';
@@ -136,22 +129,6 @@ class Speedguard {
 
 	}
 
-	/**
-	 * Define the locale for this plugin for internationalization.
-	 *
-	 * Uses the Speedguard_i18n class in order to set the domain and to register the hook
-	 * with WordPress.
-	 *
-	 * @since    1.0.0
-	 * @access   private
-	 */
-	private function set_locale() {
-
-		$plugin_i18n = new Speedguard_i18n();
-
-		$this->loader->add_action( 'plugins_loaded', $plugin_i18n, 'load_plugin_textdomain' );
-
-	}
 
 	/**
 	 * Register all of the hooks related to the admin area functionality

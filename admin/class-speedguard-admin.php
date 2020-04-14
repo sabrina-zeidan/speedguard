@@ -268,7 +268,7 @@ class Speedguard_Admin {
 			$notices = Speedguard_Admin::set_notice(__('API key you have entered is not valid.','speedguard'),'error' );	 
 		}
 		else if ((SpeedGuard_AUTHORIZED) && !(Speedguard_Admin::is_screen('tests')) && !((Speedguard_Admin::get_this_plugin_option('speedguard_average')['guarded_pages_count']) > 0) ) {
-			$message = sprintf(__( 'Everything is ready to test your site speed! %1$sAdd some pages%2$s to start tests.', 'speedguard' ),'<a href="' .Speedguard_Admin::speedguard_page_url('tests'). '">','</a>');
+			$message = sprintf(__( 'Everything is ready to test your site speed! %1$sAdd some pages%2$s to start testing.', 'speedguard' ),'<a href="' .Speedguard_Admin::speedguard_page_url('tests'). '">','</a>');
 			$notices =  Speedguard_Admin::set_notice( $message,'warning' );	  
 		}
 		if (Speedguard_Admin::is_screen('settings,tests')){	
@@ -329,13 +329,13 @@ class Speedguard_Admin {
 			$notices =  Speedguard_Admin::set_notice(__('Please select the post you want to add.','speedguard'),'warning' );	  
 		}
 		if ( ! empty( $_REQUEST['speedguard'] ) && $_REQUEST['speedguard'] == 'add_new_url_error_not_current_domain' ) {
-			$notices =  Speedguard_Admin::set_notice(__('SpeedGuard monitors only pages from current website.','speedguard'),'warning' );	  
+			$notices =  Speedguard_Admin::set_notice(__('SpeedGuard only monitors pages from current website.','speedguard'),'warning' );	  
 		}
 		if ( ! empty( $_REQUEST['speedguard'] ) && $_REQUEST['speedguard'] == 'add_new_url_error_not_url' ) {
 			$notices =  Speedguard_Admin::set_notice(__('Please enter valid URL or select the post you want to add.','speedguard'),'warning' );	  
 		}
 		if ( ! empty( $_REQUEST['settings-updated'] ) && $_REQUEST['settings-updated'] == 'true' ) {
-			$notices =  Speedguard_Admin::set_notice(__('Settings are updated!'),'success' );   			 
+			$notices =  Speedguard_Admin::set_notice(__('Settings have been updated!'),'success' );   			 
 		 
 		}
 		if ( ! empty( $_REQUEST['speedguard'] ) && $_REQUEST['speedguard'] == 'new_url_added' ) {
@@ -343,7 +343,7 @@ class Speedguard_Admin {
 							
 		}
 		if ( ! empty( $_REQUEST['speedguard'] ) && $_REQUEST['speedguard'] == 'load_time_updated' ) { 
-			$notices =  Speedguard_Admin::set_notice(__('Results are successfully updated!','speedguard'),'success' );	  
+			$notices =  Speedguard_Admin::set_notice(__('Results have been successfully updated!','speedguard'),'success' );	  
 		}
 		if ( ! empty( $_REQUEST['speedguard'] ) && $_REQUEST['speedguard'] == 'delete_guarded_pages' ) { 			
 			$notices =  Speedguard_Admin::set_notice(__('Selected pages are not guarded anymore!','speedguard'),'success' );						

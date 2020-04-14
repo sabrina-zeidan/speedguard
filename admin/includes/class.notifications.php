@@ -43,7 +43,7 @@ class SpeedGuard_Notifications{
 									<body style="padding-top: 50px; padding-bottom: 50px;  background:#f5f5f5;" >
 										<table align="center" width="560" bgcolor="#fff" border="0" cellspacing="0" >  
 											<tr>
-												<td style="padding: 10px;" bgcolor="#c1e6fd" align="left"><p style="text-align:right; font-size: 1.2em; font-weight: bold;" >'.__('SpeedGuard Report for','speedguard').' '.$site_url.'<span style="font-weight:100;"> ['.$site_date.']</span></p><p style="text-align:right; font-size: 0.9em; color:#5f5a5a;">'.sprintf(__('You can stop guarding urls or add new on %1$sSpeedGuard Tests%2$s page','speedguard'),'<a href="'.Speedguard_Admin::speedguard_page_url('tests').'" target="_blank">','</a>').'</p></td> 
+												<td style="padding: 10px;" bgcolor="#c1e6fd" align="left"><p style="text-align:right; font-size: 1.2em; font-weight: bold;" >'.__('SpeedGuard Report for','speedguard').' '.$site_url.'<span style="font-weight:100;"> ['.$site_date.']</span></p><p style="text-align:right; font-size: 0.9em; color:#5f5a5a;">'.sprintf(__('You can stop guarding URLs or add new on %1$sSpeedGuard Tests%2$s page','speedguard'),'<a href="'.Speedguard_Admin::speedguard_page_url('tests').'" target="_blank">','</a>').'</p></td> 
 											</tr>
 											<tr>
 												<td width="100%" style="padding: 0;">';
