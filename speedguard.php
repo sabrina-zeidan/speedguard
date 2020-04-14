@@ -14,7 +14,7 @@
  * Plugin Name:       SpeedGuard
  * Plugin URI:		  http://wordpress.org/plugins/speedguard/
  * Description:       Monitors load time of the 65 most important pages of your website; every single day for free.
- * Version:           1.5
+ * Version:           1.5.1
  * Author:            Sabrina Zeidan
  * Author URI:        http://sabrinazeidan.com/
  * License:           GPL-2.0+
@@ -27,7 +27,7 @@ if ( ! defined( 'WPINC' ) ) {
 	die;
 }
 
-define( 'SPEEDGUARD_VERSION', '1.5' );
+define( 'SPEEDGUARD_VERSION', '1.5.1' );
 
 
 /**
@@ -35,13 +35,13 @@ define( 'SPEEDGUARD_VERSION', '1.5' );
  * This action is documented in includes/class-speedguard-activator.php
  */
 function activate_speedguard($network_wide) {	
-	//Network-wide  activatio is a PRO feature. If tries to activate Network wide, stop:
+	//Network-wide  activation is a PRO feature. If tries to activate Network wide, stop:
 	if (is_multisite() && $network_wide && (!defined('SPEEDGUARD_PRO'))) {
 		deactivate_plugins( plugin_basename( __FILE__ ) );
 		if ( isset( $_GET['activate'] ) ) {
                     unset( $_GET['activate'] );
            }
-		wp_die( __( 'Network activation is only available in PRO version', 'speedguard' ) );
+		wp_die( __( 'Network activation is not available at the moment. But feel free to activate this plugin on per-site basis!', 'speedguard' ) );
 	}
 	
 	//Activate in all other cases
