@@ -66,7 +66,8 @@ class SpeedGuard_Notifications{
 													</tr></thead><tbody>';			
 													
 														foreach($guarded_pages as $guarded_page_id) {  
-															$guarded_page_url = get_the_title($guarded_page_id);
+															//$guarded_page_url = get_the_title($guarded_page_id);
+															$guarded_page_url = get_post_meta($guarded_page_id, 'speedguard_page_url',true );
 															$guarded_page_load_time = get_post_meta($guarded_page_id, 'load_time',true );
 															$report_link = 'https://www.webpagetest.org/result/'.get_post_meta($guarded_page_id,'webpagetest_request_test_result_id',true);		
 															$gmt_report_date = date('Y-m-d H:i:s',get_post_meta($guarded_page_id,'webpagetest_request_test_result_date',true)); 

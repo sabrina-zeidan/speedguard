@@ -15,8 +15,9 @@ jQuery(document).ready(function($){
 			$("#toplevel_page_speedguard").animate({backgroundColor: "" }); 
 		},3000);
 	}	
-	//Both SG pages
-	if ($("body").hasClass("post-type-guarded-page") || $("body").hasClass("speedguard_page_speedguard_tests") || $("body").hasClass("speedguard_page_speedguard_settings")){
+	
+	//All SpeedGuard pages  
+	if ($("body").hasClass("post-type-guarded-page") || $("body").hasClass("speedguard_page_speedguard_clients")  || $("body").hasClass("toplevel_page_speedguard_tests") || $("body").hasClass("speedguard_page_speedguard_settings") || $("body").hasClass("speedguard_page_speedguard_settings")){
 		postboxes.add_postbox_toggles( 'speedguard');	
 		//Tips Attention Seeker
 		if  (!$("body").hasClass("no-guarded-pages")) {
@@ -28,27 +29,9 @@ jQuery(document).ready(function($){
 				
 			},20000);  
 		}		
-	}	
-	//SpeedGuard Tests Page
-	if ($("body").hasClass("speedguard_page_speedguard_tests")){
-		$("#quick_press_box").appendTo(".wrap");
-		$("#poststuff").appendTo(".wrap");
-		$("#posts-filter").appendTo("#place-here");
-		$('#speedguard_new_url').focus();
-		//No guarded pages yet
-		if ($("body").hasClass("no-guarded-pages")){
-			$( "#speedguard-results-meta-box" ).addClass( "closed" );
-			setInterval(function() {
-				$("#speedguard_new_url").animate({outlineColor: '#8ce6ff', }, 'slow');
-				$("#speedguard_new_url").animate({outlineColor: 'transparent' }, 'slow');
-				$("#speedguard_new_url").animate({outlineColor: '#8ce6ff' }, 'slow');
-				$("#speedguard_new_url").animate({outlineColor: 'transparent' }, 'slow');
-				$("#speedguard_new_url").animate({outlineColor: '#8ce6ff' }, 'slow');
-				$("#speedguard_new_url").animate({outlineColor: '' }, 'slow');  
-			},3000); 			
-		}
 	}
-
-}); 
+	
+	
+	}); 
 
 

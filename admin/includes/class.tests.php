@@ -20,12 +20,11 @@ class SpeedGuard_List_Table extends WP_List_Table{
 	public function no_items() {
     _e('No pages guarded yet. Add something in the field above for the start.','speedguard');
 	}
-    public function prepare_items()
-    {
+    public function prepare_items(string $client_id = ''){
         $columns = $this->get_columns();
         $hidden = $this->get_hidden_columns();
         $sortable = $this->get_sortable_columns();
-        $data = $this->table_data();
+        $data = $this->table_data($client_id);
         usort( $data, array( &$this, 'sort_data' ) );
         $perPage = 20;
         $currentPage = $this->get_pagenum();
@@ -50,6 +49,8 @@ class SpeedGuard_List_Table extends WP_List_Table{
         $columns = array(
 			'cb' => '<input type="checkbox" />',
             'guarded_page_title' => __( 'URL', 'speedguard' ),
+			'location' => __( 'Location', 'speedguard' ),
+            'connection' => __( 'Connection', 'speedguard' ),
             'load_time' => __( 'Speed Index', 'speedguard' ),
             'report_link' => __( 'Report link', 'speedguard' ),
 			'report_date' => __( 'Updated', 'speedguard' ),
@@ -79,21 +80,35 @@ class SpeedGuard_List_Table extends WP_List_Table{
      *
      * @return Array
      */
-    private function table_data()    {
-
-        $data = array();
+    private function table_data(string $client_id = '')    {
+        $data = array();		
 		$args = array(
 					'post_type' => SpeedGuard_Admin::$cpt_name,
 					'post_status' => 'publish',
 					'posts_per_page'   => -1,
 					'fields'=>'ids',
-					'no_found_rows' => true, 
-				);
+					'no_found_rows' => true, 		
+					);
 		$the_query = new WP_Query( $args );
+			if (!empty($client_id)){
+			$meta_query = array();
+				$meta_query[] = array(
+					'relation' => 'AND',
+					array(
+						'key' => 'speedguard_page_client_id',
+						'compare' => '=',
+						'value' => $client_id
+					
+					)
+				);				
+				$the_query->set('meta_query',$meta_query);	
+			}
 		$guarded_pages = $the_query->get_posts();
 		if( $guarded_pages ) :
 		foreach($guarded_pages as $guarded_page_id) {  
-			$guarded_page_url = get_the_title($guarded_page_id);		
+			$guarded_page_url = get_post_meta( $guarded_page_id,'speedguard_page_url', true);
+			$location = get_post_meta( $guarded_page_id,'speedguard_page_location', true);
+			$connection = get_post_meta( $guarded_page_id,'speedguard_page_connection', true);
 			$load_time_result = get_post_meta( $guarded_page_id,'load_time', true);
 			$load_time_score = get_post_meta( $guarded_page_id,'load_time_score',true);
 			if ($load_time_result == 'waiting'){
@@ -113,6 +128,8 @@ class SpeedGuard_List_Table extends WP_List_Table{
 				$data[] = array(
 					'guarded_page_id' => $guarded_page_id,
 					'guarded_page_title' => '<a href="'.$guarded_page_url.'" target="_blank">'.$guarded_page_url.'</a>',
+					'location' => $location['label'],
+					'connection' => $connection,
 					'load_time' => $guarded_page_load_time,
 					'report_link' => '<a href="'.$report_link.'" target="_blank">'.__('Report','speedguard').'</a>',
 					'report_date' => $updated,						
@@ -135,6 +152,8 @@ class SpeedGuard_List_Table extends WP_List_Table{
     public function column_default( $item, $column_name ){
         switch( $column_name ) {
             case 'guarded_page_title':
+			case 'location':
+            case 'connection':
             case 'load_time':
             case 'report_link':
             case 'report_date': 
@@ -199,9 +218,7 @@ class SpeedGuard_List_Table extends WP_List_Table{
 	
 class SpeedGuard_Tests{
 	function __construct(){		
-		add_action ( 'wp_ajax_' . 'webpagetest_update_waiting_ajax',  array( 'SpeedGuard_Tests', 'webpagetest_update_waiting_ajax_function') );	
-		//add_action( 'rest_api_init', array( $this, 'speedguard_rest_api_register_routes') );
-		add_action( 'rest_api_init', array( $this, 'speedguard_rest_api_register_routes') );
+		add_action ( 'wp_ajax_' . 'webpagetest_update_waiting_ajax',  array( 'SpeedGuard_Tests', 'webpagetest_update_waiting_ajax_function') );	add_action( 'rest_api_init', array( $this, 'speedguard_rest_api_register_routes') );
 	} 
 	
 	
@@ -365,16 +382,23 @@ class SpeedGuard_Tests{
 				} 
 				
 				if (!empty($url_to_add)){
+						$location = Speedguard_Admin::get_this_plugin_option( 'speedguard_options' )['test_server_location'];
+						$location  = explode("|", $location);
+						$location = array('code' => $location[0], 'label' => $location[1]);
+						$connection = Speedguard_Admin::get_this_plugin_option( 'speedguard_options' )['test_connection_type'];
+						$code = $url_to_add.'|'.$location['code'].'|'.$connection;
 						$new_target_page = array( 
-						'post_title'           => $url_to_add,
-						'post_status'   => 'publish',	
-						'post_type'   => SpeedGuard_Admin::$cpt_name,	 
+							'post_title'           => $code,
+							'post_status'   => 'publish',	
+							'post_type'   => SpeedGuard_Admin::$cpt_name,	 
 						);												
 						
 						if (defined('SPEEDGUARD_MU_NETWORK')) switch_to_blog(get_network()->site_id);   
 						$target_page_id = wp_insert_post( $new_target_page );  
+						$update_field = update_post_meta($target_page_id, 'speedguard_page_url', $url_to_add);  
 						if ($guarded_post_blog_id) $update_field = update_post_meta($target_page_id, 'guarded_post_blog_id', $guarded_post_blog_id);  
 						if ($guarded_post_id) $update_field = update_post_meta($target_page_id, 'guarded_post_id', $guarded_post_id);   
+						
 						if (defined('SPEEDGUARD_MU_NETWORK')) restore_current_blog(); 
 													
 						if (defined('SPEEDGUARD_MU_NETWORK')) switch_to_blog($guarded_post_blog_id);   
@@ -422,83 +446,7 @@ class SpeedGuard_Tests{
 					</form>
 			</div>
 			<?php 
-			}
-
-			add_action( 'admin_footer','ajax_waiting'); 
-			function ajax_waiting() {				
-				$args = array( 					
-					'post_type' => SpeedGuard_Admin::$cpt_name,
-					'post_status' => 'publish',
-					'posts_per_page'   => -1,
-					'fields'=>'ids',
-					'meta_query' => array(array('key' => 'load_time','value' => 'waiting','compare' => 'LIKE')),
-					'fields' => 'ids',
-					'no_found_rows' => true, 
-				);
-			
-				$the_query = new WP_Query( $args );
-				$waiting_pages = $the_query->get_posts();
-				wp_reset_postdata();
-
-				?>
-				<script type="text/javascript">
-					jQuery(document).ready(function($){					
-					var waiting_pages_number = <?php echo count($waiting_pages); ?>; 
-					var waiting_pages = <?php echo json_encode( array_values( $waiting_pages ) ); ?>;
-					var waiting_pages = JSON.stringify(waiting_pages);					
-					//if there are guarded pages waiting for results
-						if ( parseInt ( waiting_pages_number ) > 0 ) {
-							console.log("There are tests waiting :",waiting_pages_number); // string 1 rad baz tubular
-								function update_test_results() {
-									$.ajax(ajaxurl,{
-										type: 'POST',
-										data: { action: 'webpagetest_update_waiting_ajax',					
-												post_ids: waiting_pages, 
-												},
-										dataType: 'json',
-										success: function ( response ) {
-													response.forEach(function(response) {									
-														if ( response.success ) {
-															console.log("Success here:",response.html);  
-															 $("#post-"+response.html+" .load_time").empty().append(response.average_speed_index);  
-														var location_updated = location.href.replace(/retesting_load_time|new_url_added[^&$]*/i, 'load_time_updated');  				
-															console.log("Location: ",location_updated); 
-															//window.location_updated; // This is not jQuery but simple plain ol' JS
-															window.location.replace(location_updated); // This is not jQuery but simple plain ol' JS
-															
-														} else {	
-															console.log("NO Success:",response); 
-															//callback update_test_results again in 10 seconds
-															setTimeout(function () {
-																update_test_results();
-															}, 20000) 
-														}										
-													  }) 
-												},
-											error: function ( errorThrown ) {
-												console.log( errorThrown ); 
-											}, 
-										});
-										  }
-							
-						update_test_results();	
-
-					}
-					}); 
-	
-				</script>
-				<?php
-		}		
-		
-		
-			
-			
-			
-			
-			
-			
-			
-			
+			}			
 		}			
 }
 new SpeedGuard_Tests; 

@@ -3,7 +3,7 @@ Contributors: sabrinazeidan
 Tags: speed, speed test, site speed, performance, optimization
 Requires at least: 4.7
 Tested up to: 5.4
-Stable tag: 1.5.1
+Stable tag: 1.6
 Requires PHP: 5.4
 License: GPLv2 or later 
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -108,6 +108,10 @@ It is! Use per-site activation.
 * Thanx to Baboon designs from the Noun Project for the timer icon.
 
 == Changelog ==
+
+= Version 1.6 =
+* Performance of external requests improved (tips and API credits)
+* Minor bugs fixed
 
 = Version 1.5.1 =
 * Typo update

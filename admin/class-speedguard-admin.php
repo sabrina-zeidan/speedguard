@@ -36,30 +36,18 @@ class Speedguard_Admin {
 	public function __construct( $plugin_name, $version ) { 
 		$this->plugin_name = $plugin_name;
 		$this->version = $version;
-		
-		
-		//Constants
 		$speedguard_api = Speedguard_Admin::get_this_plugin_option('speedguard_api');		 
 		 if (isset( $speedguard_api['authorized'] ) && $speedguard_api['authorized'] === true) define( 'SPEEDGUARD_WPT_API', true);
 		
-		
-		//Multisite
-		
-		if (!function_exists('is_plugin_active_for_network')) require_once( ABSPATH . '/wp-admin/includes/plugin.php' );
-						 
-		if (is_plugin_active_for_network( 'speedguard/speedguard.php' )) define( 'SPEEDGUARD_MU_NETWORK', true);
-						 
+		//Multisite		
+		if (!function_exists('is_plugin_active_for_network')) require_once( ABSPATH . '/wp-admin/includes/plugin.php' );					 
+		if (is_plugin_active_for_network( 'speedguard/speedguard.php' )) define( 'SPEEDGUARD_MU_NETWORK', true);				 
 		if (is_multisite() && !(is_plugin_active_for_network('speedguard/speedguard.php'))) define( 'SPEEDGUARD_MU_PER_SITE', true);
 
-  
 		//Menu items and Admin notices
 		add_action((defined('SPEEDGUARD_MU_NETWORK') ? 'network_' : ''). 'admin_menu', array( $this, 'speedguard_admin_menu' ) );
-  
 		add_action((defined('SPEEDGUARD_MU_NETWORK') ? 'network_' : ''). 'admin_notices', array( $this, 'show_admin_notices'));			
   
-		
-		
-		
 		//If Network activated don't load stuff on subsites. Load on the main site of the Multisite network or for regular WP install
 		global $blog_id;		
 		if (!(is_plugin_active_for_network( 'speedguard/speedguard.php' )) || (is_plugin_active_for_network( 'speedguard/speedguard.php' )) && (is_main_site($blog_id) )) {
@@ -67,34 +55,19 @@ class Speedguard_Admin {
 		require_once plugin_dir_path( __FILE__ ) . '/includes/class.settings.php'; 
 		require_once plugin_dir_path( __FILE__ ) . '/includes/class.tests.php'; 
 		require_once plugin_dir_path( __FILE__ ) . '/includes/class.webpagetest.php'; 
-		require_once plugin_dir_path( __FILE__ ) . '/includes/class.notifications.php'; 		
+		require_once plugin_dir_path( __FILE__ ) . '/includes/class.notifications.php'; 	
+
 		add_action('admin_init', array($this,'speedguard_cpt') );	
 		add_filter('admin_body_class', array( $this, 'body_classes_filter'));
-		add_action( 'load-toplevel_page_speedguard_tests', array( $this, 'not_authorized_redirect' ) );	
-		
-		}	
-		
-		
-		//???
-		
+		add_action( 'load-toplevel_page_speedguard_tests', array( $this, 'not_authorized_redirect' ) );
 		add_action('transition_post_status', array( $this,'guarded_page_unpublished_hook'),10,3);
 		add_action('before_delete_post', array( $this,'before_delete_test_hook'), 10, 1);	
-		
-		
+		add_action( 'admin_footer', array($this, 'ajax_waiting')); 		
 		//MU Headers alredy sent fix
 		add_action('init', array( $this, 'app_output_buffer'));
-
-
-		
+		}	
 	}
-	
 
-
-
-
-	function app_output_buffer() {
-	ob_start();
-	}
 	
 	public static function capability() {
 		$capability = 'manage_options';
@@ -200,19 +173,21 @@ class Speedguard_Admin {
 	}
 	
 	public static function is_screen($screens){
-		//screens: dashboard,settings,tests,plugins
+		//screens: dashboard,settings,tests,plugins, clients
 		$screens = explode(",",$screens);
 		$screens = str_replace(
-			array('tests','settings'), 
-			array('toplevel_page_speedguard_tests','speedguard_page_speedguard_settings'),$screens
+			array('tests','settings','clients'), 
+			array('toplevel_page_speedguard_tests','speedguard_page_speedguard_settings','speedguard_page_speedguard_clients'),$screens
 		);
+		require_once(ABSPATH . 'wp-admin/includes/screen.php');
 		//Multisite screens
-		if (MULTISITE){
+		if (defined('SPEEDGUARD_MU_NETWORK')){
 			foreach ($screens as $screen){
 				$screens[] = $screen.'-network';
 			}  	
 		}
-		$current_screen = get_current_screen()->id;
+		$current_screen = get_current_screen();
+		if ($current_screen) $current_screen = $current_screen->id;
 		if (in_array(($current_screen), $screens)){
 			$return = TRUE;
 		}
@@ -240,14 +215,14 @@ class Speedguard_Admin {
 	}
 	//Plugin Scripts 
 	public function enqueue_scripts() {
-		if (Speedguard_Admin::is_screen('settings,tests,plugins')){	
+		if (Speedguard_Admin::is_screen('settings,tests,plugins,clients')){	
 			wp_enqueue_script('jquery');
 			wp_enqueue_script('common');
 			wp_enqueue_script('wp-lists');
 			wp_enqueue_script('postbox');  
 			
 		}
-		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'assets/js/speedguard-admin.js', array( 'jquery','jquery-ui-autocomplete'), $this->version, false  );
+		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'assets/js/speedguard-admin.js', array( 'jquery','jquery-ui-autocomplete'), date('h:i:s'), false  );
 		
 		wp_enqueue_script('global',	plugin_dir_url( __FILE__ ) . 'assets/js/global.min.js',	array( 'jquery' ), $this->version, true);
 		wp_localize_script(		'global',		'global',		array('search_api' => home_url( '/wp-json/speedguard/search' ), 
@@ -294,44 +269,8 @@ class Speedguard_Admin {
 			$message = sprintf(__( 'Everything is ready to test your site speed! %1$sAdd some pages%2$s to start testing.', 'speedguard' ),'<a href="' .Speedguard_Admin::speedguard_page_url('tests'). '">','</a>');
 			$notices =  Speedguard_Admin::set_notice( $message,'warning' );	  
 		}
-		if (Speedguard_Admin::is_screen('settings,tests')){	
-			$plugin_dir_created = filemtime(WP_PLUGIN_DIR.'/speedguard' );
-			$days_later = strtotime('+7 days', $plugin_dir_created);		
-			if (($speedguard_options['plugin_rated']  != true) && (time() > $days_later)){					
-				$ask_to_rate = sprintf(__( 'Awesome, you\'ve been using SpeedGuard for more than 1 week. May I ask you to give it a 5-star rating on WordPress?  %1$sOk, you deserved it%2$sI already did%3$sNot good enough%4$s', "speedguard" ),
-				'<form id="rate-speedguard" action="" method="post"><a href="https://wordpress.org/support/plugin/speedguard/reviews/?rate=5#new-post" target="_blank">',
-				'</a> | <button type="submit" name="speedguard_rating" value="already_rated" class="already-rated">', 
-				'</button>| <span id="leave-feedback" style="border: 0;  background: transparent; color: #0073aa; cursor:pointer;text-decoration:underline;">',
-				'</span>');	
-				$second = sprintf(__( '%1$sHow can I make SpeedGuard plugin better for you?%2$s %3$sI will be happy to receive support to my email %7$s regarding the issues I am reporting.(Please include a detailed description)%4$s %5$sSend feedback%6$s', "speedguard" ),
-				'<div style="display:none; margin-top: 2em;" id="feedback-form"><p><em>',
-				'</em></p><textarea rows="2" style="width: 100%;" id="speedguard_feedback" name="speedguard_feedback"></textarea>',
-				'<p><input name="answer_to_email" type="checkbox" checked="checked"><label for="answer_to_email">',
-				'</label></p>',
-				'<button type="submit" name="speedguard_rating" value="send_feedback" class="button button-secondary">',
-				'</button></div></form>',
-				'<input type="text" size="30" readonly  name="admin_email" value="'.Speedguard_Admin::get_this_plugin_option('admin_email').'">');		
-				$notices =  Speedguard_Admin::set_notice($ask_to_rate.$second,'success'); 										
-			}
-		}				
-		if ( !empty( $_POST['speedguard_rating'])){
-			if ($_POST['speedguard_rating'] == 'already_rated' ){				
-				$notices =  Speedguard_Admin::set_notice(__('Thank you friend!','speedguard'),'success' );	 
-			}
-			else if ($_POST['speedguard_rating'] == 'send_feedback' ){	
-				$plugin_author_email = 'sabrinazeidan@gmail.com';
-				$site_url = str_replace( 'http://', '', get_home_url() );   				
-					if ( isset($_POST['answer_to_email']) && $_POST['answer_to_email'] == true){	
-						$answer_to_email = "Here is my email: ".$_POST['admin_email']; 					
-					}
-					else $answer_to_email = "Email not provided";
-				wp_mail($plugin_author_email,'New feedback for SpeedGuard',$_POST['speedguard_feedback'].' <p>from '.$site_url.' <p>'.$answer_to_email, array('Content-Type: text/html; charset=UTF-8'));
-				$notices =  Speedguard_Admin::set_notice(__('Thank you for your honest opinion!','speedguard'),'success' );	 
-			}
-			$speedguard_options['plugin_rated'] = true;
-			Speedguard_Admin::update_this_plugin_option('speedguard_options', $speedguard_options);
-			
-		}
+		
+		
 		if ( ! empty( $_POST['speedguard'] ) && $_POST['speedguard'] == 'add_new_url' ) {
 			//var_dump($_POST);
 			$notices = SpeedGuard_Tests::import_data($_POST);
@@ -378,5 +317,76 @@ class Speedguard_Admin {
 		//	delete_transient( 'speedguard-notice-deactivation' );		 	
 		} 	 		
 		if (isset($notices)) print $notices;
-	}	
+	}
+	function ajax_waiting() {				
+			if(Speedguard_Admin::is_screen('tests') || Speedguard_Admin::is_screen('clients')){ 
+				$args = array( 					
+					'post_type' => SpeedGuard_Admin::$cpt_name,
+					'post_status' => 'publish',
+					'posts_per_page'   => -1,
+					'fields'=>'ids',
+					'meta_query' => array(array('key' => 'load_time','value' => 'waiting','compare' => 'LIKE')),
+					'fields' => 'ids',
+					'no_found_rows' => true, 
+				);
+			
+				$the_query = new WP_Query( $args );
+				$waiting_pages = $the_query->get_posts();
+				wp_reset_postdata();
+
+				?>
+				<script type="text/javascript">
+					jQuery(document).ready(function($){					
+					var waiting_pages_number = <?php echo count($waiting_pages); ?>; 
+					var waiting_pages = <?php echo json_encode( array_values( $waiting_pages ) ); ?>;
+					var waiting_pages = JSON.stringify(waiting_pages);					
+					//if there are guarded pages waiting for results
+						if ( parseInt ( waiting_pages_number ) > 0 ) {
+							console.log("There are tests waiting :",waiting_pages_number); // string 1 rad baz tubular
+								function update_test_results() {
+									$.ajax(ajaxurl,{
+										type: 'POST',
+										data: { action: 'webpagetest_update_waiting_ajax',					
+												post_ids: waiting_pages, 
+												},
+										dataType: 'json',
+										success: function ( response ) {
+													response.forEach(function(response) {									
+														if ( response.success ) {
+															console.log("Success here:",response.html);  
+															 $("#post-"+response.html+" .load_time").empty().append(response.average_speed_index);  
+														var location_updated = location.href.replace(/retesting_load_time|new_url_added[^&$]*/i, 'load_time_updated');  				
+															console.log("Location: ",location_updated); 
+															//window.location_updated; // This is not jQuery but simple plain ol' JS
+															window.location.replace(location_updated); // This is not jQuery but simple plain ol' JS
+															
+														} else {	
+															console.log("NO Success:",response); 
+															//callback update_test_results again in 10 seconds
+															setTimeout(function () {
+																update_test_results();
+															}, 20000) 
+														}										
+													  }) 
+												},
+											error: function ( errorThrown ) {
+												console.log( errorThrown ); 
+											}, 
+										});
+										  }
+							
+						update_test_results();	
+
+					}
+					}); 
+	
+				</script>
+				<?php
+		}
+	}
+	function app_output_buffer() {
+		ob_start();
+	}
+
+	
 }

@@ -48,9 +48,8 @@ class SpeedGuard_Settings{
 				if (empty($new_value['email_me_at'])) $new_value['email_me_at'] = $admin_email;
 				if (empty($new_value['email_me_case'])) $new_value['email_me_case'] = 'just in case average speed worse than';
 				if (empty($new_value['critical_load_time'])) $new_value['critical_load_time'] = '3';				
-				if (empty($new_value['test_server_location'])) $new_value['test_server_location'] = 'Dulles';				
-				if (empty($new_value['test_connection_type'])) $new_value['test_connection_type'] = 'Cable';							
-				if (empty($new_value['plugin_rated'])) $new_value['plugin_rated'] = false;		 		
+				if (empty($new_value['test_server_location'])) $new_value['test_server_location'] = 'Dulles|Dulles, VA';						
+				if (empty($new_value['test_connection_type'])) $new_value['test_connection_type'] = 'Cable';								
 				return $new_value;				
 		}
 	function default_options_added($option, $new_value){ 
@@ -72,7 +71,6 @@ class SpeedGuard_Settings{
 								'critical_load_time' => false,
 								'test_server_location' => false,
 								'test_connection_type' => false,
-								'plugin_rated' => false,
 								);
 						} 
 					Speedguard_Admin::update_this_plugin_option('speedguard_options', $new_value);
@@ -313,18 +311,25 @@ class SpeedGuard_Settings{
 		$options = Speedguard_Admin::get_this_plugin_option('speedguard_options');
 		$field_name = esc_attr( $args['label_for'] );
 		$items = array(
-			'Dulles' => __('Dulles, VA','speedguard'),
-			'ec2-us-west-1' => __('California, USA','speedguard'),
-			'London_EC2' => __('London, UK','speedguard'),
-			'ap-south-1' => __('Mumbai, India','speedguard')
+			'Dulles|Dulles, VA' => __('Dulles, VA','speedguard'),
+			'ec2-us-west-1|California, USA' => __('California, USA','speedguard'),
+			'London_EC2|London, UK' => __('London, UK','speedguard'),
+			'ap-south-1|Mumbai, India' => __('Mumbai, India','speedguard')
 			);
 		echo "<select id='speedguard_options[".$field_name."]' name='speedguard_options[".$field_name."]' >";
-		foreach($items as $item=>$item_label) {
-			$selected = ($options[$field_name] == $item) ? ' selected="selected" ' : '';		
-			echo "<option ".$selected." value='$item'>$item_label</option>";		
+		foreach($items as $key => $item) {
+			$selected = ($options[$field_name] == $key) ? ' selected="selected" ' : '';		
+			echo "<option ".$selected." value='".$key."'>".$item."</option>";
 		}
 		echo "</select>";
 	}
+	
+	
+	
+
+		
+		
+		
 	function test_connection_type_fn( $args ) {
 		$options = Speedguard_Admin::get_this_plugin_option('speedguard_options');
 		$field_name = esc_attr( $args['label_for'] );
@@ -348,11 +353,6 @@ class SpeedGuard_Settings{
 		echo " <input type='text' id='speedguard_options[critical_load_time]' name='speedguard_options[critical_load_time]'  class='numbers'  size='2' value='".$options[$field_name]."'> ".__('s','speedguard');
 		}
 	} 
-	function plugin_rated_fn( $args ) {
-		$options = Speedguard_Admin::get_this_plugin_option('speedguard_options');
-		$field_name = esc_attr( $args['label_for'] );
-		echo "<input type='hidden' name='speedguard_options[".$field_name."]' value='".$options['plugin_rated']."' />";
-	}
 	
 	function speedguard_field_api( $args ) {	
 		$options = Speedguard_Admin::get_this_plugin_option('speedguard_api');
@@ -404,7 +404,7 @@ class SpeedGuard_Settings{
 		
 		
 		add_settings_field( 'speedguard_critical_load_time', '',array($this,'critical_load_time_fn'), 'speedguard','speedguard_hidden_section',['label_for' => 'critical_load_time']); 
-		add_settings_field( 'speedguard_plugin_rated', '',array($this,'plugin_rated_fn'), 'speedguard','speedguard_hidden_section',['label_for' => 'plugin_rated']); 	
+
 	} 
 	function speedguard_settings_general() { 	
 	}
