@@ -99,9 +99,11 @@ class SpeedGuard_WebPageTest{
 	/** API credits usage */
 	public static function credits_usage() {
 		$api = Speedguard_Admin::get_this_plugin_option( 'speedguard_api' );		
-		$message = sprintf(__( '%1$s of %2$s tests used today', 'speedguard' ),$api['credits_used'],$api['credits_limit']) . "\n\n";
-		$result = $message.' '.$api['check_date']; 
-		if ($api['credits_used']) return $result;
+		if (isset($api['credits_used'])){
+			$message = sprintf(__( '%1$s of %2$s tests used today', 'speedguard' ),$api['credits_used'],$api['credits_limit']) . "\n\n";
+			$result = $message.' '.$api['check_date']; 
+			return $result;
+		}
 	}
 
 
