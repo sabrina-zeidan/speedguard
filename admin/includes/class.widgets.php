@@ -6,8 +6,10 @@
 class SpeedGuardWidgets{
 	function __construct(){ 
 		$options = Speedguard_Admin::get_this_plugin_option( 'speedguard_options' );
-		if ($options['show_dashboard_widget'] === 'on')	add_action( 'wp_'.(defined('SPEEDGUARD_MU_NETWORK') ? 'network_' : ''). 'dashboard_setup', array( &$this,'speedguard_dashboard_widget') ); 
+		if (!empty($options)){
+		if ($options['show_dashboard_widget'] === 'on')	add_action( 'wp_'.(defined('SPEEDGUARD_MU_NETWORK') ? 'network_' : ''). 'dashboard_setup', array( $this,'speedguard_dashboard_widget') ); 
 		if ($options['show_ab_widget'] === 'on') add_action( 'admin_bar_menu', array( $this,'speedguard_admin_bar_widget'),710);
+		}
 	}
 
 	function speedguard_admin_bar_widget($wp_admin_bar ) { 

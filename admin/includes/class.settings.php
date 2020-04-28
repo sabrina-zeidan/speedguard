@@ -219,14 +219,12 @@ class SpeedGuard_Settings{
 				'post_type' => Speedguard_Admin::$cpt_name,
 				'post_status' => 'publish',
 				'posts_per_page'   => -1,
-				'fields'=>'ids',
+				'fields'=> 'ids',
 				'no_found_rows' => true
 				);	
 			$the_query = new WP_Query( $args );
 			$guarded_pages = $the_query->get_posts();				
-			if( $posts ) :
-			SpeedGuard_Tests::handle_bulk_retest_load_time('retest_load_time', $guarded_pages);
-			endif;
+			if(!empty($guarded_pages)) SpeedGuard_Tests::handle_bulk_retest_load_time('retest_load_time', $guarded_pages);
 			wp_reset_postdata();
 		}	         
 	function email_test_results_function() {
