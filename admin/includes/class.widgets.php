@@ -179,8 +179,8 @@ class SpeedGuardWidgets{
 				$tip_content = $the_tips[$rand_keys];		
 		$title = '<b>'.$tip_content['title'].'</b>';
 		$description = '<p>'.$tip_content['description'].'</p>';
-		$link = '<p>'.$tip_content['link'].'</p>';
-		$content = $title.$description.$link;
+		//$link = '<p>'.$tip_content['link'].'</p>';
+		$content = $title.$description;
 		echo $content;
 	}
 	public static function about_meta_box(){
