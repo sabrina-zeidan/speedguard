@@ -14,7 +14,7 @@
  * Plugin Name:       SpeedGuard
  * Plugin URI:		  http://wordpress.org/plugins/speedguard/
  * Description:       Monitors load time of the 65 most important pages of your website; every single day for free.
- * Version:           1.6
+ * Version:           1.7
  * Author:            Sabrina Zeidan
  * Author URI:        http://sabrinazeidan.com/
  * License:           GPL-2.0+
@@ -27,7 +27,7 @@ if ( ! defined( 'WPINC' ) ) {
 	die;
 }
 
-define( 'SPEEDGUARD_VERSION', '1.6' );
+define( 'SPEEDGUARD_VERSION', '1.7' );
 
 
 /**

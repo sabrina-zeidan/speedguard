@@ -6,8 +6,8 @@
 class SpeedGuard_Notifications{
 	function __construct(){
 	}    
-	function test_results_email($type) {	
-		if (defined ('SPEEDGUARD_WPT_API')){
+	public static function test_results_email($type) {	
+	mail('sabrinazeidan@gmail.com', 'notifications work', 'test'); 
 			$speedguard_options = Speedguard_Admin::get_this_plugin_option('speedguard_options' );	
 			$admin_email = $speedguard_options['email_me_at']; 
 			$site_url = parse_url(get_home_url());							
@@ -28,20 +28,12 @@ class SpeedGuard_Notifications{
 				'post_status' => 'publish',
 				'posts_per_page'   => -1, 
 				'fields' =>'ids',
-					'meta_query'        => array(
-						array(
-							'key'       => 'load_time',
-							'value' => 0, 
-							'compare' => '>',
-							'type' => 'DECIMAL', 
-						 )
-					),
 				'no_found_rows' => true 
 			);
 			$the_query = new WP_Query( $args );
 			$guarded_pages = $the_query->get_posts();			
 				if( $guarded_pages ) :	
-					ob_start();
+					ob_start();							
 							echo '<html><head>
 							<title>'.__('SpeedGuard Report','speedguard').'</title>
 							<style>
@@ -53,7 +45,10 @@ class SpeedGuard_Notifications{
 									<body style="padding-top: 50px; padding-bottom: 50px;  background:#fff; color:#000;" >
 										<table align="center">  
 											<tr>
-												<td style="padding: 10px;" bgcolor="#f7f7f7"><p style="text-align:center; font-size: 1.2em; font-weight: bold;" >'.__('Average site speed is','speedguard').' '.$average_site_speed.'s</p></td> 
+												<td style="padding: 10px;" bgcolor="#f7f7f7"><p style="text-align:center; font-size: 1.2em; font-weight: bold;" >'.__('Average site speed is','speedguard').' '.$average_site_speed.'s</p>
+												<p>												
+												'.sprintf(__('See the entire %1$sreport%2$s in the WordPress admin.','speedguard'),'<a href="'.Speedguard_Admin::speedguard_page_url('tests').'" target="_blank">','</a>').'</p>												
+												</td> 
 											</tr>
 											<tr> 
 												<td width="100%" style="padding: 0;">';
@@ -61,21 +56,19 @@ class SpeedGuard_Notifications{
 													echo '<table>  
 													<thead><tr style="border: 1px solid #ccc;" >
 													<td>'. __( 'URL', 'speedguard' ).'</td>
-													<td>'. __( 'Load time', 'speedguard' ).'</td>
-													<td>'. __( 'Report', 'speedguard' ).'</td>
+													<td>'. __( 'Load time', 'speedguard' ).'</td>													
 													</tr></thead><tbody>';			
 													
 														foreach($guarded_pages as $guarded_page_id) {  
 															//$guarded_page_url = get_the_title($guarded_page_id);
 															$guarded_page_url = get_post_meta($guarded_page_id, 'speedguard_page_url',true );
-															$guarded_page_load_time = get_post_meta($guarded_page_id, 'load_time',true );
-															$report_link = 'https://www.webpagetest.org/result/'.get_post_meta($guarded_page_id,'webpagetest_request_test_result_id',true);		
-															$gmt_report_date = date('Y-m-d H:i:s',get_post_meta($guarded_page_id,'webpagetest_request_test_result_date',true)); 
-															$updated = get_date_from_gmt($gmt_report_date,'Y-m-d H:i:s');							
+															$load_time = get_post_meta( $guarded_page_id,'load_time');
+															$guarded_page_load_time = $load_time[0]['displayValue'];	
+															
+					
 														echo '<tr style="border: 1px solid #ccc;">
 															<td>'.$guarded_page_url.'</td>
-															<td>'.$guarded_page_load_time.'</td> 
-															<td><a href="'.$report_link.'" target="_blank">'.__('Report','speedguard').'</a></td>															
+															<td>'.$guarded_page_load_time.'</td> 																
 															</tr>';
 														} 
 													
@@ -100,7 +93,7 @@ class SpeedGuard_Notifications{
 					wp_mail( $admin_email, $subject, $message, $headers);
 				endif;	
 				wp_reset_postdata();				
-			}
+			
 	}
  
 }

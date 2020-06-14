@@ -3,7 +3,7 @@ Contributors: sabrinazeidan
 Tags: speed, speed test, site speed, performance, optimization
 Requires at least: 4.7
 Tested up to: 5.4
-Stable tag: 1.6
+Stable tag: 1.7
 Requires PHP: 5.4
 License: GPLv2 or later 
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -14,36 +14,33 @@ Test site speed performance daily, get notified if it's slow, get detailed repor
 
 _Is it your website’s slow speed holding you back from getting more visitors from Google?_
 
-Get the definite answer in less than 10 minutes:
+Get the definite answer in less than 5 minutes:
 1. Install SpeedGuard
 2. Add the most important pages of your website to run a site speed test
-3. Get a complete picture of your site’s speed health in 10 minutes
+3. Get a complete picture of your site’s speed health in a few minutes
 
 #### With SpeedGuard you get:
 
-* speed tests of the <strong>65 most important pages of your website</strong>
-* <strong>reliable results</strong> — every page is tested 3 times to ensure accurate load data tracking
-* <strong>up-to-date information</strong> — site loading speed tests are run and results are updated every single day
-* <strong>real users experience</strong> — you can choose both the location and Internet connection speed
+* <strong>unlimited Google Lighthouse tests</strong>
+* <strong>automatic </strong> everyday monitoring
+* <strong>desktop and mobile</strong> testing
 * <strong>daily reports</strong> about your site speed health are delivered straight to your inbox. If site performance gets worse, you'll be able to prevent big problems asap
-* <strong>detailed data for every test with just one click</strong> which you can pass to the performance engineer to improve your site speed
+* <strong>links to the Google PageSpeed Insights reports</strong> which you can pass to the performance engineer to improve your site speed
 * <strong>tests are completely automated</strong> since first time setup is done
-* <strong>easy to start</strong> — you need just 10 minutes to set up the plugin for the first time
+* <strong>easy to use</strong> — just pick pages of your website that you would like to monitor
+* <strong>It's free :)</strong>
 
-* <strong>It's free</strong>
-
-Stop losing visitors because of slow site speed. No need to guess whether your website is really slow. Install SpeedGuard and get the definite answer in your WordPress Dashboard in 10 minutes.
+No need to guess whether your website is slow or fast - get the definite answer in your WordPress Dashboard in a few minutes.
 
 == Idea Behind ==
-Doing SEO for clients and my own projects for the past 10 years, I noticed the solution to the not-getting-traffic problem often can be found in quite basic things: sitemap, robots.txt, duplicates, redirections. But, first of all, site speed. 
- 
 Today, if your website loads slow, there is no need to even bother with any other optimization at all. 
 
 Page load time is one of Google’s top priorities for 2020 and it’s also its ranking signal. <strong>If Google’s crawler can't access your website because it's loading slow or throwing errors, it will never proceed further with indexation and ranking</strong>, and as a result, your website won't get any decent organic traffic.
 
 I wanted an easy-to-use tool to warn me in case my website load time may harm it’s search rankings. I wanted a native WordPress solution, with all information available from the dashboard, simple but still informative, a guard who will do the monitoring every day and ping me, in case something goes wrong. 
 I have not found one and that's why I've built this plugin. 
-I'll be happy to know that you find it useful as well!
+
+I'll be happy to know that you find it useful as well, feel free to leave a review :)
 
 == Screenshots ==
 1. Plugin installation
@@ -56,14 +53,11 @@ I'll be happy to know that you find it useful as well!
 2. Search for SpeedGuard plugin
 3. Click Install SpeedGuard
 4. Activate SpeedGuard after installation
-5. Follow further instructions to get API key and start using SpeedGuard
-= Getting API Key for free testing: =
-1. Fill out this [short form](http://www.webpagetest.org/getkey.php)
-2. Check your email and confirm the request
-3. You will receive the email with "WebPagetest API Key" subject. Copy your API key from this email into the field on SpeedGuard->Settings page and press "Save API Key".
+5. Follow further instructions to add pages that you want to test
+
 
 = Configuration: =
-Go to the SpeedGuard->Settings page to set the scan frequency and whether you prefer to be emailed. 
+Go to the SpeedGuard -> Settings page to set the scan frequency and whether you prefer to be emailed. 
 
 For example, you can set tests to run every day and send you a performance report every day, too. 
 
@@ -72,25 +66,16 @@ In this case, the plugin will perform tests every day but only send you the warn
 
 == Frequently Asked Questions ==
 
-= How accurate the results are? =
-SpeedGuard is using [WebPageTest](https://www.webpagetest.org/) API, to get reliable test results. Each test is run 3 times (cache disabled), then the average load time is calculated and displayed in order to get accurate results. 
- 
-= Where the site speed is tested from? =
-You can choose one of the following locations to test:
-* Dulles, VA
-* California, USA
-* London, UK
-* Mumbai, India
+= How tests are performed? =
+Starting from version 1.7 SpeedGuard is using [Google PageSpeed Insights API](https://developers.google.com/speed/pagespeed/insights/) which uses [Lighthouse](https://developers.google.com/web/tools/lighthouse) technology to perform tests. 
+
+= Do I need Google PageSpeed Insights API key to use SpeedGuard? =
+No, you don't. Just add pages you need to test. 
 
 = Are the speed results for desktop or mobile users? =
-You can choose the type of Internet connection to test:
-* Cable - 5 Mbps down, 1 Mbps up, 28ms first-hop RTT, 0% packet loss
-* 3GSlow - 400 Kbps down and up, 400 ms first-hop RTT, 0% packet loss
-* 3G - 1.6 Mbps down, 768 Kbps up, 300 ms first-hop RTT, 0% packet loss
-* 4G - 9 Mbps down and up, 170 ms first-hop RTT, 0% packet loss
-
-= How many tests I can perform for free? =
-You can run up to 65 tests per day with WebPageTest publice instance for free. It can be 65 different URLs from your website tested once per day or 65 tests of one specific page — it’s up to you. There is a widget on SpeedGuard pages that shows how many tests you have already used.
+You can choose the type of device to emulate:
+* Desktop
+* Mobile
 
 = Is it compatible with WordPress Multisite? =
 It is! Use per-site activation.
@@ -108,6 +93,12 @@ It is! Use per-site activation.
 * Thanx to Baboon designs from the Noun Project for the timer icon.
 
 == Changelog ==
+
+= Version 1.7 =
+* As WebPageTest.org stopped providing public API keys, SpeedGuard switched to make tests using [Google PageSpeed Insights API](https://developers.google.com/speed/pagespeed/insights/) which uses [Lighthouse](https://developers.google.com/web/tools/lighthouse) technology.
+* Tracked performance metrics is [Largest Contentful Paint](https://web.dev/lcp/)
+* Minor bugs fixed
+
 
 = Version 1.6 =
 * Performance of external requests improved (tips and API credits)

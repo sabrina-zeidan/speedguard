@@ -17,9 +17,10 @@ class SpeedGuardWidgets{
 			global $post; 		
 				$speedguard_on = get_post_meta($post->ID,'speedguard_on', true);
 				if ($speedguard_on && $speedguard_on[0] == 'true'){
-					$page_load_speed = get_post_meta($speedguard_on[1],'load_time', true);
+				$page_load_speed = get_post_meta($speedguard_on[1],'load_time');
+				$page_load_speed = $page_load_speed[0]['displayValue'];		
 					if ($page_load_speed != "waiting") { 					
-						$title = sprintf(__( '%1$ss', 'speedguard' ),$page_load_speed);	
+						$title = sprintf(__( '%1$s', 'speedguard' ),$page_load_speed);	
 						$href = Speedguard_Admin::speedguard_page_url('tests').'#speedguard-add-new-url-meta-box';
 						$class = get_post_meta($speedguard_on[1],'load_time_score', true); 
 						$atitle = __('This page load time','speedguard');
@@ -98,41 +99,31 @@ class SpeedGuardWidgets{
 	/*Meta boxes*/ 
 	public static function add_meta_boxes(){
 		wp_nonce_field('closedpostboxes', 'closedpostboxesnonce', false ); 		
-		add_meta_box( 'api-meta-box', __('API Key','speedguard'), array('SpeedGuard_Settings','api_meta_box'), '', 'api', 'core' );
-		 
-		if (defined('SPEEDGUARD_WPT_API')){			
+			
 			add_meta_box( 'settings-meta-box', __('SpeedGuard Settings','speedguard'), array('SpeedGuard_Settings','settings_meta_box'), '', 'normal', 'core' );		
 			add_meta_box( 'speedguard-speedresults-meta-box', __('Site Speed Results','speedguard'), array('SpeedGuardWidgets', 'speedguard_dashboard_widget_function'			), '', 'main-content', 'core' );
 			add_meta_box( 'speedguard-add-new-url-meta-box', __('Add new','speedguard'), array('SpeedGuardWidgets', 'add_new_url_meta_box'), '', 'main-content', 'core' );
 			add_meta_box( 'tests-list-meta-box', __('Test results','speedguard'), array('SpeedGuard_Tests', 'tests_list_metabox' ), '', 'main-content', 'core' );
 			add_meta_box( 'speed-score-legend-meta-box',__('Speed Score','speedguard'), array('SpeedGuardWidgets', 'speed_score_legend_meta_box'), '', 'main-content', 'core' );	
-			add_meta_box( 'speedguard-api-credits-meta-box', __('API Credits','speedguard'), array('SpeedGuard_Settings','credits_meta_box'),'','side','core'); 
-			add_meta_box( 'speedguard-tips-meta-box', __('Why is my website so slow?','speedguard'), array('SpeedGuard_Settings', 'tips_meta_box' ), '', 'side', 'core' ); 	
-			add_meta_box( 'speedguard-about-meta-box', __('Do you like this plugin?','speedguard'), array('SpeedGuardWidgets', 'about_meta_box' ), '', 'side', 'core' );			
-			add_filter( "postbox_classes_speedguard_page_speedguard_settings_api-meta-box", 'minify_my_metabox' );						
-						function minify_my_metabox( $classes ) {
-							array_push( $classes, 'closed' );
-							return $classes;
-						}			
-						
-		}
+			add_meta_box( 'speedguard-tips-meta-box', __('Why is my website slow?','speedguard'), array('SpeedGuard_Settings', 'tips_meta_box' ), '', 'side', 'core' ); 	
+			add_meta_box( 'speedguard-about-meta-box', __('Do you like this plugin?','speedguard'), array('SpeedGuardWidgets', 'about_meta_box' ), '', 'side', 'core' );				
 					
 	}		
 	/*Meta Boxes Widgets*/ 
 	public static function speed_score_legend_meta_box(){
 		$content = '<table>
 									<tr>
-									<td><span class="speedguard-score score-green"></span></td>
+									<td class="speedguard-score"><span class="score-green">●</span></td>
 									<td>0 — 2.9'.__('s','speedguard').'</td>
 									<td>'.__('Better than average. Your site speed propably has no direct negative impact on search ranking. However, you may improve user experience significantly (which is another important search ranking factor) by reducing site load time. This is especially true for e-commerce websites. In most cases for WordPress websites Speed Index can be improved to 2 seconds without significant changes.','speedguard').'</td>
 									</tr>
 									<tr>
-									<td><span class="speedguard-score score-yellow"></span></td>
+									<td class="speedguard-score"><span class="score-yellow">●</span></td>
 									<td>3 — 5.9'.__('s','speedguard').'</td>
 									<td>'.__('Not bad, but not good either. Average Speed Index is 6s [2018], so this a is mediocre result. Reducing your site speed index to at least to 3 seconds will help you to outrank your competitors on Google.','speedguard').'</td>
 									</tr>
 									<tr>
-									<td><span class="speedguard-score score-red"></span></td>
+									<td class="speedguard-score"><span class="score-red">●</span></td>
 									<td>6'.__('s','speedguard').' '.__('and more','speedguard').'</td>
 									<td>'.__('Worse than the average. Your SE rankings are definitely harmed by your site speed. There might be a long list of reasons why your website is slow, and potentially a lot of work to do. But the good news is, you may see the first positive results as soon as you start.','speedguard').'</td>  
 									</tr> 
@@ -151,10 +142,7 @@ class SpeedGuardWidgets{
 		</form>';
 		echo $content;
 	}
-	public static function credits_meta_box($post = '', $args = ''){
-		$content = Speedguard_WebPageTest::credits_usage(); 
-		echo $content;
-	}
+
 	public static function tips_meta_box(){
 			$external_links = array(
 				'hosting' => array('test' => 'http://www.bytecheck.com/', 'siteground' => 'https://bit.ly/SPDGRD_SiteGround'),
@@ -172,8 +160,6 @@ class SpeedGuardWidgets{
 				'link' => ''),
 				array('title' => __('It might be your media.','speedguard'), 
 				'description' => __('Loading images may take up to 90% of page load time. It might take 5 seconds to load a regular image and less than half a second to load its optimized version. That\'s why you can make your site load times faster just by reducing your images size.','speedguard').'<p><b>'.sprintf(__('Proper image compression for WordPress:%1$sis lossless%2$syou definitely don\'t want your images to become pixelated. After a lossless compression your images will look just the same as the original ones.%3$shas no file size limit%4$sis automatic and bulk%5$s','speedguard'),'</b></p><ul><li>','<br>','</li><li>','</li><li>','</li></ul>').'<p>'.sprintf(__('Install %1$sShortPixel plugin%2$s to get all these (even with free plan).','speedguard'),'<a href="' .$external_links['images']['shortpixel']. '" target="_blank">','</a>'), 'link' => ''), 
-				array('title' => __('It might be the long queue.','speedguard'), 
-				'description' => __('In order to show your website page to the user, his browser should load all necessary resources from your server. But the number of concurrent connections is limited.','speedguard').sprintf(__('%1$s%2$sThe access might be blocked%3$s until one of the previous resources has been fully retrieved and requests may wait in queue before they are processed. Rather than hosting your website a single server, you can distribute the files and load across multiple systems.','speedguard'),'<p>','<b>','</b>').sprintf(__('%1$sThis is how a %2$sContent Delivery Network%3$s (CDN) works. It provides  an easy way to increase the speed of your website while also lowering the latency. MaxCDN offers %4$sWordPress plans%5$s starting from 9$/mo.','speedguard'),'<p>','<b>','</b>','<a href="' .$external_links['cdn']['maxcdn']. '" target="_blank">','</a>'), 'link' => '')  
 				); 
 				$rand_keys = array_rand($the_tips, 1); 
 				$tip_content = $the_tips[$rand_keys];		

@@ -1,24 +1,19 @@
 <?php
 /**
 * 
-*	Class responsible for SpeedGuard Tests Page
+*	Class responsible for SpeedGuard Tests Page View
 */
 
-// WP_List_Table is not loaded automatically so we need to load it in our application
+// WP_List_Table is not loaded automatically 
 if( ! class_exists( 'WP_List_Table' ) ) {
     require_once( ABSPATH . 'wp-admin/includes/class-wp-list-table.php' );
 }
 /**
- * Create a new table class that will extend the WP_List_Table
+ * New table class that extends the WP_List_Table
  */
 class SpeedGuard_List_Table extends WP_List_Table{
-    /**
-     * Prepare the items for the table to process
-     *
-     * @return Void
-     */
 	public function no_items() {
-    _e('No pages guarded yet. Add something in the field above for the start.','speedguard');
+		_e('No pages guarded yet. Add something in the field above for the start.','speedguard');
 	}
     public function prepare_items(string $client_id = ''){
         $columns = $this->get_columns();
@@ -38,48 +33,33 @@ class SpeedGuard_List_Table extends WP_List_Table{
         $this->items = $data;
 		$this->process_bulk_action();
     }
-
-	 function column_cb($item) {
+	//Checkbox column
+	 function column_cb($item){
         return sprintf(
             '<input type="checkbox" name="guarded-pages[]" value="%s" />', $item['guarded_page_id']
         );    
     }
-    public function get_columns()
-    {
+    //Columns names
+	public function get_columns(){
+		$lcp = '<a href="https://web.dev/lcp/" target="_blank">'.__('Largest Contentful Paint','speedguard').'</a>';
         $columns = array(
 			'cb' => '<input type="checkbox" />',
             'guarded_page_title' => __( 'URL', 'speedguard' ),
-			'location' => __( 'Location', 'speedguard' ),
-            'connection' => __( 'Connection', 'speedguard' ),
-            'load_time' => __( 'Speed Index', 'speedguard' ),
-            'report_link' => __( 'Report link', 'speedguard' ),
+            'load_time' => $lcp,
+            'report_link' => __( 'Google PageSpeed Insights Report', 'speedguard' ),
 			'report_date' => __( 'Updated', 'speedguard' ),
         );
         return $columns;
     }
-    /**
-     * Define which columns are hidden
-     *
-     * @return Array
-     */
-    public function get_hidden_columns()
-    {
+	//Hidden columns
+    public function get_hidden_columns(){
         return array();
     }
-    /**
-     * Define the sortable columns
-     *
-     * @return Array
-     */
-    public function get_sortable_columns()
-    {
+    //Sortable columns
+    public function get_sortable_columns(){
         return array('guarded_page_title' => array('guarded_page_title', false));
     }
-    /**
-     * Get the table data
-     *
-     * @return Array
-     */
+	//Table data
     private function table_data(string $client_id = '')    {
         $data = array();		
 		$args = array(
@@ -107,53 +87,44 @@ class SpeedGuard_List_Table extends WP_List_Table{
 		if( $guarded_pages ) :
 		foreach($guarded_pages as $guarded_page_id) {  
 			$guarded_page_url = get_post_meta( $guarded_page_id,'speedguard_page_url', true);
-			$location = get_post_meta( $guarded_page_id,'speedguard_page_location', true);
 			$connection = get_post_meta( $guarded_page_id,'speedguard_page_connection', true);
-			$load_time_result = get_post_meta( $guarded_page_id,'load_time', true);
-			$load_time_score = get_post_meta( $guarded_page_id,'load_time_score',true);
-			if ($load_time_result == 'waiting'){
-				$guarded_page_load_time = '<div class="loading" title="'.__('test is running...','speedguard').'"></div>';
-			}
+			$load_time = get_post_meta( $guarded_page_id,'load_time');			
+			$load_time = $load_time[0];	
+		
+			if (!is_array($load_time)){
+				$guarded_page_load_time = __('checking','speedguard');
+				$start_test = SpeedGuard_Lighthouse::lighthouse_new_test($guarded_page_id);	
+			}			
 			else {
-				$guarded_page_load_time = '<span class="speedguard-score score-'.$load_time_score.'">'.$load_time_result.'</span>';
-			}		 
-				 
-			$report_link = 'https://www.webpagetest.org/result/'.get_post_meta($guarded_page_id,'webpagetest_request_test_result_id',true);		
-			$webpagetest_request_test_result_date = get_post_meta($guarded_page_id,'webpagetest_request_test_result_date',true);
-			if (!empty($webpagetest_request_test_result_date)){
-			$gmt_report_date = date('Y-m-d H:i:s',$webpagetest_request_test_result_date); 
-			}
-			else {$gmt_report_date = '';}
-			$updated = get_date_from_gmt($gmt_report_date,'Y-m-d H:i:s');  	
+				$guarded_page_load_time = '<span data-score="'.$load_time['score'].'" class="speedguard-score"><span>●</span> '.$load_time['displayValue'].'</span>';
+				}	
+			$report_link = add_query_arg( array(
+							'url'=> $guarded_page_url,
+							'tab' => $connection
+							),'https://developers.google.com/speed/pagespeed/insights/' );	
+							
+			$updated = get_the_modified_date('Y-m-d H:i:s', $guarded_page_id );				
+					
 				$data[] = array(
 					'guarded_page_id' => $guarded_page_id,
 					'guarded_page_title' => '<a href="'.$guarded_page_url.'" target="_blank">'.$guarded_page_url.'</a>',
-					'location' => $location['label'],
-					'connection' => $connection,
 					'load_time' => $guarded_page_load_time,
 					'report_link' => '<a href="'.$report_link.'" target="_blank">'.__('Report','speedguard').'</a>',
 					'report_date' => $updated,						
                  );
+			
         }
 		endif;
 		wp_reset_postdata();
         				
         return $data;
     }
-    /**
-     * Define what data to show on each column of the table
-     *
-     * @param  Array $item        Data
-     * @param  String $column_name - Current column name
-     *
-     * @return Mixed
-     */
-	 
+	
+	//Columns names
     public function column_default( $item, $column_name ){
         switch( $column_name ) {
             case 'guarded_page_title':
-			case 'location':
-            case 'connection':
+           // case 'connection':
             case 'load_time':
             case 'report_link':
             case 'report_date': 
@@ -162,11 +133,7 @@ class SpeedGuard_List_Table extends WP_List_Table{
                 return print_r( $item, true ) ;
         }
     }
-    /**
-     * Allows you to sort the data by the variables set in the $_GET
-     *
-     * @return Mixed
-     */
+	//Sort data the variables set in the $_GET
     private function sort_data( $a, $b ){
         // Set defaults
         $orderby = 'guarded_page_title';
@@ -192,33 +159,25 @@ class SpeedGuard_List_Table extends WP_List_Table{
 	public function get_bulk_actions() {
 		$actions = array(
 			'delete'    => __( 'Stop guarding', 'speedguard'),
-			'retest_load_time' => __( 'Retest Speed Index', 'speedguard')					
+			'retest_load_time' => __( 'Retest', 'speedguard')					
 		);
 		return $actions;
 	}
 	
 	public function process_bulk_action() {
-	       // security check!
-        /**
-		if ( isset( $_POST['_wpnonce'] ) && ! empty( $_POST['_wpnonce'] ) ) {
-            $nonce  = filter_input( INPUT_POST, '_wpnonce', FILTER_SANITIZE_STRING );
-            $action = 'bulk-' . $this->_args['plural'];
-
-            if ( ! wp_verify_nonce( $nonce, $action ) )
-                wp_die( 'Nope! Security check failed!' );
-
-        }
-		**/ 
+		
         $doaction = $this->current_action();
-		if (!empty($doaction))	$process_bulk_action = SpeedGuard_Tests::handle_bulk_retest_load_time($doaction, $_POST['guarded-pages']);
+		if (!empty($doaction) & !empty($_POST['guarded-pages']))	$process_bulk_action = SpeedGuard_Tests::handle_bulk_retest_load_time($doaction, $_POST['guarded-pages']);
+		
+		
 	}    
 }
 
 	
 	
 class SpeedGuard_Tests{
-	function __construct(){		
-		add_action ( 'wp_ajax_' . 'webpagetest_update_waiting_ajax',  array( 'SpeedGuard_Tests', 'webpagetest_update_waiting_ajax_function') );	add_action( 'rest_api_init', array( $this, 'speedguard_rest_api_register_routes') );
+	function __construct(){			
+		add_action( 'rest_api_init', array( $this, 'speedguard_rest_api_register_routes') );
 	} 
 	
 	
@@ -284,19 +243,24 @@ class SpeedGuard_Tests{
  		
 		return $posts;	
 
-	
 	}
 
-	public static function handle_bulk_retest_load_time($doaction,$post_ids) {
+	public static function handle_bulk_retest_load_time($doaction,$post_ids){
 		if ( $doaction == 'retest_load_time' ) {
-			foreach ($post_ids as $guarded_page_id) { 
-				$load_time = get_post_meta($guarded_page_id,'load_time', true);
-				if ($load_time != 'waiting'){
-					$test_created = SpeedGuard_WebPageTest::webpagetest_new_test($guarded_page_id);
-				}					
-				$updated = SpeedGuard_WebPageTest::update_waiting_pageload($guarded_page_id); 					
-			}
-		$redirect_to = add_query_arg( 'speedguard', 'retesting_load_time');				
+			foreach ($post_ids as $guarded_page_id){ 
+				$updated = get_the_modified_date('Y-m-d H:i:s', $guarded_page_id );
+					if ((strtotime("-5 minutes")) > strtotime($updated)){
+						//older - go on
+						//TODO if there are a few newer and a few old - show notice accordingly
+						$test_created = SpeedGuard_Lighthouse::lighthouse_new_test($guarded_page_id);
+						$updated = add_query_arg( 'speedguard', 'load_time_updated');						
+					}
+					else {
+						$slow_down = add_query_arg( 'speedguard', 'slow_down');	
+					}
+			$redirect_to = (!empty($updated)) ? $updated : $slow_down;				
+			}				
+						
 		}
 		else if ( $doaction == 'delete' ) {
 			foreach ($post_ids as $guarded_page_id) { 
@@ -308,41 +272,12 @@ class SpeedGuard_Tests{
 			wp_safe_redirect( esc_url_raw($redirect_to) );
 			exit;
 		}
+		
+		
+		
 	}
 	
-	public static function webpagetest_update_waiting_ajax_function() {
-		$post_ids = json_decode(stripslashes($_POST['post_ids']));
-		  $results = array();
-			foreach($post_ids as $guarded_page_id){
-				$webpagetest_request_test_result_id = get_post_meta($guarded_page_id,'webpagetest_request_test_result_id', true);
-				$webpagetest_request_test_results_link = 'http://www.webpagetest.org/jsonResult.php?test='.$webpagetest_request_test_result_id; 
-				$webpagetest_request_test_results = wp_safe_remote_get($webpagetest_request_test_results_link);							
-				//if ( is_wp_error( $webpagetest_request_test_results ) ) {return false;}
-				$webpagetest_request_test_results = wp_remote_retrieve_body( $webpagetest_request_test_results);
-				$webpagetest_request_test_results = json_decode($webpagetest_request_test_results, true);		
-					if ($webpagetest_request_test_results["statusCode"] != 200){
-						$r['success'] = FALSE;						
-					}
-					else { 
-				
-						$average_speed_index = round(($webpagetest_request_test_results["data"]["average"]["firstView"]["SpeedIndex"]/1000),1);  
-						update_post_meta( $guarded_page_id, 'load_time', $average_speed_index);	   
-						$completed_date = $webpagetest_request_test_results["data"]["completed"];										
-						update_post_meta( $guarded_page_id, 'webpagetest_request_test_result_date', $completed_date);	
-						$r['success'] = TRUE;			 			
-				}
-				
-				array_push($results, array(
-					'success' => $r['success'],
-					'html' => $guarded_page_id,
-					'test_link' => $webpagetest_request_test_results_link,
-					'status' => $webpagetest_request_test_results["statusCode"],
-					'average_speed_index' => isset($average_speed_index) ? $average_speed_index : '' ,
-				));	
-			}//foreach
-			echo json_encode ( $results );
-			die();	 
-}			
+		
 					
 	public static function import_data() { 
 		$url_from_autocomplete = htmlspecialchars($_POST['speedguard_new_url_permalink']); 
@@ -382,11 +317,8 @@ class SpeedGuard_Tests{
 				} 
 				
 				if (!empty($url_to_add)){
-						$location = Speedguard_Admin::get_this_plugin_option( 'speedguard_options' )['test_server_location'];
-						$location  = explode("|", $location);
-						$location = array('code' => $location[0], 'label' => $location[1]);
 						$connection = Speedguard_Admin::get_this_plugin_option( 'speedguard_options' )['test_connection_type'];
-						$code = $url_to_add.'|'.$location['code'].'|'.$connection;
+						$code = $url_to_add.'|'.$connection;
 						$new_target_page = array( 
 							'post_title'           => $code,
 							'post_status'   => 'publish',	
@@ -406,7 +338,8 @@ class SpeedGuard_Tests{
 						$update_field = update_post_meta($guarded_post_id, 'speedguard_on', array('true',$target_page_id) );
 						if (defined('SPEEDGUARD_MU_NETWORK')) restore_current_blog(); 
 						//start test 
-						$start_test = SpeedGuard_WebPageTest::webpagetest_new_test($target_page_id);	
+						//$start_test = SpeedGuard_WebPageTest::webpagetest_new_test($target_page_id);	
+						$start_test = SpeedGuard_Lighthouse::lighthouse_new_test($target_page_id);	
 						$redirect_to = add_query_arg( 'speedguard', 'new_url_added');	 	
 				}
 			if (isset($redirect_to)){
@@ -427,7 +360,7 @@ class SpeedGuard_Tests{
 		
 		public static function tests_page() { 
 			if (Speedguard_Admin::is_screen('tests')){
-				SpeedGuardWidgets::add_meta_boxes();				
+				SpeedGuardWidgets::add_meta_boxes();					
 		?>		
 			<div class="wrap">        
 				<h2><?php _e( 'Speedguard :: Guarded pages', 'speedguard' ); ?></h2>		
