@@ -41,11 +41,10 @@ class SpeedGuard_List_Table extends WP_List_Table{
     }
     //Columns names
 	public function get_columns(){
-		$lcp = '<a href="https://web.dev/lcp/" target="_blank">'.__('Largest Contentful Paint','speedguard').'</a>';
         $columns = array(
 			'cb' => '<input type="checkbox" />',
             'guarded_page_title' => __( 'URL', 'speedguard' ),
-            'load_time' => $lcp,
+            'load_time' =>  __( 'LCP', 'speedguard' ),
             'report_link' => __( 'Google PageSpeed Insights Report', 'speedguard' ),
 			'report_date' => __( 'Updated', 'speedguard' ),
         );

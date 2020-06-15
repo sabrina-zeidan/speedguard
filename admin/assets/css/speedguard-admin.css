@@ -1,7 +1,10 @@
+/**
+ * All of the CSS for your admin-specific functionality should be
+ * included in this file. 
+ */
 /**General**/
 #adminmenu #toplevel_page_speedguard div.wp-menu-image {background-size: 18px auto;}
-
-/** Results Page**/
+ 
 #tests-list-meta-box .loading {background-image: url(../images/loading.gif); height: 18px; width: 18px;}
 #tests-list-meta-box .column-guarded_page_title{   min-width:250px;}
 #tests-list-meta-box .column-load_time, #tests-list-meta-box .column-report_link, #tests-list-meta-box .column-report_date{text-align: center; width:90px; vertical-align: middle; }
@@ -9,7 +12,7 @@
 #tests-list-meta-box .manage-column {font-size: 0.8em;}
 #tests-list-meta-box p.search-box {display: none;}
 
-
+/** Results Page**/
 .toplevel_page_speedguard_tests .page-title-action {display:none;}
 .toplevel_page_speedguard_tests #speedguard_add_url {width:100%;} 
 .toplevel_page_speedguard_tests #speedguard_add_url #speedguard_new_url{width:80%; outline: 5px solid transparent;}
@@ -22,14 +25,9 @@
 #speed-score-legend-meta-box table td {padding: 1.2em 0.5em; min-width: 80px; border:0px;}
 #speed-score-legend-meta-box .speedguard-score {font-size: 2em; margin-left:1em;}
 
+
 .toplevel_page_speedguard_tests #tests-list-meta-box #location, .toplevel_page_speedguard_tests #tests-list-meta-box .column-location{display: none;}
 .toplevel_page_speedguard_tests #tests-list-meta-box #connection, .toplevel_page_speedguard_tests #tests-list-meta-box .column-connection{display: none;}
-
-.speedguard-score {font-weight: 600; font-size: 1.2em;}
-.speedguard-score  .score-green {color:#33a849; margin-left: 0.4em;}
-.speedguard-score  .score-yellow {color:#f9d30d; margin-left: 0.4em;}
-.speedguard-score  .score-red { color:#e6493a; margin-left: 0.4em;}
-
 
 /** Settings Page**/
 #api-meta-box table {display: inline-block;    max-width: 500px;}
@@ -50,6 +48,7 @@
 .no-guarded-pages #speedguard_dashboard_widget {display:none;} 
 .no-guarded-pages #speedguard-site-speed-score {display:none;}  
 
+
 #speedguard-tips-meta-box{ width: 280px;}
 #speedguard-tips-meta-box ul{list-style:circle; margin-left:2em;}
 .speedguard-results{width: 100%; margin: 2.6em 0; text-align: center;}
@@ -57,6 +56,18 @@
 .speedguard-results .result-column .result-numbers {margin:0; font-size:1.6em;}
 .speedguard-results .result-column .average{font-weight:bold;font-size:2.2em;}
 .speedguard-results .button{margin-top: 2em;}
+.ab-top-menu .green a{color:#a9f38a !important; }
+.ab-top-menu .yellow  a{color:#f3dc8a !important; }
+.ab-top-menu .red  a{color:#f35252 !important; }
+
+
+
+
+.speedguard-score {font-weight: 600; font-size: 1.2em;}
+.speedguard-score  .score-green {color:#33a849; margin-left: 0.4em;}
+.speedguard-score  .score-yellow {color:#f9d30d; margin-left: 0.4em;}
+.speedguard-score  .score-red { color:#e6493a; margin-left: 0.4em;}
+
 #speedguard-about-meta-box #szpic {background-image: url(../images/sabrina.png); height:75px; width:75px; float: right; margin:1em;}
 
 /**Notices**/

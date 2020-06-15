@@ -7,7 +7,7 @@ Stable tag: 1.7
 Requires PHP: 5.4
 License: GPLv2 or later 
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
-Checks your website loading speed every day using Google PageSpeed Insights (Lighthouse). It's free.  
+Checks your website loading speed on daily basis. It's free.  
 
 == Description ==
 Test site speed performance daily, get notified if it's slow, get detailed reports. Right in your WordPress dashboard. It's free. 

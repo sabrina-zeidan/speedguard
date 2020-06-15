@@ -61,10 +61,40 @@ class Speedguard_Admin {
 		//MU Headers alredy sent fix
 		add_action('init', array( $this, 'app_output_buffer'));
 		
+		//add_action('wp_head',array( $this, 'fix_backwards_compatibility_wpt') );
+		
 		}	
 	}
 
-	
+	function fix_backwards_compatibility_wpt(){
+		if (Speedguard_Admin::is_screen('tests')){	
+			if (get_transient('speedguard-notice-activation')){
+
+			$args = array(
+				'post_type' => SpeedGuard_Admin::$cpt_name ,
+				'post_status' => 'publish',
+				'posts_per_page'   => -1, 
+				'fields' =>'ids',
+					'meta_query'        => array(
+						array(
+							'key'       => 'load_time',
+							'value' => 0, 
+							'compare' => '>',
+							'type' => 'DECIMAL', 
+						 )
+					),
+				'no_found_rows' => true 
+			);
+			$the_query = new WP_Query( $args );
+			$guarded_pages = $the_query->get_posts();			
+				if( $guarded_pages ){
+				$process_bulk_action = SpeedGuard_Tests::handle_bulk_retest_load_time('retest_load_time', $guarded_pages);	
+				}
+				
+				delete_transient( 'speedguard-notice-activation' );
+			}
+		}	
+	}
 	
 	public static function capability() {
 		$capability = 'manage_options';

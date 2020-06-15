@@ -1,10 +1,18 @@
+
+
+
 jQuery(document).ready(function($){
-	//Score coloring
 	$("span.speedguard-score").each(function() {        
 	    $(this).data('score') > 0.7 ? $(this).children('span').addClass('score-green') : ($(this).data('score') > 0.4 ? $(this).children('span').addClass('score-yellow') : $(this).children('span').addClass('score-red'))  ;
        
     });
+	
        
+	
+	//Feedback notice
+	$( "#leave-feedback" ).click(function() {
+		$( "#feedback-form" ).toggle( 'slow');
+	});
 	//On SG activation
 	if ($("body").hasClass("plugins-php") && $("body").hasClass("speedguard-just-activated")) {
 		//$('#toplevel_page_speedguard').focus();	
