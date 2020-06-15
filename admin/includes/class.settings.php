@@ -29,8 +29,6 @@ class SpeedGuard_Settings{
 		add_action( 'added_post_meta', array( $this,'load_time_updated_function'), 10, 4 );
 		add_action( 'updated_post_meta', array( $this,'load_time_updated_function'), 10, 4 );
 		add_action( 'deleted_post_meta', array( $this,'load_time_updated_function'), 10, 4 );	
-		//Set speed score when load_time is updated
-		add_action( 'updated_post_meta', array( $this,'speed_score_function'), 10, 4 );
 		add_filter ('cron_schedules', array( $this,'speedguard_cron_schedules') ); 			
 		//send report when load_time is updated by cron automatically
 		add_action('speedguard_update_results',  array( $this,'update_results_cron_function')); 
@@ -78,17 +76,6 @@ class SpeedGuard_Settings{
 				}
 	}
 		
-	function speed_score_function( $meta_id, $post_id, $meta_key, $meta_value ){
-			if ( 'load_time' == $meta_key && $meta_value != 'waiting' ) {
-			//2018 Speed Index
-			$world_average = '6';			
-			$recommended_by_google = '3';			
-				if ($meta_value < $recommended_by_google) { $load_time_score = 'green'; }
-				else if ($meta_value < $world_average) { $load_time_score = 'yellow'; } 
-				else { $load_time_score = 'red'; } 
-				update_post_meta( $post_id, 'load_time_score', $load_time_score);
-			}
-		}	
 	function load_time_updated_function( $meta_id, $post_id, $meta_key, $meta_value ){
 			if ( 'load_time' == $meta_key && $meta_value != 'waiting' ) {
 				$args = array(
