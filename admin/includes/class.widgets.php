@@ -145,7 +145,7 @@ class SpeedGuardWidgets{
 
 	public static function tips_meta_box(){
 			$external_links = array(
-				'hosting' => array('test' => 'http://www.bytecheck.com/', 'siteground' => 'https://bit.ly/SPDGRD_SiteGround'),
+				'hosting' => array('test' => 'http://www.bytecheck.com/', 'siteground' => 'https://bit.ly/SPDGD_SG'),
 				'images' => array('shortpixel' => 'https://shortpixel.com/pricing', 'imagify' => 'https://imagify.io'),
 				'cdn' => array('maxcdn' =>'https://www.maxcdn.com/pricing/entrepreneur/'),
 				'caching' => array('wprocket' => 'https://bit.ly/SPDGRD_WPR'),
