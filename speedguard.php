@@ -12,8 +12,8 @@
  * @package           SpeedGuard
  * @wordpress-plugin
  * Plugin Name:       SpeedGuard
- * Plugin URI:		  http://wordpress.org/plugins/speedguard/
- * Description:       Monitors load time of the 65 most important pages of your website; every single day for free.
+ * Plugin URI:	      http://wordpress.org/plugins/speedguard/
+ * Description:       Keeps an eye on your website’s speed for you; every single day for free.
  * Version:           1.7
  * Author:            Sabrina Zeidan
  * Author URI:        http://sabrinazeidan.com/
