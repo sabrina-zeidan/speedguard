@@ -7,7 +7,6 @@ class SpeedGuard_Notifications{
 	function __construct(){
 	}    
 	public static function test_results_email($type) {	
-	mail('sabrinazeidan@gmail.com', 'notifications work', 'test'); 
 			$speedguard_options = Speedguard_Admin::get_this_plugin_option('speedguard_options' );	
 			$admin_email = $speedguard_options['email_me_at']; 
 			$site_url = parse_url(get_home_url());							

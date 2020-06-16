@@ -159,15 +159,12 @@ class SpeedGuard_Settings{
 			wp_reset_postdata();
 		}	         
 	function email_test_results_function() {
-		//mail('sabrinazeidan@gmail.com', 'function fired by cron', 'test'); 
 			$speedguard_options = Speedguard_Admin::get_this_plugin_option('speedguard_options' );	
 			$email_me_case = $speedguard_options['email_me_case'];
 			if ($email_me_case == 'every time after tests are executed'){
-				mail('sabrinazeidan@gmail.com', 'every time case', 'test'); 
 				SpeedGuard_Notifications::test_results_email('regular');
 			}
-			else if ($email_me_case == 'just in case average speed worse than'){
-mail('sabrinazeidan@gmail.com', 'in case average is bad', 'test'); 				
+			else if ($email_me_case == 'just in case average speed worse than'){			
 				$critical_load_time = $speedguard_options['critical_load_time'];
 				$average_load_time = Speedguard_Admin::get_this_plugin_option('speedguard_average' )['average_load_time'];
 				if ($average_load_time > $critical_load_time){ 
