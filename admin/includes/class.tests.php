@@ -252,12 +252,12 @@ class SpeedGuard_Tests{
 						//older - go on
 						//TODO if there are a few newer and a few old - show notice accordingly
 						$test_created = SpeedGuard_Lighthouse::lighthouse_new_test($guarded_page_id);
-						$updated = add_query_arg( 'speedguard', 'load_time_updated');						
+						$results_updated = add_query_arg( 'speedguard', 'load_time_updated');						
 					}
 					else {
 						$slow_down = add_query_arg( 'speedguard', 'slow_down');	
 					}
-			$redirect_to = (!empty($updated)) ? $updated : $slow_down;				
+			$redirect_to = (!empty($results_updated)) ? $results_updated : $slow_down;				
 			}				
 						
 		}

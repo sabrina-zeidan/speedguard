@@ -7,16 +7,16 @@
  * registers the activation and deactivation functions, and defines a function
  * that starts the plugin. 
  *
- * @link              http://sabrinazeidan.com/
+ * @link              https://sabrinazeidan.com/
  * @since             1.0.0
  * @package           SpeedGuard
  * @wordpress-plugin
  * Plugin Name:       SpeedGuard
- * Plugin URI:		  http://wordpress.org/plugins/speedguard/
- * Description:       Monitors load time of the 65 most important pages of your website; every single day for free.
+ * Plugin URI:	      https://sabrinazeidan.com/speedguard/
+ * Description:       Keeps an eye on your website’s speed for you; every single day for free.
  * Version:           1.7
  * Author:            Sabrina Zeidan
- * Author URI:        http://sabrinazeidan.com/
+ * Author URI:        https://sabrinazeidan.com/
  * License:           GPL-2.0+
  * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
  * Text Domain:       speedguard

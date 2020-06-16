@@ -313,7 +313,7 @@ class Speedguard_Admin {
 							
 		}
 		if ( ! empty( $_REQUEST['speedguard'] ) && $_REQUEST['speedguard'] == 'slow_down' ) { 
-			$notices =  Speedguard_Admin::set_notice(__('You are moving to fast. Wait 5 minutes before updating the tests','speedguard'),'warning' );	  
+			$notices =  Speedguard_Admin::set_notice(__('You are moving to fast. Wait at least 5 minutes before updating the tests','speedguard'),'warning' );	  
 		}
 		if ( ! empty( $_REQUEST['speedguard'] ) && $_REQUEST['speedguard'] == 'load_time_updated' ) { 
 			$notices =  Speedguard_Admin::set_notice(__('Results have been successfully updated!','speedguard'),'success' );	  
