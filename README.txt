@@ -2,9 +2,9 @@
 Contributors: sabrinazeidan
 Tags: speed, speed test, site speed, performance, optimization
 Requires at least: 4.7
-Tested up to: 5.4
+Tested up to: 5.4.2
 Stable tag: 1.7
-Requires PHP: 5.4
+Requires PHP: 5.6
 License: GPLv2 or later 
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Keeps an eye on your website’s speed for you; every single day for free. 
@@ -99,7 +99,7 @@ It is! Use per-site activation.
 * Tracked performance metrics is [Largest Contentful Paint](https://web.dev/lcp/)
 * Minor bugs fixed
 
-_If you've got working WebPageTest API key and want to keep using it to run tests, you can use [SpeedGuard version 1.6](https://github.com/sabrina-zeidan/speedguard/releases/tag/v1.6), but mind that it's not going to be supported/updated anytime soon._
+_If you've got working WebPageTest API key and want to keep using it to run tests, you still can use [SpeedGuard version 1.6](https://github.com/sabrina-zeidan/speedguard/releases/tag/v1.6), but mind that it's not going to be supported/updated anytime soon._
 
 = Version 1.6 =
 * Performance of external requests improved (tips and API credits)
