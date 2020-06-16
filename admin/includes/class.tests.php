@@ -64,6 +64,7 @@ class SpeedGuard_List_Table extends WP_List_Table{
 		$args = array(
 					'post_type' => SpeedGuard_Admin::$cpt_name,
 					'post_status' => 'publish',
+					//TODO limit the number, ajax chunks
 					'posts_per_page'   => -1,
 					'fields'=>'ids',
 					'no_found_rows' => true, 		
