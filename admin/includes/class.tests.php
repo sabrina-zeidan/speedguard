@@ -56,7 +56,7 @@ class SpeedGuard_List_Table extends WP_List_Table{
     }
     //Sortable columns
     public function get_sortable_columns(){
-        return array('guarded_page_title' => array('guarded_page_title', false));
+        return array('guarded_page_title' => array('guarded_page_title', false),'load_time' => array('load_time', false),'report_date' => array('report_date', false));
     }
 	//Table data
     private function table_data(string $client_id = '')    {
@@ -87,6 +87,20 @@ class SpeedGuard_List_Table extends WP_List_Table{
 		if( $guarded_pages ) :
 		foreach($guarded_pages as $guarded_page_id) {  
 			$guarded_page_url = get_post_meta( $guarded_page_id,'speedguard_page_url', true);
+			
+			
+			var_dump($guarded_page_url);
+			$guarded_page_type = get_post_meta( $guarded_page_id,'speedguard_item_type', true);
+			var_dump($guarded_page_type);
+			$guarded_post_id = get_post_meta( $guarded_page_id,'guarded_post_id', true);
+			var_dump($guarded_post_id);			
+			
+			$speedguard_on = get_term_meta( $guarded_post_id,'speedguard_on', true);
+			//$speedguard_on = get_post_meta( $guarded_post_id,'speedguard_on', true);
+			var_dump($speedguard_on);
+		$vv = is_archive($guarded_post_id)	;
+var_dump($vv);	
+			
 			$connection = get_post_meta( $guarded_page_id,'speedguard_page_connection', true);
 			$load_time = get_post_meta( $guarded_page_id,'load_time');			
 			$load_time = $load_time[0];	
@@ -194,7 +208,7 @@ class SpeedGuard_Tests{
 	}
   
 
- function speedguard_rest_api_search( $request ) {
+	function speedguard_rest_api_search( $request ) {
 		if ( empty( $request['term'] ) ) {
 			return;
 		}		
@@ -218,10 +232,34 @@ class SpeedGuard_Tests{
 						'ID' => $post_id,
 						'permalink' => get_permalink($post_id),
 						'blog_id' =>  get_current_blog_id(),
-						'label' => get_the_title($post_id)
+						'label' => get_the_title($post_id),
+						'type' => 'single'
 						);
 					$posts[] = $temp;											
-				}				
+				}	
+		//Include Terms too, and search all
+		$the_terms = get_terms( array(
+		  'name__like' => $request['term'],
+		  'hide_empty' => false // Optional
+		));
+		if ( count($the_terms) > 0 ) {
+		  foreach ( $the_terms as $term ) {
+			$key = 'ID';
+					$temp = array(
+						'ID' => $term->term_id,
+						'permalink' => get_term_link( $term ),
+						'blog_id' =>  get_current_blog_id(),
+						'label' => $term->name,
+						'type' => 'archive'
+						);
+					$posts[] = $temp;			
+					
+		  }
+		}
+		
+		
+		
+				
 			return $posts;
 		}
 
@@ -280,6 +318,7 @@ class SpeedGuard_Tests{
 		
 					
 	public static function import_data() { 
+
 		$url_from_autocomplete = htmlspecialchars($_POST['speedguard_new_url_permalink']); 
 		$direct_input = str_replace(' ', '', htmlspecialchars($_POST['speedguard_new_url'] ));	
 		//if nothing was entered either via autocomplete or typein
@@ -310,7 +349,8 @@ class SpeedGuard_Tests{
 				}
 				//if it's not direct input but autocomplete select $url_from_autocomplete = $guarded_page_url
 				else if (!empty($url_from_autocomplete)){
-					$guarded_post_id = htmlspecialchars($_POST['speedguard_new_url_id']); 
+					$guarded_url_type = htmlspecialchars($_POST['speedguard_item_type']); 
+					$guarded_post_id = htmlspecialchars($_POST['speedguard_new_url_id']);				
 					$guarded_post_blog_id = htmlspecialchars($_POST['blog_id']);
 					$url_to_add = $url_from_autocomplete;
 					
@@ -328,15 +368,27 @@ class SpeedGuard_Tests{
 						if (defined('SPEEDGUARD_MU_NETWORK')) switch_to_blog(get_network()->site_id);   
 						$target_page_id = wp_insert_post( $new_target_page );  
 						$update_field = update_post_meta($target_page_id, 'speedguard_page_url', $url_to_add);  
+						$update_type = update_post_meta($target_page_id, 'speedguard_item_type', $guarded_url_type);  
+						//TODO always pass
 						if ($guarded_post_blog_id) $update_field = update_post_meta($target_page_id, 'guarded_post_blog_id', $guarded_post_blog_id);  
-						if ($guarded_post_id) $update_field = update_post_meta($target_page_id, 'guarded_post_id', $guarded_post_id);   
-						
-						if (defined('SPEEDGUARD_MU_NETWORK')) restore_current_blog(); 
-													
-						if (defined('SPEEDGUARD_MU_NETWORK')) switch_to_blog($guarded_post_blog_id);   
+						$update_field = update_post_meta($target_page_id, 'guarded_post_id', $guarded_post_id); 
+							
+
+
+							
 						//check url as guarded
-						$update_field = update_post_meta($guarded_post_id, 'speedguard_on', array('true',$target_page_id) );
+						//TODO for archives
+						
+						if ($guarded_url_type == 'single'){							  
+							
+							$set_speedguard_on = update_post_meta($guarded_post_id, 'speedguard_on', array('true',$target_page_id) );
+						
+						}
+						else if ($guarded_url_type == 'archive'){
+							$set_speedguard_on = update_term_meta( $guarded_post_id, 'speedguard_on', array('true',$target_page_id));
+						}
 						if (defined('SPEEDGUARD_MU_NETWORK')) restore_current_blog(); 
+						
 						//start test 
 						//$start_test = SpeedGuard_WebPageTest::webpagetest_new_test($target_page_id);	
 						$start_test = SpeedGuard_Lighthouse::lighthouse_new_test($target_page_id);	

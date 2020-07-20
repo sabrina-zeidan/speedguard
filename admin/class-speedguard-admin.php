@@ -63,8 +63,21 @@ class Speedguard_Admin {
 		
 		//add_action('wp_head',array( $this, 'fix_backwards_compatibility_wpt') );
 		
+		 // Add removable query args
++        add_filter( 'removable_query_args', array( $this, 'removable_query_args' ) );
 		}	
 	}
+	
+	 public function removable_query_args( $query_args ) {
+		if (Speedguard_Admin::is_screen('settings,tests,clients')){	
+			$new_query_args = array('speedguard');
+			$query_args = array_merge( $query_args, $new_query_args );
+		}
+        return $query_args;
+    }
+
+
+
 
 	function fix_backwards_compatibility_wpt(){
 		if (Speedguard_Admin::is_screen('tests')){	
@@ -110,15 +123,18 @@ class Speedguard_Admin {
 		$supported_post_types['page'] = 'page';
 		return $supported_post_types;
 	}
-	public static function before_delete_test_hook( $postid ) {
-		//When test is deleted
+	//Remove meta when test is deleted
+	public static function before_delete_test_hook( $postid ) {		
 		if  (get_post_type($postid) == Speedguard_Admin::$cpt_name){
-			$guarded_post_id = get_post_meta($postid,'guarded_post_id', true);
+			$guarded_item_id = get_post_meta($postid,'guarded_post_id', true);
+			$guarded_item_type = get_post_meta($postid,'speedguard_item_type', true);
 			if (defined('SPEEDGUARD_MU_NETWORK')){ 
 				$blog_id = get_post_meta($postid,'guarded_post_blog_id', true); 				
 				switch_to_blog($blog_id);
 			}				
-				update_post_meta($guarded_post_id, 'speedguard_on', 'false');  	 
+			if ($guarded_item_type == 'single') update_post_meta($guarded_item_id, 'speedguard_on', 'false'); 
+			else if	($guarded_item_type == 'archive') update_term_meta($guarded_item_id, 'speedguard_on', 'false');
+	
 			if (defined('SPEEDGUARD_MU_NETWORK')) switch_to_blog(get_network()->site_id); 
 		}
 	}
@@ -220,7 +236,7 @@ class Speedguard_Admin {
 		$args = array( 			
 			'public'      => true, 
 			'exclude_from_search'      => true, 
-			'publicly_queryable'      => false, 
+			'publicly_queryable'      => true, 
 			'show_ui'      => true, 
 			'supports' => array('title','custom-fields'),	
 		); 			
@@ -244,8 +260,9 @@ class Speedguard_Admin {
 		}
 		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'assets/js/speedguard-admin.js', array( 'jquery','jquery-ui-autocomplete'), date('h:i:s'), false  );
 		
-		wp_enqueue_script('global',	plugin_dir_url( __FILE__ ) . 'assets/js/global.min.js',	array( 'jquery' ), $this->version, true);
-		wp_localize_script(		'global',		'global',		array('search_api' => home_url( '/wp-json/speedguard/search' ), 
+		wp_enqueue_script('speedguard-search',	plugin_dir_url( __FILE__ ) . 'assets/js/speedguard-search.js',	array( 'jquery' ), $this->version, true);
+		wp_localize_script(		'speedguard-search',		'speedguard-search',		array('search_api' => home_url( '/wp-json/speedguard/search' ), 
+		//SpeedGuard_Tests::speedguard_search($request)
 		//'nonce' => wp_create_nonce('wp_rest')
 		));
 		

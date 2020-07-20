@@ -43,8 +43,10 @@ I have not found one and that's why I've built this plugin.
 I'll be happy to know that you find it useful as well, feel free to leave a review :)
 
 == Screenshots ==
-1. Running a site speed test
-
+1. Plugin installation
+2. Getting API Key
+3. Running a site speed test
+3. Settings: widgets, tests and notifications
 == Installation ==
 = Automatic plugin installation: =
 1. Go to Plugins > Add New in your WordPress Admin

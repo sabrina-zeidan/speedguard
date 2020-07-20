@@ -13,9 +13,17 @@ class SpeedGuardWidgets{
 	}
 
 	function speedguard_admin_bar_widget($wp_admin_bar ) { 
-		if((current_user_can('manage_options'))&&(is_singular(SpeedGuard_Admin::supported_post_types()))) {
-			global $post; 		
-				$speedguard_on = get_post_meta($post->ID,'speedguard_on', true);
+		if (is_singular(SpeedGuard_Admin::supported_post_types())) {
+			$type = 'single';
+		}
+		else if (is_archive()) {
+			$type = 'archive';
+		}
+		if((current_user_can('manage_options'))&&(!empty($type))) {
+			global $post; 
+				$current_item_id = ($type == 'archive') ? get_queried_object()->term_id : $post->ID;
+				$current_item_link = ($type == 'archive') ? get_term_link($current_item_id) : get_permalink($current_item_id);
+				$speedguard_on = ($type == 'archive') ? get_term_meta($current_item_id,'speedguard_on', true) : get_post_meta($current_item_id,'speedguard_on', true);	
 				if ($speedguard_on && $speedguard_on[0] == 'true'){
 				$page_load_speed = get_post_meta($speedguard_on[1],'load_time');
 				$page_load_speed = $page_load_speed[0]['displayValue'];		
@@ -33,17 +41,19 @@ class SpeedGuardWidgets{
 					}					
 				}
 				else {
+
 					$add_url_link = add_query_arg( array(
 							'speedguard'=> 'add_new_url',
-							'new_url_id'=>$post->ID,
+							'new_url_id'=> $current_item_id,
 							),Speedguard_Admin::speedguard_page_url('tests')); 
- 							
+ 					
 					$title = '<form action="'.$add_url_link.'" method="post">
-						<input type="hidden" name="speedguard" value="add_new_url" /> 
-						<input type="hidden" id="blog_id" name="blog_id" value="" />
-						<input type="hidden" name="speedguard_new_url_id" value="'.$post->ID.'" />
-						<input type="hidden" id="speedguard_new_url_permalink" name="speedguard_new_url_permalink" value="'.get_permalink($post).'"/>
-											<button style="border: 0;  background: transparent; color:inherit; cursor:pointer;">'.__('Test this page load time','speedguard').'</button></form>';
+					<input type="hidden" id="blog_id" name="blog_id" value="" />
+					<input type="hidden" name="speedguard" value="add_new_url" /> 
+					<input type="hidden" name="speedguard_new_url_id" value="'.$current_item_id.'" />	
+					<input type="hidden" id="speedguard_new_url_permalink" name="speedguard_new_url_permalink" value="'.$current_item_link.'"/>
+					<input type="hidden" id="speedguard_item_type" name="speedguard_item_type" value="'.$type.'"/> 
+					<button style="border: 0;  background: transparent; color:inherit; cursor:pointer;">'.__('Test speed','speedguard').'</button></form>';
 					$href = Speedguard_Admin::speedguard_page_url('tests');
 					$class='';
 					$atitle='';
@@ -76,7 +86,7 @@ class SpeedGuardWidgets{
 			$speedguard_average = Speedguard_Admin::get_this_plugin_option('speedguard_average' );	
 			//var_dump($speedguard_average);	
 			if (is_array($speedguard_average)) 	$average_load_time = $speedguard_average['average_load_time'];
-					if (isset($average_load_time)){
+					if (!empty($average_load_time)){
 						$min_load_time = $speedguard_average['min_load_time'];
 						$max_load_time = $speedguard_average['max_load_time'];			
 						$content =  "<div class='speedguard-results'>
@@ -131,11 +141,12 @@ class SpeedGuardWidgets{
 									';
 		echo $content;
 	}
-	public static function add_new_url_meta_box(){
+	public static function add_new_url_meta_box(){		
 		$content = '<form name="speedguard_add_url" id="speedguard_add_url"  method="post" action="">   
 		<input class="form-control"  type="text" id="speedguard_new_url" name="speedguard_new_url" value="" placeholder="'.__('Start typing the title of the post, page or custom post type...','speedguard').'" autofocus="autofocus"/>
 		<input type="hidden" id="blog_id" name="blog_id" value="" />
 		<input type="hidden" id="speedguard_new_url_permalink" name="speedguard_new_url_permalink" value=""/> 
+		<input type="hidden" id="speedguard_item_type" name="speedguard_item_type" value=""/> 
 		<input type="hidden" id="speedguard_new_url_id" name="speedguard_new_url_id" value=""/>
 		<input type="hidden" name="speedguard" value="add_new_url" />
 		<input type="submit" name="Submit" value="'.__('Add','speedguard').'" />
