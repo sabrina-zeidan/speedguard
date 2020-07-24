@@ -80,7 +80,7 @@ class SpeedGuard_Settings{
 			if ( 'load_time' == $meta_key && $meta_value != 'waiting' ) {
 				$args = array(
 				'no_found_rows' => true, 
-				'post_type' => SpeedGuard_Admin::$cpt_name,
+				'post_type' => Speedguard_Admin::$cpt_name,
 				'post_status' => 'publish',
 				'posts_per_page'   => -1, 
 				'fields' =>'ids',
@@ -96,7 +96,7 @@ class SpeedGuard_Settings{
 				$waiting_tests = $the_query->get_posts();
 					if (count($waiting_tests) == 0){					
 						$args = array(
-							'post_type' => SpeedGuard_Admin::$cpt_name,
+							'post_type' => Speedguard_Admin::$cpt_name,
 							'post_status' => 'publish',
 							'posts_per_page'   => -1, 
 							'fields' =>'ids'
@@ -130,7 +130,7 @@ class SpeedGuard_Settings{
 												'guarded_pages_count' => 0							
 												);
 							}
-						if ($new_averages) Speedguard_Admin::update_this_plugin_option('speedguard_average', $new_averages);						
+						Speedguard_Admin::update_this_plugin_option('speedguard_average', $new_averages);						
 						wp_reset_postdata();
 					}
 				wp_reset_postdata();

@@ -62,7 +62,7 @@ class SpeedGuard_List_Table extends WP_List_Table{
     private function table_data(string $client_id = '')    {
         $data = array();		
 		$args = array(
-					'post_type' => SpeedGuard_Admin::$cpt_name,
+					'post_type' => Speedguard_Admin::$cpt_name,
 					'post_status' => 'publish',
 					//TODO limit the number, ajax chunks
 					'posts_per_page'   => -1,
@@ -98,8 +98,8 @@ class SpeedGuard_List_Table extends WP_List_Table{
 			$speedguard_on = get_term_meta( $guarded_post_id,'speedguard_on', true);
 			//$speedguard_on = get_post_meta( $guarded_post_id,'speedguard_on', true);
 			var_dump($speedguard_on);
-		$vv = is_archive($guarded_post_id)	;
-var_dump($vv);	
+//		$vv = is_archive($guarded_post_id)	;
+//var_dump($vv);	
 			
 			$connection = get_post_meta( $guarded_page_id,'speedguard_page_connection', true);
 			$load_time = get_post_meta( $guarded_page_id,'load_time');			
@@ -206,62 +206,62 @@ class SpeedGuard_Tests{
 	function get_items_permissions_check( $request ) {
 		return current_user_can( 'edit_posts' );
 	}
-  
+
+	function speedguard_search($request){
+		$args = array(
+			'post_type' => Speedguard_Admin::supported_post_types(),
+			'post_status' => 'publish',
+			'posts_per_page'   => -1,
+			'fields'   => 'ids',
+			's'             => $request['term'],
+			'no_found_rows' => true,  
+			'update_post_meta_cache' => false,
+			'update_post_term_cache' => false
+			);
+		$the_query = new WP_Query( $args );								
+		$this_blog_found_posts = $the_query->get_posts();
+			$temp = array();
+			foreach( $this_blog_found_posts as $key => $post_id) { 
+				$key = 'ID';
+				$temp = array(
+					'ID' => $post_id,
+					'permalink' => get_permalink($post_id),
+					'blog_id' =>  get_current_blog_id(),
+					'label' => get_the_title($post_id),
+					'type' => 'single'
+					);
+				$posts[] = $temp;											
+			}	
+	//Include Terms too, and search all
+	$the_terms = get_terms( array(
+	  'name__like' => $request['term'],
+	  'hide_empty' => false // Optional
+	));
+	if ( count($the_terms) > 0 ) {
+	  foreach ( $the_terms as $term ) {
+		$key = 'ID';
+				$temp = array(
+					'ID' => $term->term_id,
+					'permalink' => get_term_link( $term ),
+					'blog_id' =>  get_current_blog_id(),
+					'label' => $term->name,
+					'type' => 'archive'
+					);
+				$posts[] = $temp;			
+				
+	  }
+	}
+	
+	
+	
+			
+		return $posts;
+	}
 
 	function speedguard_rest_api_search( $request ) {
 		if ( empty( $request['term'] ) ) {
 			return;
 		}		
-		function speedguard_search($request){
-			$args = array(
-				'post_type' => SpeedGuard_Admin::supported_post_types(),
-				'post_status' => 'publish',
-				'posts_per_page'   => -1,
-				'fields'   => 'ids',
-				's'             => $request['term'],
-				'no_found_rows' => true,  
-				'update_post_meta_cache' => false,
-				'update_post_term_cache' => false
-				);
-			$the_query = new WP_Query( $args );								
-			$this_blog_found_posts = $the_query->get_posts();
-				$temp = array();
-				foreach( $this_blog_found_posts as $key => $post_id) { 
-					$key = 'ID';
-					$temp = array(
-						'ID' => $post_id,
-						'permalink' => get_permalink($post_id),
-						'blog_id' =>  get_current_blog_id(),
-						'label' => get_the_title($post_id),
-						'type' => 'single'
-						);
-					$posts[] = $temp;											
-				}	
-		//Include Terms too, and search all
-		$the_terms = get_terms( array(
-		  'name__like' => $request['term'],
-		  'hide_empty' => false // Optional
-		));
-		if ( count($the_terms) > 0 ) {
-		  foreach ( $the_terms as $term ) {
-			$key = 'ID';
-					$temp = array(
-						'ID' => $term->term_id,
-						'permalink' => get_term_link( $term ),
-						'blog_id' =>  get_current_blog_id(),
-						'label' => $term->name,
-						'type' => 'archive'
-						);
-					$posts[] = $temp;			
-					
-		  }
-		}
-		
-		
-		
-				
-			return $posts;
-		}
 
 		//search all blogs if Network Activated
 		if (defined('SPEEDGUARD_MU_NETWORK')) {     
@@ -270,13 +270,13 @@ class SpeedGuard_Tests{
 				foreach ($sites as $site ) {
 					$blog_id = $site->blog_id;				
 					switch_to_blog( $blog_id );
-						$this_blog_posts = speedguard_search($request);
+						$this_blog_posts = $this->speedguard_search($request);
 						$posts = array_merge($posts, $this_blog_posts);
 					restore_current_blog();	 				
 				}//endforeach					
 		}//endif network
 		else {		
-			$posts = speedguard_search($request);
+			$posts = $this->speedguard_search($request);
 		}
  		
 		return $posts;	
@@ -362,7 +362,7 @@ class SpeedGuard_Tests{
 						$new_target_page = array( 
 							'post_title'           => $code,
 							'post_status'   => 'publish',	
-							'post_type'   => SpeedGuard_Admin::$cpt_name,	 
+							'post_type'   => Speedguard_Admin::$cpt_name,	 
 						);												
 						
 						if (defined('SPEEDGUARD_MU_NETWORK')) switch_to_blog(get_network()->site_id);   

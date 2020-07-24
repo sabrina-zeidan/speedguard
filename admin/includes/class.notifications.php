@@ -23,7 +23,7 @@ class SpeedGuard_Notifications{
 				$subject = sprintf(__('%1$s speed report [SpeedGuard]','speedguard'),$site_url);
 			}
 			$args = array(
-				'post_type' => SpeedGuard_Admin::$cpt_name ,
+				'post_type' => Speedguard_Admin::$cpt_name ,
 				'post_status' => 'publish',
 				'posts_per_page'   => -1, 
 				'fields' =>'ids',

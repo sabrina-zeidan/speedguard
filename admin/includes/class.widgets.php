@@ -13,7 +13,7 @@ class SpeedGuardWidgets{
 	}
 
 	function speedguard_admin_bar_widget($wp_admin_bar ) { 
-		if (is_singular(SpeedGuard_Admin::supported_post_types())) {
+		if (is_singular(Speedguard_Admin::supported_post_types())) {
 			$type = 'single';
 		}
 		else if (is_archive()) {
