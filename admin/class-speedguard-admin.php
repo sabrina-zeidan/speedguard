@@ -4,35 +4,16 @@
  *
  * @link       http://sabrinazeidan.com/
  * @since      1.0.0
- * 
  * @package    Speedguard
  * @subpackage Speedguard/admin 
- */
-
-/**
- * The admin-specific functionality of the plugin.
- *
- * Defines the plugin name, version, and two examples hooks for how to
- * enqueue the admin-specific stylesheet and JavaScript.
- *
- * @package    Speedguard
- * @subpackage Speedguard/admin
  * @author     Sabrina Zeidan <sabrinazeidan@gmail.com>
  */
  
 class Speedguard_Admin {
 	static public $cpt_name = 'guarded-page';	
-	/**
-	 * The ID of this plugin.
-	 * 
-	 * @since    1.0.0
-	 * @access   private
-	 * @var      string    $plugin_name    The ID of this plugin.
-	 */
 	private $plugin_name; 
 	private $version;
 
-	//public function __construct( $plugin_name, $version, $network ) { 
 	public function __construct( $plugin_name, $version ) { 
 		$this->plugin_name = $plugin_name;
 		$this->version = $version; 
@@ -61,23 +42,74 @@ class Speedguard_Admin {
 		//MU Headers alredy sent fix
 		add_action('init', array( $this, 'app_output_buffer'));
 		
-		//add_action('wp_head',array( $this, 'fix_backwards_compatibility_wpt') );
-		
 		 // Add removable query args
-+        add_filter( 'removable_query_args', array( $this, 'removable_query_args' ) );
-		}	
+        add_filter( 'removable_query_args', array( $this, 'removable_query_args' ) );
+		add_filter((defined('SPEEDGUARD_MU_NETWORK') ? 'network_admin_' : ''). 'plugin_action_links_speedguard/speedguard.php', array( $this, 'speedguard_actions_links' ) );
+		}
+
+		add_action( 'admin_footer', array($this, 'run_waiting_tests_ajax')); 	
+		add_action( 'wp_ajax_run_waiting_tests', array($this, 'run_waiting_tests' ));
+
 	}
+	function run_waiting_tests_ajax(){ 
+		if (Speedguard_Admin::is_screen('tests') || Speedguard_Admin::is_screen('clients')) {
+			$args = array( 					
+					'post_type' => SpeedGuard_Admin::$cpt_name,
+					'post_status' => 'publish',
+					'posts_per_page'   => -1,
+					'fields'=>'ids',
+					'meta_query' => array(array('key' => 'load_time','value' => 'waiting','compare' => 'LIKE')),
+					'fields' => 'ids',
+					'no_found_rows' => true, 
+				);
+			
+				$the_query = new WP_Query( $args );
+				$waiting_pages = $the_query->get_posts();
+				wp_reset_postdata();
+				if (count($waiting_pages) < 1) return;
+				
+	?>
+		<script type="text/javascript" >
+			jQuery(document).ready(function($) {
+				var data = {
+					'action': 'run_waiting_tests',
+					'post_ids': <?php echo json_encode( array_values( $waiting_pages ) ); ?>,
+				};
+			jQuery.post(ajaxurl, data, function(response) {
+				setTimeout(function () {
+					window.location.replace(window.location.href + "&speedguard=load_time_updated");
+					}, 10000) 
+			});
+			});
+		</script>
+	<?
+		}
+	}	
+
+	function run_waiting_tests() {
+		global $wpdb; 
+		$posts_ids = $_POST['post_ids'] ;
+		foreach ($posts_ids as $post_id){
+			$test_created = SpeedGuard_Lighthouse::lighthouse_new_test($post_id);
+		}
+		echo count($posts_ids);
+		wp_die();
+	}
+
 	
+	public function speedguard_actions_links( array $actions ) {
+		return array_merge( array(
+			'settings' => sprintf(__( '%1$sSettings%2$s', 'speedguard' ),'<a href="' .Speedguard_Admin::speedguard_page_url('settings'). '">','</a>'),
+			'tests' => sprintf(__( '%1$sTests%2$s', 'speedguard' ),'<a href="' .Speedguard_Admin::speedguard_page_url('tests'). '">','</a>')
+		), $actions );
+	}
 	 public function removable_query_args( $query_args ) {
 		if (Speedguard_Admin::is_screen('settings,tests,clients')){	
-			$new_query_args = array('speedguard');
+			$new_query_args = array('speedguard','new_url_id');
 			$query_args = array_merge( $query_args, $new_query_args );
 		}
         return $query_args;
     }
-
-
-
 
 	function fix_backwards_compatibility_wpt(){
 		if (Speedguard_Admin::is_screen('tests')){	
@@ -104,7 +136,7 @@ class Speedguard_Admin {
 				$process_bulk_action = SpeedGuard_Tests::handle_bulk_retest_load_time('retest_load_time', $guarded_pages);	
 				}
 				
-				delete_transient( 'speedguard-notice-activation' );
+				//delete_transient( 'speedguard-notice-activation' );
 			}
 		}	
 	}
@@ -234,9 +266,9 @@ class Speedguard_Admin {
 	}
 	public static function speedguard_cpt() {
 		$args = array( 			
-			'public'      => true, 
+			'public'      => false, 
 			'exclude_from_search'      => true, 
-			'publicly_queryable'      => true, 
+			//'publicly_queryable'      => true, 
 			'show_ui'      => true, 
 			'supports' => array('title','custom-fields'),	
 		); 			
@@ -244,7 +276,7 @@ class Speedguard_Admin {
 	}		
 	//Plugin Styles
 	public function enqueue_styles() { 
-		if (Speedguard_Admin::is_screen('dashboard,settings,tests')){		
+		if (Speedguard_Admin::is_screen('dashboard,settings,tests') || !is_admin()){		
 			//wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'assets/css/speedguard-admin.css', array(), $this->version ); 
 			wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'assets/css/speedguard-admin.css', array(), date('h:i:s') ); 
 		}
@@ -258,14 +290,17 @@ class Speedguard_Admin {
 			wp_enqueue_script('postbox');  
 			
 		}
-		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'assets/js/speedguard-admin.js', array( 'jquery','jquery-ui-autocomplete'), date('h:i:s'), false  );
-		
-		wp_enqueue_script('speedguard-search',	plugin_dir_url( __FILE__ ) . 'assets/js/speedguard-search.js',	array( 'jquery' ), $this->version, true);
-		wp_localize_script(		'speedguard-search',		'speedguard-search',		array('search_api' => home_url( '/wp-json/speedguard/search' ), 
-		//SpeedGuard_Tests::speedguard_search($request)
-		//'nonce' => wp_create_nonce('wp_rest')
-		));
-		
+		if (Speedguard_Admin::is_screen('settings,tests,plugins,clients') || !is_admin()){
+			wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'assets/js/speedguard-admin.js', array( 'jquery','jquery-ui-autocomplete'), date('h:i:s'), false  );
+		}
+		if (Speedguard_Admin::is_screen('tests')){
+			wp_enqueue_script('speedguardsearch',	plugin_dir_url( __FILE__ ) . 'assets/js/speedguard-search.js',	array( 'jquery' ), $this->version, true);
+			wp_localize_script(	'speedguardsearch',		'speedguardsearch',		array('search_api' => home_url( '/wp-json/speedguard/search' ), 
+			//SpeedGuard_Tests::speedguard_search($request)
+			//'nonce' => wp_create_nonce('wp_rest')
+			));
+		}
+			
 	}
 	//Plugin Body classes
 	function body_classes_filter($classes) {		
@@ -276,7 +311,7 @@ class Speedguard_Admin {
 		if (Speedguard_Admin::is_screen('plugins')){	
 			if (get_transient('speedguard-notice-activation')){
 				$classes = $classes.' speedguard-just-activated'; 
-				delete_transient( 'speedguard-notice-activation' );
+			//	delete_transient( 'speedguard-notice-activation' );
 			}
 		}		
 		return $classes;
@@ -294,24 +329,33 @@ class Speedguard_Admin {
 		if (!current_user_can('manage_options')) return;
 			$speedguard_options = Speedguard_Admin::get_this_plugin_option('speedguard_options' );		
 		if (!(Speedguard_Admin::is_screen('tests')) && (!isset($speedguard_average['guarded_pages_count']) )) {
-			
 			$message = sprintf(__( 'Everything is ready to test your site speed! %1$sAdd some pages%2$s to start testing.', 'speedguard' ),'<a href="' .Speedguard_Admin::speedguard_page_url('tests'). '">','</a>');
-			$notices =  Speedguard_Admin::set_notice( $message,'warning' );	  
+			//$notices =  Speedguard_Admin::set_notice( $message,'warning' );	
+			//TODO Notice, if nothing except homepage is added
 		}
 		
+		if((Speedguard_Admin::is_screen('plugins')) && (get_transient( 'speedguard-notice-activation'))){   
+			$add_homepage = SpeedGuard_Tests::add_test(get_site_url());
+			delete_transient( 'speedguard-notice-deactivation' );	
+			if (empty(get_transient( 'speedguard-homepage-added-previousely'))){
+				$message = sprintf(__( 'Homepage speed test has just started. Would you like to %1$stest some other pages%2$s as well?', 'speedguard' ),'<a href="' .Speedguard_Admin::speedguard_page_url('tests'). '">','</a>');
+				$notices =  Speedguard_Admin::set_notice( $message,'success' );	  
+			}
+				
+		} 		 		
 		
 		if ( ! empty( $_POST['speedguard'] ) && $_POST['speedguard'] == 'add_new_url' ) {
-			//var_dump($_POST);
-			$notices = SpeedGuard_Tests::import_data($_POST);
+			
+			//$notices = SpeedGuard_Tests::add_test($_POST);
+			//$notices = SpeedGuard_Tests::add_test($_POST['speedguard_new_url_permalink'], $_POST['speedguard_item_type'],$_POST['speedguard_new_url_id'],$_POST['blog_id']);
+			$url = (!empty($_POST['speedguard_new_url_permalink'])) ? $_POST['speedguard_new_url_permalink'] : $_POST['speedguard_new_url'];
+			$notices = SpeedGuard_Tests::add_test($url, $_POST['speedguard_item_type'],$_POST['speedguard_new_url_id'],$_POST['blog_id']);
 		}
 		//TODO show notice while tests are running
 		if ( ! empty( $_REQUEST['speedguard'] ) && $_REQUEST['speedguard'] == 'retest_load_time' ) {
-			$notices = Speedguard_Admin::set_notice(__('Wait a sec','speedguard'),'success' );	 
+			$notices = Speedguard_Admin::set_notice(__('Tests are running...','speedguard'),'success' );	 
 		}
-
-		if ( ! empty( $_REQUEST['speedguard'] ) && $_REQUEST['speedguard'] == 'retesting_load_time' ) {
-			$notices = Speedguard_Admin::set_notice(__('Updated','speedguard'),'success' );	  
-		}
+		
 		if ( ! empty( $_REQUEST['speedguard'] ) && $_REQUEST['speedguard'] == 'add_new_url_error_empty' ) {
 			$notices =  Speedguard_Admin::set_notice(__('Please select the post you want to add.','speedguard'),'warning' );	  
 		}
@@ -325,6 +369,9 @@ class Speedguard_Admin {
 			$notices =  Speedguard_Admin::set_notice(__('Settings have been updated!'),'success' );   			 
 		 
 		}
+		if ( ! empty( $_REQUEST['speedguard'] ) && $_REQUEST['speedguard'] == 'already_guarded' ) {
+			$notices =  Speedguard_Admin::set_notice(__('This URL is already guarded!','speedguard'),'warning' );   												
+		}
 		if ( ! empty( $_REQUEST['speedguard'] ) && $_REQUEST['speedguard'] == 'new_url_added' ) {
 			$notices =  Speedguard_Admin::set_notice(__('New URL is successfully added!','speedguard'),'success' );   						
 							
@@ -333,7 +380,7 @@ class Speedguard_Admin {
 			$notices =  Speedguard_Admin::set_notice(__('You are moving to fast. Wait at least 5 minutes before updating the tests','speedguard'),'warning' );	  
 		}
 		if ( ! empty( $_REQUEST['speedguard'] ) && $_REQUEST['speedguard'] == 'load_time_updated' ) { 
-			$notices =  Speedguard_Admin::set_notice(__('Results have been successfully updated!','speedguard'),'success' );	  
+			$notices =  Speedguard_Admin::set_notice(__('Results are being updated!','speedguard'),'success' );	  
 		}
 		if ( ! empty( $_REQUEST['speedguard'] ) && $_REQUEST['speedguard'] == 'delete_guarded_pages' ) { 			
 			$notices =  Speedguard_Admin::set_notice(__('Selected pages are not guarded anymore!','speedguard'),'success' );						

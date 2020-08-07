@@ -69,10 +69,10 @@ class SpeedGuard_Settings{
 					$admin_email = $speedguard_options['email_me_at'];
 					$check_recurrence = $speedguard_options['check_recurrence'];				
 						wp_clear_scheduled_hook('speedguard_update_results');
+						wp_clear_scheduled_hook('speedguard_email_test_results');
 						if (!wp_next_scheduled ( 'speedguard_update_results' )) {				
 							wp_schedule_event(time(), 'speedguard_interval', 'speedguard_update_results');
-						}
-											
+						}										
 				}
 	}
 		
@@ -99,9 +99,10 @@ class SpeedGuard_Settings{
 							'post_type' => SpeedGuard_Admin::$cpt_name,
 							'post_status' => 'publish',
 							'posts_per_page'   => -1, 
-							'fields' =>'ids'
-											);
+							'fields' =>'ids'								
+							);
 						$the_query = new WP_Query( $args );
+	
 						$guarded_pages = $the_query->get_posts();
 						$guarded_page_load_time_all = array();
 						
@@ -109,17 +110,19 @@ class SpeedGuard_Settings{
 						if (count($guarded_pages) > 0) {		
 							foreach($guarded_pages as $guarded_page) {
 								$guarded_page_load_time = get_post_meta(  $guarded_page,'load_time');  
-								if ($guarded_page_load_time) $guarded_page_load_time = round(($guarded_page_load_time[0]['numericValue']/1000),1);			
-								if ($guarded_page_load_time) $guarded_page_load_time_all[] = $guarded_page_load_time;
+								if (!empty($guarded_page_load_time[0]['numericValue']) &&$guarded_page_load_time[0]['numericValue'] > 0){
+									$guarded_page_load_time = round(($guarded_page_load_time[0]['numericValue']/1000),1);			
+									$guarded_page_load_time_all[] = $guarded_page_load_time;
+								}
 							}
-							$average_load_time = round(array_sum($guarded_page_load_time_all)/count($guarded_pages),1); 
+							$average_load_time = round(array_sum($guarded_page_load_time_all)/count($guarded_page_load_time_all),1); 
 							$min_load_time = min($guarded_page_load_time_all);
 							$max_load_time = max($guarded_page_load_time_all);	
 							$new_averages = array(
 								'average_load_time'=> $average_load_time,
 								'min_load_time'=> $min_load_time,
 								'max_load_time' => $max_load_time,
-								'guarded_pages_count' => count($guarded_pages)							
+								'guarded_pages_count' => count($guarded_page_load_time_all)							
 							); 
 						}						
 						else {

@@ -22,8 +22,7 @@
  */
 class Speedguard_Activator {
 	public static function activate() {	
-	set_transient( 'speedguard-notice-activation', true, 20 );
-
+		set_transient( 'speedguard-notice-activation', true, 20 );
 	}			
 			
 }	 

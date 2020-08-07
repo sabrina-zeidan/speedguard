@@ -13,35 +13,61 @@ class SpeedGuardWidgets{
 	}
 
 	function speedguard_admin_bar_widget($wp_admin_bar ) { 
+			if (!current_user_can('manage_options')) return;	
 		if (is_singular(SpeedGuard_Admin::supported_post_types())) {
+			global $post; 
 			$type = 'single';
+			$current_item_id = $post->ID;
+			$current_item_link = get_permalink($current_item_id);
+			$speedguard_on = get_post_meta($current_item_id,'speedguard_on', true);		
+			if ($speedguard_on && $speedguard_on[0] == 'true'){
+				$is_guarded = true;
+				$test_id = $speedguard_on[1];
+				$load_time = get_post_meta( $test_id,'load_time');			
+			}
+			else {
+				$is_guarded = false;
+			}							
 		}
 		else if (is_archive()) {
 			$type = 'archive';
+			$current_item_id = get_queried_object()->term_id;
+			$current_item_link = get_term_link($current_item_id);
+			$speedguard_on = get_term_meta($current_item_id,'speedguard_on', true);
+			if ($speedguard_on && $speedguard_on[0] == 'true'){
+				$is_guarded = true;
+				$test_id = $speedguard_on[1];
+				$load_time = get_post_meta( $test_id,'load_time');					
+			}
+			else {
+				$is_guarded = false;
+			}					
+			
 		}
-		if((current_user_can('manage_options'))&&(!empty($type))) {
-			global $post; 
-				$current_item_id = ($type == 'archive') ? get_queried_object()->term_id : $post->ID;
-				$current_item_link = ($type == 'archive') ? get_term_link($current_item_id) : get_permalink($current_item_id);
-				$speedguard_on = ($type == 'archive') ? get_term_meta($current_item_id,'speedguard_on', true) : get_post_meta($current_item_id,'speedguard_on', true);	
-				if ($speedguard_on && $speedguard_on[0] == 'true'){
-				$page_load_speed = get_post_meta($speedguard_on[1],'load_time');
-				$page_load_speed = $page_load_speed[0]['displayValue'];		
-					if ($page_load_speed != "waiting") { 					
-						$title = sprintf(__( '%1$s', 'speedguard' ),$page_load_speed);	
-						$href = Speedguard_Admin::speedguard_page_url('tests').'#speedguard-add-new-url-meta-box';
-						$class = get_post_meta($speedguard_on[1],'load_time_score', true); 
-						$atitle = __('This page load time','speedguard');
-					}
-					else {
-						$title = sprintf(__( 'In process', 'speedguard' ),$page_load_speed);	
-						$href = Speedguard_Admin::speedguard_page_url('tests').'#speedguard-add-new-url-meta-box';
-						$class = get_post_meta($speedguard_on[1],'load_time_score', true); 
-						$atitle = __('Results are currently being updated','speedguard');
-					}					
+		else if (is_home()) {
+			$type = 'homepage'; 
+			$current_item_id = '';
+			$current_item_link = get_site_url(); //TODO Multisite
+			//Check if it's already guarded				
+				$homepage_found = SpeedGuard_Tests::is_homepage_guarded();
+				if (!empty($homepage_found)){							
+					$is_guarded = true;
+					$test_id = $homepage_found;
+					$load_time = get_post_meta( $test_id,'load_time');							
 				}
 				else {
-
+					$is_guarded = false;
+				}							
+		}
+		//The output			
+		//There is the load time
+		if (isset($is_guarded) && $is_guarded === true && $load_time[0]['displayValue']!= 'waiting') { 	
+			$title = '<span data-score="'.$load_time[0]['score'].'" class="speedguard-score"><span>●</span> '.$load_time[0]['displayValue'].'</span>';
+			$href = Speedguard_Admin::speedguard_page_url('tests').'#speedguard-add-new-url-meta-box';				
+			$atitle = __('This page load time','speedguard');
+		}
+		//Item is not guarded or test is in process currently
+		else if (isset($is_guarded) && $is_guarded === false) {
 					$add_url_link = add_query_arg( array(
 							'speedguard'=> 'add_new_url',
 							'new_url_id'=> $current_item_id,
@@ -55,22 +81,20 @@ class SpeedGuardWidgets{
 					<input type="hidden" id="speedguard_item_type" name="speedguard_item_type" value="'.$type.'"/> 
 					<button style="border: 0;  background: transparent; color:inherit; cursor:pointer;">'.__('Test speed','speedguard').'</button></form>';
 					$href = Speedguard_Admin::speedguard_page_url('tests');
-					$class='';
 					$atitle='';
-				}
-			
+		}			
 			$args = array( 
 				'id'    => 'speedguard_ab',
-				'title' => $title,
-				'href'  => $href,
+				'title' => isset($title) ? $title : '',
+				'href'  => isset($href) ? $href : '',
 				'meta'  => array( 
-				'class' => 'menupop '.$class, 
-				'title' => $atitle,
+				'class' => 'menupop', 
+				'title' => isset($atitle) ? $atitle : '',
 				'target' => 'blank'
 				)
 			);
 			$wp_admin_bar->add_node( $args );
-		}
+		
 	}
 	function speedguard_dashboard_widget() {  
 		wp_add_dashboard_widget('speedguard_dashboard_widget', __('Site Speed Results [Speedguard]','speedguard'), array($this,'speedguard_dashboard_widget_function'),'',array( 'echo' => 'true'));	
@@ -84,7 +108,6 @@ class SpeedGuardWidgets{
 	}	
 	public static function speedguard_dashboard_widget_function($post = '', $args = '') {
 			$speedguard_average = Speedguard_Admin::get_this_plugin_option('speedguard_average' );	
-			//var_dump($speedguard_average);	
 			if (is_array($speedguard_average)) 	$average_load_time = $speedguard_average['average_load_time'];
 					if (!empty($average_load_time)){
 						$min_load_time = $speedguard_average['min_load_time'];

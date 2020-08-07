@@ -2,8 +2,8 @@
 Contributors: sabrinazeidan
 Tags: speed, speed test, site speed, performance, optimization
 Requires at least: 4.7
-Tested up to: 5.4.2
-Stable tag: 1.7
+Tested up to: 5.5
+Stable tag: 1.8
 Requires PHP: 5.6
 License: GPLv2 or later 
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -21,7 +21,7 @@ Get the definite answer in less than 5 minutes:
 
 #### With SpeedGuard you get:
 
-* <strong>unlimited Google Lighthouse tests</strong>
+* <strong>unlimited Google Lighthouse tests (PageSpeed Insights API)</strong>
 * <strong>automatic </strong> everyday monitoring
 * <strong>desktop and mobile</strong> testing
 * <strong>daily reports</strong> about your site speed health are delivered straight to your inbox. If site performance gets worse, you'll be able to prevent big problems asap
@@ -44,7 +44,6 @@ I'll be happy to know that you find it useful as well, feel free to leave a revi
 
 == Screenshots ==
 1. Plugin installation
-2. Getting API Key
 3. Running a site speed test
 3. Settings: widgets, tests and notifications
 == Installation ==
@@ -93,6 +92,20 @@ It is! Use per-site activation.
 * Thanx to Baboon designs from the Noun Project for the timer icon.
 
 == Changelog ==
+
+= Version 1.8 =
+* [New] Support for archives is added
+* [New] Tests results can be sorted now (by time, URL and speed)
+* [New] Homepage test is added automatically on plugin activation
+* [Tweak] Tests are run with AJAX in the background
+* [Tweak] Already guarded items are excluded from autocomplete
+* [Tweak] Type-in validation improved
+* [Tweak] Settings and Tests links are added to plugin's tab on the Plugins page
+* [Fixed] Homepage can't be added if it an archive
+* [Fixed] Sanitization type-in doesn't work in all cases
+* [Fixed] Upcoming email notification is sent to the old email after it's been updated
+* [Fixed] Notice to wait for 5 minutes before next run stays even after 5 minutes passed
+* [Fixed] Email report contains a line with no results if the test is in running at the moment
 
 = Version 1.7 =
 * As WebPageTest.org stopped providing public API keys, SpeedGuard switched to make tests using [Google PageSpeed Insights API](https://developers.google.com/speed/pagespeed/insights/) which uses [Lighthouse](https://developers.google.com/web/tools/lighthouse) technology.

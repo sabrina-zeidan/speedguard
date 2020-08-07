@@ -1,13 +1,8 @@
-
-
-
 jQuery(document).ready(function($){
 	$("span.speedguard-score").each(function() {        
 	    $(this).data('score') > 0.7 ? $(this).children('span').addClass('score-green') : ($(this).data('score') > 0.4 ? $(this).children('span').addClass('score-yellow') : $(this).children('span').addClass('score-red'))  ;
        
-    });
-	
-       
+    });     
 	
 	//Feedback notice
 	$( "#leave-feedback" ).click(function() {

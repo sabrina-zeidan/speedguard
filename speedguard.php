@@ -1,11 +1,5 @@
 <?php
 /**
- * The plugin bootstrap file
- *
- * This file is read by WordPress to generate the plugin information in the plugin
- * admin area. This file also includes all of the dependencies used by the plugin,
- * registers the activation and deactivation functions, and defines a function
- * that starts the plugin.  
  *
  * @link              https://sabrinazeidan.com/
  * @since             1.0.0
@@ -27,7 +21,7 @@ if ( ! defined( 'WPINC' ) ) {
 	die;
 }
 
-define( 'SPEEDGUARD_VERSION', '1.7' );
+define( 'SPEEDGUARD_VERSION', '1.8' );
 
 
 /**

@@ -5,7 +5,7 @@
 /**General**/
 #adminmenu #toplevel_page_speedguard div.wp-menu-image {background-size: 18px auto;}
  
-#tests-list-meta-box .loading {background-image: url(../images/loading.gif); height: 18px; width: 18px;}
+#tests-list-meta-box .loading {background-image: url(../images/loading.gif); height: 18px; width: 18px; margin: 0 auto;}
 #tests-list-meta-box .column-guarded_page_title{   min-width:250px;}
 #tests-list-meta-box .column-load_time, #tests-list-meta-box .column-report_link, #tests-list-meta-box .column-report_date{text-align: center; width:90px; vertical-align: middle; }
 #tests-list-meta-box tbody .column-report_date{ text-align: center; font-size: 0.8em;}
