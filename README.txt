@@ -93,7 +93,8 @@ It is! Use per-site activation.
 
 == Changelog ==
 
-= Version 1.8 =
+= Version 1.8 - August 10, 2020 =
+
 * [New] Support for archives is added
 * [New] Tests results can be sorted now (by time, URL and speed)
 * [New] Homepage test is added automatically on plugin activation
@@ -108,6 +109,7 @@ It is! Use per-site activation.
 * [Fixed] Email report contains a line with no results if the test is in running at the moment
 
 = Version 1.7 =
+
 * As WebPageTest.org stopped providing public API keys, SpeedGuard switched to make tests using [Google PageSpeed Insights API](https://developers.google.com/speed/pagespeed/insights/) which uses [Lighthouse](https://developers.google.com/web/tools/lighthouse) technology.
 * Tracked performance metrics is [Largest Contentful Paint](https://web.dev/lcp/)
 * Minor bugs fixed

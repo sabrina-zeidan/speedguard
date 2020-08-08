@@ -138,8 +138,10 @@ class SpeedGuardWidgets{
 			add_meta_box( 'speedguard-add-new-url-meta-box', __('Add new','speedguard'), array('SpeedGuardWidgets', 'add_new_url_meta_box'), '', 'main-content', 'core' );
 			add_meta_box( 'tests-list-meta-box', __('Test results','speedguard'), array('SpeedGuard_Tests', 'tests_list_metabox' ), '', 'main-content', 'core' );
 			add_meta_box( 'speed-score-legend-meta-box',__('Largest Contentful Paint (LCP)','speedguard'), array('SpeedGuardWidgets', 'speed_score_legend_meta_box'), '', 'main-content', 'core' );	
+			add_meta_box( 'speedguard-important-questions-meta-box', __('Important questions:','speedguard'), array('SpeedGuardWidgets', 'important_questions_meta_box' ), '', 'side', 'core' );		
 			add_meta_box( 'speedguard-tips-meta-box', __('Why is my website slow?','speedguard'), array('SpeedGuard_Settings', 'tips_meta_box' ), '', 'side', 'core' ); 	
 			add_meta_box( 'speedguard-about-meta-box', __('Do you like this plugin?','speedguard'), array('SpeedGuardWidgets', 'about_meta_box' ), '', 'side', 'core' );				
+					
 					
 	}		
 	/*Meta Boxes Widgets*/ 
@@ -203,6 +205,15 @@ class SpeedGuardWidgets{
 		$content = $title.$description;
 		echo $content;
 	}
+	public static function important_questions_meta_box(){
+		$article_link = 'https://sabrinazeidan.com/how-fast-should-my-website-load/?utm_source=speedguard&utm_medium=sidebar&utm_campaign=important_questions';
+		$question_one = sprintf(__( '%1$sHow fast should a website load in 2020?%2$s', 'speedguard' ),
+					'<a href="' .$article_link. '" target="_blank">','</a>');	
+					
+		$content = '<ul><li>'.$question_one.'</li></ul>'; 
+		echo $content;
+	}	
+	
 	public static function about_meta_box(){
 		$picture = '<a href="https://sabrinazeidan.com" target="_blank"><div id="szpic"></div></a>';
 		$hey = sprintf(__( 'Hey!%1$s My name is Sabrina, I\'m the author of this plugin. %2$s', 'speedguard' ),'<p>','</p>');	
