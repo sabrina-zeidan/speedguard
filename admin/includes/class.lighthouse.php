@@ -12,7 +12,7 @@ class SpeedGuard_Lighthouse{
 		sleep(3); //So we can use LightHouse without API
 		
 		$guarded_page_url = get_post_meta($guarded_page_id,'speedguard_page_url', true);		
-		$device = Speedguard_Admin::get_this_plugin_option( 'speedguard_options' )['test_connection_type'];
+		$device = SpeedGuard_Admin::get_this_plugin_option( 'speedguard_options' )['test_connection_type'];
 		$request = add_query_arg( array(
 							'url'=> $guarded_page_url,
 							'category' => 'performance',	

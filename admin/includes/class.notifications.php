@@ -25,12 +25,12 @@ class SpeedGuard_Notifications{
 					wp_schedule_single_event( time() + 10*60, 'speedguard_email_test_results' ); 
 				}
 				else {
-				$speedguard_options = Speedguard_Admin::get_this_plugin_option('speedguard_options' );	
+				$speedguard_options = SpeedGuard_Admin::get_this_plugin_option('speedguard_options' );	
 				$admin_email = $speedguard_options['email_me_at']; 
 				$site_url = parse_url(get_home_url());							
 				$site_url = $site_url['host'];					
 				//$site_date = get_date_from_gmt(date('Y-m-d H:i:s',time()),'Y-m-d H:i:s');
-				$average_site_speed = Speedguard_Admin::get_this_plugin_option('speedguard_average');
+				$average_site_speed = SpeedGuard_Admin::get_this_plugin_option('speedguard_average');
 				$average_site_speed = $average_site_speed['average_load_time'];
 				$critical_load_time = $speedguard_options['critical_load_time'];
 				if ($type == 'critical_load_time'){
@@ -64,7 +64,7 @@ class SpeedGuard_Notifications{
 												<tr>
 													<td style="padding: 10px;" bgcolor="#f7f7f7"><p style="text-align:center; font-size: 1.2em; font-weight: bold;" >'.__('Average site speed is','speedguard').' '.$average_site_speed.'s</p>
 													<p>												
-													'.sprintf(__('See the entire %1$sreport%2$s in the WordPress admin.','speedguard'),'<a href="'.Speedguard_Admin::speedguard_page_url('tests').'" target="_blank">','</a>').'</p>												
+													'.sprintf(__('See the entire %1$sreport%2$s in the WordPress admin.','speedguard'),'<a href="'.SpeedGuard_Admin::speedguard_page_url('tests').'" target="_blank">','</a>').'</p>												
 													</td> 
 												</tr>
 												<tr> 
@@ -99,7 +99,7 @@ class SpeedGuard_Notifications{
 													</td> 
 												</tr>
 												<tr>
-													<td style="padding: 10px;color:#5f5a5a; text-align:right; font-size: 0.9em;" bgcolor="#e6e1e1" align="right">'.sprintf(__('This report was requested by administrator of %1$s','speedguard'),$site_url).'. '.sprintf(__('You can change SpeedGuard notification settings %1$shere%2$s any time.','speedguard'),'<a href="'.Speedguard_Admin::speedguard_page_url('settings').'" target="_blank">','</a>').'</td>
+													<td style="padding: 10px;color:#5f5a5a; text-align:right; font-size: 0.9em;" bgcolor="#e6e1e1" align="right">'.sprintf(__('This report was requested by administrator of %1$s','speedguard'),$site_url).'. '.sprintf(__('You can change SpeedGuard notification settings %1$shere%2$s any time.','speedguard'),'<a href="'.SpeedGuard_Admin::speedguard_page_url('settings').'" target="_blank">','</a>').'</td>
 												</tr>
 											</table>
 										</body>

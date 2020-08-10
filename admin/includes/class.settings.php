@@ -24,7 +24,6 @@ class SpeedGuard_Settings{
 		//Update options action function for Multisite
 		add_action('network_admin_edit_speedguard_update_settings', array($this, 'speedguard_update_settings'));
 	
-		
 		//update Averages when any load_time is updated 
 		add_action( 'added_post_meta', array( $this,'load_time_updated_function'), 10, 4 );
 		add_action( 'updated_post_meta', array( $this,'load_time_updated_function'), 10, 4 );
@@ -37,22 +36,22 @@ class SpeedGuard_Settings{
 		}
 
 	function default_options_set($new_value = '', $old_value = ''){		
-				$admin_email = Speedguard_Admin::get_this_plugin_option('admin_email');
+				$admin_email = SpeedGuard_Admin::get_this_plugin_option('admin_email');
 				if (empty($new_value['show_dashboard_widget'])) $new_value['show_dashboard_widget'] = 'on';
 				if (empty($new_value['show_ab_widget'])) $new_value['show_ab_widget'] = 'on';
 				if (empty($new_value['check_recurrence'])) $new_value['check_recurrence'] = '1';
 				if (empty($new_value['email_me_at'])) $new_value['email_me_at'] = $admin_email;
 				if (empty($new_value['email_me_case'])) $new_value['email_me_case'] = 'just in case average speed worse than';
-				if (empty($new_value['critical_load_time'])) $new_value['critical_load_time'] = '3';							
-				if (empty($new_value['test_connection_type'])) $new_value['test_connection_type'] = 'mobile';								
+				if (empty($new_value['critical_load_time'])) $new_value['critical_load_time'] = '3';
+				if (empty($new_value['test_connection_type'])) $new_value['test_connection_type'] = 'mobile';
 				return $new_value;				
 		}
 	function default_options_added($option, $new_value){ 
 				//TODO set options on activation
 				$new_value = $this->default_options_set(array());	 	
-				Speedguard_Admin::update_this_plugin_option('speedguard_options', $new_value);
+				SpeedGuard_Admin::update_this_plugin_option('speedguard_options', $new_value);
 				if ($option == 'speedguard_options'){
-					$speedguard_options = Speedguard_Admin::get_this_plugin_option('speedguard_options' );	
+					$speedguard_options = SpeedGuard_Admin::get_this_plugin_option('speedguard_options' );	
 					$admin_email = $speedguard_options['email_me_at'];
 					$check_recurrence = $speedguard_options['check_recurrence'];				
 						wp_clear_scheduled_hook('speedguard_update_results');
@@ -65,7 +64,7 @@ class SpeedGuard_Settings{
 		} 		
 	function speedguard_options_updated ($option, $old_value, $value ){
 			if ($option == 'speedguard_options'){
-					$speedguard_options = Speedguard_Admin::get_this_plugin_option('speedguard_options' );	
+					$speedguard_options = SpeedGuard_Admin::get_this_plugin_option('speedguard_options' );	
 					$admin_email = $speedguard_options['email_me_at'];
 					$check_recurrence = $speedguard_options['check_recurrence'];				
 						wp_clear_scheduled_hook('speedguard_update_results');
@@ -122,7 +121,7 @@ class SpeedGuard_Settings{
 								'average_load_time'=> $average_load_time,
 								'min_load_time'=> $min_load_time,
 								'max_load_time' => $max_load_time,
-								'guarded_pages_count' => count($guarded_page_load_time_all)							
+								'guarded_pages_count' => count($guarded_page_load_time_all)
 							); 
 						}						
 						else {
@@ -133,7 +132,7 @@ class SpeedGuard_Settings{
 												'guarded_pages_count' => 0							
 												);
 							}
-						if ($new_averages) Speedguard_Admin::update_this_plugin_option('speedguard_average', $new_averages);						
+						if ($new_averages) SpeedGuard_Admin::update_this_plugin_option('speedguard_average', $new_averages);						
 						wp_reset_postdata();
 					}
 				wp_reset_postdata();
@@ -141,7 +140,7 @@ class SpeedGuard_Settings{
 	}	
 	function update_results_cron_function() {					
 			//if send report on: schedule cron job 
-			$speedguard_options = Speedguard_Admin::get_this_plugin_option('speedguard_options' );	
+			$speedguard_options = SpeedGuard_Admin::get_this_plugin_option('speedguard_options' );	
 			$email_me_case = $speedguard_options['email_me_case'];
 				if ($email_me_case != 'never'){												
 					if (!wp_next_scheduled ( 'speedguard_email_test_results' )) {				
@@ -150,7 +149,7 @@ class SpeedGuard_Settings{
 					}
 				}
 			$args = array(
-				'post_type' => Speedguard_Admin::$cpt_name,
+				'post_type' => SpeedGuard_Admin::$cpt_name,
 				'post_status' => 'publish',
 				'posts_per_page'   => -1,
 				'fields'=> 'ids',
@@ -162,14 +161,14 @@ class SpeedGuard_Settings{
 			wp_reset_postdata();
 		}	         
 	function email_test_results_function() {
-			$speedguard_options = Speedguard_Admin::get_this_plugin_option('speedguard_options' );	
+			$speedguard_options = SpeedGuard_Admin::get_this_plugin_option('speedguard_options' );	
 			$email_me_case = $speedguard_options['email_me_case'];
 			if ($email_me_case == 'every time after tests are executed'){
 				SpeedGuard_Notifications::test_results_email('regular');
 			}
 			else if ($email_me_case == 'just in case average speed worse than'){			
 				$critical_load_time = $speedguard_options['critical_load_time'];
-				$average_load_time = Speedguard_Admin::get_this_plugin_option('speedguard_average' )['average_load_time'];
+				$average_load_time = SpeedGuard_Admin::get_this_plugin_option('speedguard_average' )['average_load_time'];
 				if ($average_load_time > $critical_load_time){ 
 					SpeedGuard_Notifications::test_results_email('critical_load_time'); 
 				}
@@ -177,7 +176,7 @@ class SpeedGuard_Settings{
 			
 		}		
 	function speedguard_cron_schedules($schedules){
-					$speedguard_options = Speedguard_Admin::get_this_plugin_option('speedguard_options' );	
+					$speedguard_options = SpeedGuard_Admin::get_this_plugin_option('speedguard_options' );	
 					$check_recurrence = $speedguard_options['check_recurrence'];
 							$value = constant( 'DAY_IN_SECONDS' );
 							$interval = (int)$check_recurrence*$value;
@@ -190,19 +189,19 @@ class SpeedGuard_Settings{
 	}				
 		
 	function show_dashboard_widget_fn( $args ) {
-		$options = Speedguard_Admin::get_this_plugin_option('speedguard_options');
+		$options = SpeedGuard_Admin::get_this_plugin_option('speedguard_options');
 		$field_name = esc_attr( $args['label_for'] );
 		if($options[$field_name] == 'on') { $checked = ' checked="checked" '; }	else { $checked = '';}
 		echo "<input type='hidden' name='speedguard_options[".$field_name."]' value='off' /><input ".$checked." id='speedguard_options[".$field_name."]' name='speedguard_options[".$field_name."]' type='checkbox' />";
 	}
 	function show_ab_widget_fn( $args ) {
-		$options = Speedguard_Admin::get_this_plugin_option('speedguard_options');
+		$options = SpeedGuard_Admin::get_this_plugin_option('speedguard_options');
 		$field_name = esc_attr( $args['label_for'] );
 		if($options[$field_name] == 'on') { $checked = ' checked="checked" '; }	else { $checked = '';}
 		echo "<input type='hidden' name='speedguard_options[".$field_name."]' value='off' /><input ".$checked." id='speedguard_options[".$field_name."]' name='speedguard_options[".$field_name."]' type='checkbox' />";
 	}
 	function check_recurrence_fn( $args ) {
-		$options = Speedguard_Admin::get_this_plugin_option('speedguard_options');
+		$options = SpeedGuard_Admin::get_this_plugin_option('speedguard_options');
 		$field_name = esc_attr( $args['label_for'] );
 		$days =_n(' day',' days',$options[$field_name],'speedguard');
 		$string = "<input id='speedguard_options[".$field_name."]' name='speedguard_options[".$field_name."]' type='text' class='numbers' size='2' value='".$options[$field_name]."'/> ".$days;
@@ -210,7 +209,7 @@ class SpeedGuard_Settings{
 		echo $string.$instructions;
 }
 	function email_me_at_fn( $args ) {
-		$options = Speedguard_Admin::get_this_plugin_option('speedguard_options');
+		$options = SpeedGuard_Admin::get_this_plugin_option('speedguard_options');
 		$field_name = esc_attr( $args['label_for'] ); 
 		echo "<input id='speedguard_options[".$field_name."]' name='speedguard_options[".$field_name."]' type='text' size='40' value='".$options[$field_name]."'/>";			
 	}
@@ -218,7 +217,7 @@ class SpeedGuard_Settings{
 				echo $item;
 			}
 	function email_me_case_fn( $args ) {
-		$options = Speedguard_Admin::get_this_plugin_option('speedguard_options');
+		$options = SpeedGuard_Admin::get_this_plugin_option('speedguard_options');
 		$field_name = esc_attr( $args['label_for'] );
 		$items = array(
 			'every time after tests are executed' => __('every time after tests are executed','speedguard'),
@@ -239,7 +238,7 @@ class SpeedGuard_Settings{
 	}		
 		
 	function test_connection_type_fn( $args ) {
-		$options = Speedguard_Admin::get_this_plugin_option('speedguard_options');
+		$options = SpeedGuard_Admin::get_this_plugin_option('speedguard_options');
 		$field_name = esc_attr( $args['label_for'] );
 		$items = array(
 			'mobile' => __('Mobile','speedguard'),
@@ -254,13 +253,11 @@ class SpeedGuard_Settings{
 	}
 	function critical_load_time_fn( $args ) { 
 	if ( isset($args['show']) && $args['show'] == true){
-		$options = Speedguard_Admin::get_this_plugin_option('speedguard_options');
+		$options = SpeedGuard_Admin::get_this_plugin_option('speedguard_options');
 		$field_name = esc_attr( $args['label_for'] );
 		echo " <input type='text' id='speedguard_options[critical_load_time]' name='speedguard_options[critical_load_time]'  class='numbers'  size='2' value='".$options[$field_name]."'> ".__('s','speedguard');
 		}
 	} 
-	
-		
 	
 	function speedguard_update_settings() {
 		check_admin_referer('speedguard-options');
@@ -295,25 +292,19 @@ class SpeedGuard_Settings{
 	}
 
 	public static function my_settings_page_function() {
-		if (Speedguard_Admin::is_screen('settings')){	
+		if (SpeedGuard_Admin::is_screen('settings')){	
 			SpeedGuardWidgets::add_meta_boxes();
 			?>
 			<div class="wrap">        
 				<h2><?php _e( 'SpeedGuard :: Settings', 'speedguard' ); ?></h2>				
 						<div id="poststuff" class="metabox-holder has-right-sidebar">
 							<div id="side-info-column" class="inner-sidebar">
-								<?php 							
-								do_meta_boxes( '', 'side', 0 ); ?>
+								<?php do_meta_boxes( '', 'side', 0 ); ?>
 							</div>
 							<div id="post-body" class="has-sidebar">
 								<div id="post-body-content" class="has-sidebar-content">
 								<form method="post" action="<?php print_r( defined('SPEEDGUARD_MU_NETWORK') ? 'edit.php?action=speedguard_update_settings' : 'options.php' ); ?>">
-								<?php   // wp_nonce_field( 'update-options' );
-								do_meta_boxes( '', 'normal', 0 );
-								//settings_fields('speedguard');
-			   // do_settings_sections('speedguard');
-				//submit_button();
-				?>
+								<?php  do_meta_boxes( '', 'normal', 0 ); ?>
 								</form>	
 
 			  
@@ -326,10 +317,13 @@ class SpeedGuard_Settings{
 			}
 	}	
 		
-	public static function tips_meta_box(){echo SpeedGuardWidgets::tips_meta_box();}			 
-	public static function settings_meta_box(){settings_fields('speedguard');do_settings_sections( 'speedguard' );  submit_button( __( 'Save Settings','speedguard'),'primary','submit',false );}
-		
+	public static function tips_meta_box(){
+		echo SpeedGuardWidgets::tips_meta_box();
+	}			 
+	public static function settings_meta_box(){
+		settings_fields('speedguard');
+		do_settings_sections( 'speedguard' );
+		submit_button( __( 'Save Settings','speedguard'),'primary','submit',false );
+	}		
 }
 new SpeedGuard_Settings; 
-
-

@@ -5,7 +5,7 @@
 */
 class SpeedGuardWidgets{
 	function __construct(){ 
-		$options = Speedguard_Admin::get_this_plugin_option( 'speedguard_options' );
+		$options = SpeedGuard_Admin::get_this_plugin_option( 'speedguard_options' );
 		if (!empty($options)){
 		if ($options['show_dashboard_widget'] === 'on')	add_action( 'wp_'.(defined('SPEEDGUARD_MU_NETWORK') ? 'network_' : ''). 'dashboard_setup', array( $this,'speedguard_dashboard_widget') ); 
 		if ($options['show_ab_widget'] === 'on') add_action( 'admin_bar_menu', array( $this,'speedguard_admin_bar_widget'),710);
@@ -63,7 +63,7 @@ class SpeedGuardWidgets{
 		//There is the load time
 		if (isset($is_guarded) && $is_guarded === true && $load_time[0]['displayValue']!= 'waiting') { 	
 			$title = '<span data-score="'.$load_time[0]['score'].'" class="speedguard-score"><span>●</span> '.$load_time[0]['displayValue'].'</span>';
-			$href = Speedguard_Admin::speedguard_page_url('tests').'#speedguard-add-new-url-meta-box';				
+			$href = SpeedGuard_Admin::speedguard_page_url('tests').'#speedguard-add-new-url-meta-box';				
 			$atitle = __('This page load time','speedguard');
 		}
 		//Item is not guarded or test is in process currently
@@ -71,7 +71,7 @@ class SpeedGuardWidgets{
 					$add_url_link = add_query_arg( array(
 							'speedguard'=> 'add_new_url',
 							'new_url_id'=> $current_item_id,
-							),Speedguard_Admin::speedguard_page_url('tests')); 
+							),SpeedGuard_Admin::speedguard_page_url('tests')); 
  					
 					$title = '<form action="'.$add_url_link.'" method="post">
 					<input type="hidden" id="blog_id" name="blog_id" value="" />
@@ -80,7 +80,7 @@ class SpeedGuardWidgets{
 					<input type="hidden" id="speedguard_new_url_permalink" name="speedguard_new_url_permalink" value="'.$current_item_link.'"/>
 					<input type="hidden" id="speedguard_item_type" name="speedguard_item_type" value="'.$type.'"/> 
 					<button style="border: 0;  background: transparent; color:inherit; cursor:pointer;">'.__('Test speed','speedguard').'</button></form>';
-					$href = Speedguard_Admin::speedguard_page_url('tests');
+					$href = SpeedGuard_Admin::speedguard_page_url('tests');
 					$atitle='';
 		}			
 			$args = array( 
@@ -107,7 +107,7 @@ class SpeedGuardWidgets{
 			$wp_meta_boxes['dashboard']['normal']['core'] = $sorted_dashboard;
 	}	
 	public static function speedguard_dashboard_widget_function($post = '', $args = '') {
-			$speedguard_average = Speedguard_Admin::get_this_plugin_option('speedguard_average' );	
+			$speedguard_average = SpeedGuard_Admin::get_this_plugin_option('speedguard_average' );	
 			if (is_array($speedguard_average)) 	$average_load_time = $speedguard_average['average_load_time'];
 					if (!empty($average_load_time)){
 						$min_load_time = $speedguard_average['min_load_time'];
@@ -116,13 +116,13 @@ class SpeedGuardWidgets{
 						<div class='result-column'><p class='result-numbers'>$max_load_time</p>".__('Worst','speedguard')."</div>
 						<div class='result-column'><p class='result-numbers average'>$average_load_time</p>".__('Average Load Time','speedguard')."</div>
 						<div class='result-column'><p class='result-numbers'>$min_load_time</p>".__('Best','speedguard')."</div>	
-						<a href='".Speedguard_Admin::speedguard_page_url('tests')."#speedguard-tips-meta-box' class='button button-primary' target='_blank'>".__('Improve','speedguard')."</a> 
+						<a href='".SpeedGuard_Admin::speedguard_page_url('tests')."#speedguard-tips-meta-box' class='button button-primary' target='_blank'>".__('Improve','speedguard')."</a> 
 						</div>
 						";						
 					}
 					else {
 					$content = sprintf(__( 'First %1$sadd URLs%2$s that should be guarded.', 'speedguard' ),
-					'<a href="' .Speedguard_Admin::speedguard_page_url('tests').'#speedguard-add-new-url-meta-box">',
+					'<a href="' .SpeedGuard_Admin::speedguard_page_url('tests').'#speedguard-add-new-url-meta-box">',
 					'</a>'
 					);
 					}
@@ -189,13 +189,13 @@ class SpeedGuardWidgets{
 			);
 			
 				$the_tips = array(
-				array('title' =>__('It might be your caching plugin.','speedguard'), 
-				'description' =>__( 'There are some basic things that ALL caching plugins do like: browser caching, server side caching, GZIP compression etc.','speedguard').'<p>'.__( 'There are some caching plugins that go further and take care of your database, minify CSS and JS files, defer their load etc.','speedguard').'</p><p>'.sprintf(__('My favourite one is %1$sWP Rocket%2$s. Because it’s not a caching plugin at all. It does much much more: from YouTube video lazy-loading to DNS-prefetching.','speedguard'),'<a href="' .$external_links['caching']['wprocket']. '" target="_blank">','</a>').'</p><p>'.sprintf(__('But the most important thing is that all WP Rocket’s features are aimed to improve real users’ experience and %1$sreduce the time before users can actually interact with your site%2$s. This is exactly what SpeedGuard measures, by the way.','speedguard'),'<strong>','</strong>').'</p><p>'.__('While site content that is not crucial at the moment is being loaded in the background, a user is already viewing your website. Isn’t that wonderful?','speedguard')),
-				array('title' =>__('It might be your hosting.','speedguard'), 
-				'description' =>__( 'The slowness of your website may be caused by slow server response time of your hosting. Google recommends keeping server response time under 200ms. An overloaded or poorly configured server may take up to 2 seconds to respond before your site even start to render.','speedguard').'<p><b>'.__( 'How to detect if your hosting is slow?','speedguard').'</b></p><p>'.sprintf(__('%1$sTest your website%2$s to see how long it takes your server to load.','speedguard'),'<a href="' .$external_links['hosting']['test']. '" target="_blank">','</a>').'</p><p>'.sprintf(__('If your numbers are above 500ms you should definitely consider upgrade your hosting plan or move to the faster hosting provider. For example, SiteGround offers %1$sfast servers optimized for WordPress%2$s even in the minimal plan that starts from 3.95 €/Mo.','speedguard'),'<a href="' .$external_links['hosting']['siteground']. '" target="_blank">','</a>').'</p>',
+				array('title' =>__('It might be your caching plugin.','speedguard-tips'), 
+				'description' =>__( 'There are some basic things that ALL caching plugins do like: browser caching, server side caching, GZIP compression etc.','speedguard-tips').'<p>'.__( 'There are some caching plugins that go further and take care of your database, minify CSS and JS files, defer their load etc.','speedguard-tips').'</p><p>'.sprintf(__('My favourite one is %1$sWP Rocket%2$s. Because it’s not a caching plugin at all. It does much much more: from YouTube video lazy-loading to DNS-prefetching.','speedguard-tips'),'<a href="' .$external_links['caching']['wprocket']. '" target="_blank">','</a>').'</p><p>'.sprintf(__('But the most important thing is that all WP Rocket’s features are aimed to improve real users’ experience and %1$sreduce the time before users can actually interact with your site%2$s. This is exactly what SpeedGuard measures, by the way.','speedguard-tips'),'<strong>','</strong>').'</p><p>'.__('While site content that is not crucial at the moment is being loaded in the background, a user is already viewing your website. Isn’t that wonderful?','speedguard-tips')),
+				array('title' =>__('It might be your hosting.','speedguard-tips'), 
+				'description' =>__( 'The slowness of your website may be caused by slow server response time of your hosting. Google recommends keeping server response time under 200ms. An overloaded or poorly configured server may take up to 2 seconds to respond before your site even start to render.','speedguard-tips').'<p><b>'.__( 'How to detect if your hosting is slow?','speedguard-tips').'</b></p><p>'.sprintf(__('%1$sTest your website%2$s to see how long it takes your server to load.','speedguard-tips'),'<a href="' .$external_links['hosting']['test']. '" target="_blank">','</a>').'</p><p>'.sprintf(__('If your numbers are above 500ms you should definitely consider upgrade your hosting plan or move to the faster hosting provider. For example, SiteGround offers %1$sfast servers optimized for WordPress%2$s even in the minimal plan that starts from 3.95 €/Mo.','speedguard-tips'),'<a href="' .$external_links['hosting']['siteground']. '" target="_blank">','</a>').'</p>',
 				'link' => ''),
-				array('title' => __('It might be your media.','speedguard'), 
-				'description' => __('Loading images may take up to 90% of page load time. It might take 5 seconds to load a regular image and less than half a second to load its optimized version. That\'s why you can make your site load times faster just by reducing your images size.','speedguard').'<p><b>'.sprintf(__('Proper image compression for WordPress:%1$sis lossless%2$syou definitely don\'t want your images to become pixelated. After a lossless compression your images will look just the same as the original ones.%3$shas no file size limit%4$sis automatic and bulk%5$s','speedguard'),'</b></p><ul><li>','<br>','</li><li>','</li><li>','</li></ul>').'<p>'.sprintf(__('Install %1$sShortPixel plugin%2$s to get all these (even with free plan).','speedguard'),'<a href="' .$external_links['images']['shortpixel']. '" target="_blank">','</a>'), 'link' => ''), 
+				array('title' => __('It might be your media.','speedguard-tips'), 
+				'description' => __('Loading images may take up to 90% of page load time. It might take 5 seconds to load a regular image and less than half a second to load its optimized version. That\'s why you can make your site load times faster just by reducing your images size.','speedguard-tips').'<p><b>'.sprintf(__('Proper image compression for WordPress:%1$sis lossless%2$syou definitely don\'t want your images to become pixelated. After a lossless compression your images will look just the same as the original ones.%3$shas no file size limit%4$sis automatic and bulk%5$s','speedguard-tips'),'</b></p><ul><li>','<br>','</li><li>','</li><li>','</li></ul>').'<p>'.sprintf(__('Install %1$sShortPixel plugin%2$s to get all these (even with free plan).','speedguard-tips'),'<a href="' .$external_links['images']['shortpixel']. '" target="_blank">','</a>'), 'link' => ''), 
 				); 
 				$rand_keys = array_rand($the_tips, 1); 
 				$tip_content = $the_tips[$rand_keys];		

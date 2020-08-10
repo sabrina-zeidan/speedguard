@@ -10,16 +10,13 @@ License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Keeps an eye on your website’s speed for you; every single day for free. 
 
 == Description ==
-Test site speed performance daily, get notified if it's slow, get detailed reports. Right in your WordPress dashboard. It's free. 
+<strong>Test site speed performance daily, get notified if it's slow, get detailed reports. 
+Right in your WordPress dashboard. 
+It's free. </strong> 
 
-_Is it your website’s slow speed holding you back from getting more visitors from Google?_
+[youtube https://www.youtube.com/watch?v=y_RvQEhdq9c]
 
-Get the definite answer in less than 5 minutes:
-1. Install SpeedGuard
-2. Add the most important pages of your website to run a site speed test
-3. Get a complete picture of your site’s speed health in a few minutes
-
-#### With SpeedGuard you get:
+**With SpeedGuard you get:**
 
 * <strong>unlimited Google Lighthouse tests (PageSpeed Insights API)</strong>
 * <strong>automatic </strong> everyday monitoring
@@ -32,6 +29,18 @@ Get the definite answer in less than 5 minutes:
 
 No need to guess whether your website is slow or fast - get the definite answer in your WordPress Dashboard in a few minutes.
 
+**Test loading times of:**
+
+* Posts
+* Pages
+* Events
+* WooCommerce Products
+* any other Custom Post Type
+* Archives
+* Categories
+* Tags
+* any other Custom Taxonomy
+
 == Idea Behind ==
 Today, if your website loads slow, there is no need to even bother with any other optimization at all. 
 
@@ -43,9 +52,12 @@ I have not found one and that's why I've built this plugin.
 I'll be happy to know that you find it useful as well, feel free to leave a review :)
 
 == Screenshots ==
-1. Plugin installation
-3. Running a site speed test
-3. Settings: widgets, tests and notifications
+1. HomePage is tested on activation
+2. Add pages you want to test
+3. View PageSpeed Insights reports
+4. Choose Mobile or Desktop
+5. Choose when you would like to get notified
+
 == Installation ==
 = Automatic plugin installation: =
 1. Go to Plugins > Add New in your WordPress Admin
@@ -79,6 +91,8 @@ You can choose the type of device to emulate:
 = Is it compatible with WordPress Multisite? =
 It is! Use per-site activation.
 
+= Where can I suggest a new feature or report a bug? =
+On [SpeedGuard's GitHub repo](https://github.com/sabrina-zeidan/speedguard)! 
 
 == Translations ==
 

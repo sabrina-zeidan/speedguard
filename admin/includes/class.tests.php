@@ -181,13 +181,7 @@ class SpeedGuard_Tests{
 	function __construct(){			
 		add_action( 'rest_api_init', array( $this, 'speedguard_rest_api_register_routes') );
 	}  
-	
-	
-	
-	
-	
-
-	 function speedguard_rest_api_register_routes() { 
+	function speedguard_rest_api_register_routes() { 
 		register_rest_route( 'speedguard', '/search', array(
 			'methods'  => 'GET',
 			'callback' => array( $this, 'speedguard_rest_api_search'),
@@ -203,7 +197,7 @@ class SpeedGuard_Tests{
 		if ( empty( $request['term'] ) ) {
 			return;
 		}		
-		function speedguard_search($request){
+	function speedguard_search($request){
 			$meta_query = array(
 								'relation' => 'OR',
 								array(
@@ -273,13 +267,13 @@ class SpeedGuard_Tests{
 				foreach ($sites as $site ) {
 					$blog_id = $site->blog_id;				
 					switch_to_blog( $blog_id );
-						$this_blog_posts = speedguard_search($request);
+						$this_blog_posts = $this->speedguard_search($request);
 						$posts = array_merge($posts, $this_blog_posts);
 					restore_current_blog();	 				
 				}//endforeach					
 		}//endif network
 		else {		
-			$posts = speedguard_search($request);
+			$posts = $this->speedguard_search($request);
 		}
  		
 		return $posts;	
@@ -399,7 +393,7 @@ class SpeedGuard_Tests{
 							$redirect_to = add_query_arg( 'speedguard', 'already_guarded');
 						}
 						else {//Valid and not guarded yet >>> ADD						
-							$connection = Speedguard_Admin::get_this_plugin_option( 'speedguard_options' )['test_connection_type'];
+							$connection = SpeedGuard_Admin::get_this_plugin_option( 'speedguard_options' )['test_connection_type'];
 							$code = $url_to_add.'|'.$connection;
 								$new_target_page = array( 
 									'post_title'           => $code,
@@ -444,7 +438,7 @@ class SpeedGuard_Tests{
 		}
 		
 		public static function tests_page() { 
-			if (Speedguard_Admin::is_screen('tests')){
+			if (SpeedGuard_Admin::is_screen('tests')){
 				SpeedGuardWidgets::add_meta_boxes();	
 				$args = array(
 							'post_type' => SpeedGuard_Admin::$cpt_name,
