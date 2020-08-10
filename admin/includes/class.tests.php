@@ -267,13 +267,13 @@ class SpeedGuard_Tests{
 				foreach ($sites as $site ) {
 					$blog_id = $site->blog_id;				
 					switch_to_blog( $blog_id );
-						$this_blog_posts = $this->speedguard_search($request);
+						$this_blog_posts = speedguard_search($request);
 						$posts = array_merge($posts, $this_blog_posts);
 					restore_current_blog();	 				
 				}//endforeach					
 		}//endif network
 		else {		
-			$posts = $this->speedguard_search($request);
+			$posts = speedguard_search($request);
 		}
  		
 		return $posts;	
