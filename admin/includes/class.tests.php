@@ -176,7 +176,6 @@ class SpeedGuard_List_Table extends WP_List_Table{
 }
 
 	
-	
 class SpeedGuard_Tests{
 	function __construct(){			
 		add_action( 'rest_api_init', array( $this, 'speedguard_rest_api_register_routes') );
@@ -184,23 +183,18 @@ class SpeedGuard_Tests{
 	function speedguard_rest_api_register_routes() { 
 		register_rest_route( 'speedguard', '/search', array(
 			'methods'  => 'GET',
-			'callback' => array( $this, 'my_awesome_func_new'), // this part fetches the right $_GET params //For internal calls
-		
-			//'permission_callback' => array( $this, 'get_items_permissions_check'),
-			//'permission_callback' => function( WP_REST_Request $request ) {     return current_user_can( 'manage_options' );        },
-			'permission_callback' => '__return_true',
-		
+			'callback' => array( $this, 'speedguard_rest_api_search'), // this part fetches the right $_GET params //For internal calls
+			'permission_callback' => function( WP_REST_Request $request ) { return current_user_can( 'manage_options' ); }		
 		) );
 	}
-	function my_awesome_func_new( WP_REST_Request $request ) {
-		/**
-		if ( empty( $request['term'] ) ) {
+	function speedguard_rest_api_search( WP_REST_Request $request ) {
+		$search_term = $request->get_param( 'term' );
+		if ( empty( $search_term ) ) {
 			return;
 		}	
-		**/
-		$search_term = $request->get_param( 'term' );
-		//search all blogs if Network Activated
-		if (defined('SPEEDGUARD_MU_NETWORK')) {    //PRO 
+		//search all blogs if Network Activated TODO PRO
+		/**
+		if (defined('SPEEDGUARD_MU_NETWORK')) {    
 				$sites = get_sites();
 				$posts = array();				
 				foreach ($sites as $site ) {
@@ -214,14 +208,9 @@ class SpeedGuard_Tests{
 		else {		
 			$posts = SpeedGuard_Tests::speedguard_search_function($search_term);
 		}
- 		
+		**/
+ 		$posts = SpeedGuard_Tests::speedguard_search_function($search_term);
 		return $posts;	
-
-		
-		//$do = SpeedGuard_Tests::speedguard_search_function($search_term);
-		//	var_dump($posts);
-		//die();
-		//return "hello";
 	}
 	
 	function speedguard_search_function($search_term){
@@ -251,8 +240,6 @@ class SpeedGuard_Tests{
 				);
 			$the_query = new WP_Query( $args );								
 			$this_blog_found_posts = $the_query->get_posts();
-			//var_dump($this_blog_found_posts);
-		//	die();
 				$temp = array();
 				foreach( $this_blog_found_posts as $key => $post_id) { 
 					//$key = 'ID';
@@ -274,7 +261,6 @@ class SpeedGuard_Tests{
 		));
 		if ( count($the_terms) > 0 ) {
 		  foreach ( $the_terms as $term ) {
-			//$key = 'ID';
 					$temp = array(
 						'ID' => $term->term_id,
 						'permalink' => get_term_link( $term ),
@@ -285,68 +271,12 @@ class SpeedGuard_Tests{
 					$posts[] = $temp;			
 					
 		  }
-		}	
-
+		}
 			if (!empty($posts)) return $posts;
-		
-	
 	}
 	
-	function my_awesome_func( WP_REST_Request $request ) {
- /**
- // You can access parameters via direct array access on the object:
-  $param = $request['some_param'];
- 
-  // Or via the helper method:
-  $param = $request->get_param( 'some_param' );
- 
-  // You can get the combined, merged set of parameters:
-  $parameters = $request->get_params();
- 
-  // The individual sets of parameters are also available, if needed:
-  $parameters = $request->get_url_params();
-  $parameters = $request->get_query_params();
-  $parameters = $request->get_body_params();
-  $parameters = $request->get_json_params();
-  $parameters = $request->get_default_params();
-  
-**/
-//$request = new WP_REST_Request( 'GET', '/wp/v2/posts' );
-//$request = new WP_REST_Request( 'GET', 'http://karrraba.ru/wp-json/speedguard/search?term=hi' );
-//var_dump($request);
-$request->set_query_params( [ 'per_page' => 12 ] );
-$response = rest_do_request( $request );
-//$server = rest_get_server();
-//$data = $server->response_to_data( $response, false );
-//$json = wp_json_encode( $data );
-//var_dump($request);
-var_dump($response);
-//var_dump($server);
-die();
-var_dump($json );
-$request->set_query_params( [ 'per_page' => 12 ] );
-$response = rest_do_request( $request );
-$server = rest_get_server();
-$data = $server->response_to_data( $response, false );
-$json = wp_json_encode( $data );
-var_dump($json );
 
 
- 
-  // Uploads aren't merged in, but can be accessed separately:
-  $parameters = $request->get_file_params();
-}
-
-	function get_items_permissions_check( $request ) {
-		//return current_user_can( 'edit_posts' );
-		//return current_user_can( 'manage_options' );
-		$res = current_user_can('manage_options');
-		$res = is_admin();
-		var_dump($res);
-		die();
-		return true;
-	}
-  
 
 	
 
@@ -392,9 +322,7 @@ var_dump($set_waiting_status);
 		
 		
 		
-	}
-	
-		
+	}		
 
 
 

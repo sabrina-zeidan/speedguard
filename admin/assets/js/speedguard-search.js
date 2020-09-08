@@ -1,26 +1,13 @@
 jQuery(function($){
-	/**
-	jQuery.ajax({
-            url: "/rest/abc",
-            type: "GET",
-
-            contentType: 'application/json; charset=utf-8',
-            success: function(resultData) {
-                //here is your json.
-                  // process it
-
-            },
-            error : function(jqXHR, textStatus, errorThrown) {
-            },
-
-            timeout: 120000,
-        });
-		
-	**/
     var getData = function (request, response) {
-        $.getJSON(
-			window.location.protocol + "//" + window.location.hostname + "/wp-json/speedguard/search?term=" + request.term,
-            function (data) {
+		jQuery.ajax({
+            url: speedguardsearch.search_url + request.term,
+            type: "GET",
+            contentType: 'application/json; charset=utf-8',
+			beforeSend: function ( xhr ) {
+				xhr.setRequestHeader( 'X-WP-Nonce', speedguardsearch.nonce ); //no need to verify that the nonce is valid inside your custom end point
+			},
+            success: function(data) {
 				if ( data !== null ) {
 					var results = [];
 					console.log(results);
@@ -32,15 +19,15 @@ jQuery(function($){
 						valueToPush["type"] = data[key].type;
 						results.push(valueToPush);	
 					}					
-				//response(results); 
-				 response(results.slice(0, 6));
-				 
-				}				
-            });
-			
-		
-		
-		
+				 var result_to_show = response(results.slice(0, 6));
+				}      
+            },
+            error : function(xhr, textStatus, errorThrown) {
+				 //console.log('error message here');
+            },
+
+            timeout: 5000,
+        });
 		
 		
     };

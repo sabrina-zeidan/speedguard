@@ -295,10 +295,10 @@ class SpeedGuard_Admin {
 		}
 		if (SpeedGuard_Admin::is_screen('tests')){
 			wp_enqueue_script('speedguardsearch',	plugin_dir_url( __FILE__ ) . 'assets/js/speedguard-search.js',	array( 'jquery' ), $this->version, true);
-			wp_localize_script(	'speedguardsearch',		'speedguardsearch',		array('search_api' => home_url( '/wp-json/speedguard/search' ),
- 
-			//SpeedGuard_Tests::speedguard_search($request)
-			'nonce' => wp_create_nonce('wp_rest')
+			wp_localize_script(	'speedguardsearch',		'speedguardsearch',		
+				array(
+					'search_url' => home_url( '/wp-json/speedguard/search?term=' ),
+					'nonce' => wp_create_nonce('wp_rest') 
 			));
 		}
 			
