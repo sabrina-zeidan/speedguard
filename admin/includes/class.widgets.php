@@ -8,7 +8,7 @@ class SpeedGuardWidgets{
 		$options = SpeedGuard_Admin::get_this_plugin_option( 'speedguard_options' );
 		if (!empty($options)){
 		if ($options['show_dashboard_widget'] === 'on')	add_action( 'wp_'.(defined('SPEEDGUARD_MU_NETWORK') ? 'network_' : ''). 'dashboard_setup', array( $this,'speedguard_dashboard_widget') ); 
-		if ($options['show_ab_widget'] === 'on') add_action( 'admin_bar_menu', array( $this,'speedguard_admin_bar_widget'),710);
+		if (($options['show_ab_widget'] === 'on') && !is_admin()) add_action( 'admin_bar_menu', array( $this,'speedguard_admin_bar_widget'),710);
 		}
 	}
 

@@ -3,7 +3,7 @@ Contributors: sabrinazeidan
 Tags: speed, speed test, site speed, performance, optimization
 Requires at least: 4.7
 Tested up to: 5.5
-Stable tag: 1.8
+Stable tag: 1.8.1
 Requires PHP: 5.6
 License: GPLv2 or later 
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -106,6 +106,9 @@ On [SpeedGuard's GitHub repo](https://github.com/sabrina-zeidan/speedguard)!
 * Thanx to Baboon designs from the Noun Project for the timer icon.
 
 == Changelog ==
+= Version 1.8.1 - Septemeber 5, 2020 =
+* [Fixed] Error happened on some installs: Unexpected end of file in ../speedguard/admin/class-speedguard-admin.php on line 403
+* [Fixed] Error happened on CPT's pages in wp-admin:  Object of class WP_Error could not be converted to string in  ../speedguard/admin/includes/class.widgets.php on line 80
 
 = Version 1.8 - August 10, 2020 =
 

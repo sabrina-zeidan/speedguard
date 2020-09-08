@@ -1,10 +1,29 @@
 jQuery(function($){
+	/**
+	jQuery.ajax({
+            url: "/rest/abc",
+            type: "GET",
+
+            contentType: 'application/json; charset=utf-8',
+            success: function(resultData) {
+                //here is your json.
+                  // process it
+
+            },
+            error : function(jqXHR, textStatus, errorThrown) {
+            },
+
+            timeout: 120000,
+        });
+		
+	**/
     var getData = function (request, response) {
         $.getJSON(
 			window.location.protocol + "//" + window.location.hostname + "/wp-json/speedguard/search?term=" + request.term,
             function (data) {
 				if ( data !== null ) {
 					var results = [];
+					console.log(results);
 					for(var key in data) {
 						var valueToPush = { }; // or "var valueToPush = new Object();" which is the same
 						valueToPush["label"] = data[key].label;
@@ -18,7 +37,14 @@ jQuery(function($){
 				 
 				}				
             });
+			
+		
+		
+		
+		
+		
     };
+ 
  
     var selectItem = function (event, ui) {
 		event.preventDefault();

@@ -184,21 +184,48 @@ class SpeedGuard_Tests{
 	function speedguard_rest_api_register_routes() { 
 		register_rest_route( 'speedguard', '/search', array(
 			'methods'  => 'GET',
-			'callback' => array( $this, 'speedguard_rest_api_search'),
+			'callback' => array( $this, 'my_awesome_func_new'), // this part fetches the right $_GET params //For internal calls
+		
 			//'permission_callback' => array( $this, 'get_items_permissions_check'),
+			//'permission_callback' => function( WP_REST_Request $request ) {     return current_user_can( 'manage_options' );        },
+			'permission_callback' => '__return_true',
+		
 		) );
 	}
-	function get_items_permissions_check( $request ) {
-		return current_user_can( 'edit_posts' );
-	}
-  
-
-	function speedguard_rest_api_search( $request ) {
+	function my_awesome_func_new( WP_REST_Request $request ) {
+		/**
 		if ( empty( $request['term'] ) ) {
 			return;
-		}		
-	function speedguard_search($request){
-			$meta_query = array(
+		}	
+		**/
+		$search_term = $request->get_param( 'term' );
+		//search all blogs if Network Activated
+		if (defined('SPEEDGUARD_MU_NETWORK')) {    //PRO 
+				$sites = get_sites();
+				$posts = array();				
+				foreach ($sites as $site ) {
+					$blog_id = $site->blog_id;				
+					switch_to_blog( $blog_id );
+						$this_blog_posts = SpeedGuard_Tests::speedguard_search_function($search_term);
+						$posts = array_merge($posts, $this_blog_posts);
+					restore_current_blog();	 				
+				}//endforeach					
+		}//endif network 
+		else {		
+			$posts = SpeedGuard_Tests::speedguard_search_function($search_term);
+		}
+ 		
+		return $posts;	
+
+		
+		//$do = SpeedGuard_Tests::speedguard_search_function($search_term);
+		//	var_dump($posts);
+		//die();
+		//return "hello";
+	}
+	
+	function speedguard_search_function($search_term){
+		$meta_query = array(
 								'relation' => 'OR',
 								array(
 									'key'       => 'speedguard_on',
@@ -214,9 +241,9 @@ class SpeedGuard_Tests{
 			$args = array(
 				'post_type' => SpeedGuard_Admin::supported_post_types(),
 				'post_status' => 'publish',
-				'posts_per_page'   => -1,
+				'posts_per_page'   => 3,
 				'fields'   => 'ids',
-				's'             => $request['term'],
+				's'             => $search_term,
 				'no_found_rows' => true,  
 				'update_post_meta_cache' => false,
 				'update_post_term_cache' => false,
@@ -224,6 +251,8 @@ class SpeedGuard_Tests{
 				);
 			$the_query = new WP_Query( $args );								
 			$this_blog_found_posts = $the_query->get_posts();
+			//var_dump($this_blog_found_posts);
+		//	die();
 				$temp = array();
 				foreach( $this_blog_found_posts as $key => $post_id) { 
 					//$key = 'ID';
@@ -239,7 +268,7 @@ class SpeedGuard_Tests{
 		
 		//Include Terms too
 		$the_terms = get_terms( array(
-		  'name__like' => $request['term'],
+		  'name__like' => $search_term,
 		  'hide_empty' => false,
 		  'meta_query' => $meta_query
 		));
@@ -257,38 +286,91 @@ class SpeedGuard_Tests{
 					
 		  }
 		}	
+
 			if (!empty($posts)) return $posts;
-		}
-
-		//search all blogs if Network Activated
-		if (defined('SPEEDGUARD_MU_NETWORK')) {     
-				$sites = get_sites();
-				$posts = array();				
-				foreach ($sites as $site ) {
-					$blog_id = $site->blog_id;				
-					switch_to_blog( $blog_id );
-						$this_blog_posts = speedguard_search($request);
-						$posts = array_merge($posts, $this_blog_posts);
-					restore_current_blog();	 				
-				}//endforeach					
-		}//endif network
-		else {		
-			$posts = speedguard_search($request);
-		}
- 		
-		return $posts;	
-
+		
+	
 	}
+	
+	function my_awesome_func( WP_REST_Request $request ) {
+ /**
+ // You can access parameters via direct array access on the object:
+  $param = $request['some_param'];
+ 
+  // Or via the helper method:
+  $param = $request->get_param( 'some_param' );
+ 
+  // You can get the combined, merged set of parameters:
+  $parameters = $request->get_params();
+ 
+  // The individual sets of parameters are also available, if needed:
+  $parameters = $request->get_url_params();
+  $parameters = $request->get_query_params();
+  $parameters = $request->get_body_params();
+  $parameters = $request->get_json_params();
+  $parameters = $request->get_default_params();
+  
+**/
+//$request = new WP_REST_Request( 'GET', '/wp/v2/posts' );
+//$request = new WP_REST_Request( 'GET', 'http://karrraba.ru/wp-json/speedguard/search?term=hi' );
+//var_dump($request);
+$request->set_query_params( [ 'per_page' => 12 ] );
+$response = rest_do_request( $request );
+//$server = rest_get_server();
+//$data = $server->response_to_data( $response, false );
+//$json = wp_json_encode( $data );
+//var_dump($request);
+var_dump($response);
+//var_dump($server);
+die();
+var_dump($json );
+$request->set_query_params( [ 'per_page' => 12 ] );
+$response = rest_do_request( $request );
+$server = rest_get_server();
+$data = $server->response_to_data( $response, false );
+$json = wp_json_encode( $data );
+var_dump($json );
+
+
+ 
+  // Uploads aren't merged in, but can be accessed separately:
+  $parameters = $request->get_file_params();
+}
+
+	function get_items_permissions_check( $request ) {
+		//return current_user_can( 'edit_posts' );
+		//return current_user_can( 'manage_options' );
+		$res = current_user_can('manage_options');
+		$res = is_admin();
+		var_dump($res);
+		die();
+		return true;
+	}
+  
+
+	
+
+	
+	
 
 	public static function handle_bulk_retest_load_time($doaction,$post_ids){
 		if ( $doaction == 'retest_load_time' ) {
+			
 			foreach ($post_ids as $guarded_page_id){ 
+			$guarded_page_id = strval($guarded_page_id);
 				$updated = get_the_modified_date('Y-m-d H:i:s', $guarded_page_id );
+				
 					if ((strtotime("-5 minutes")) > strtotime($updated)){
 						//older - go on
 						//TODO if there are a few newer and a few old - show notice accordingly						
 						$set_waiting_status = update_post_meta($guarded_page_id, 'load_time', 'waiting'); 
-						$results_updated = add_query_arg( 'speedguard', 'retest_load_time');						
+						$results_updated = add_query_arg( 'speedguard', 'retest_load_time');	
+						$current = get_post_meta($guarded_page_id, 'load_time');
+var_dump($guarded_page_id); //array(1) { [0]=> string(7) "waiting" } int(3502)    array(1) { [0]=> string(7) "waiting" } bool(false)   
+//var_dump(get_post($guarded_page_id)); //array(1) { [0]=> string(7) "waiting" } int(3502)    array(1) { [0]=> string(7) "waiting" } bool(false)   
+var_dump($current); // string(3) "661" array(1) { [0]=> string(7) "waiting" } bool(false)  string(3) "840" array(1) { [0]=> string(7) "waiting" } bool(true)
+var_dump($set_waiting_status);
+			die();						
 					}
 					else {
 						$slow_down = add_query_arg( 'speedguard', 'slow_down');	
@@ -390,7 +472,9 @@ class SpeedGuard_Tests{
 						}
 						//we have: $url_to_ad, $guarded_item_type, $guarded_item_id, $guarded_post_blog_id now + $already_guarded status
 						if (!empty($already_guarded) && ($already_guarded === true) && empty($redirect_to)){
-							$redirect_to = add_query_arg( 'speedguard', 'already_guarded');
+							
+							$redirect_to = SpeedGuard_Tests::handle_bulk_retest_load_time('retest_load_time', array($guarded_item_id));	
+							//$redirect_to = add_query_arg( 'speedguard', 'already_guarded');
 						}
 						else {//Valid and not guarded yet >>> ADD						
 							$connection = SpeedGuard_Admin::get_this_plugin_option( 'speedguard_options' )['test_connection_type'];
@@ -476,7 +560,19 @@ class SpeedGuard_Tests{
 						}
 							
 							
-							
+/**		
+
+$request = new WP_REST_Request( 'GET', '/wp/v2/posts' );
+$request = new WP_REST_Request( 'GET', '/wp-json/speedguard/search?term=hi' );
+var_dump($request);
+$request->set_query_params( [ 'per_page' => 12 ] );
+$response = rest_do_request( $request );
+$server = rest_get_server();
+$data = $server->response_to_data( $response, false );
+$json = wp_json_encode( $data );
+var_dump($json );
+**/
+		
 		?>		
 			<div class="wrap">        
 				<h2><?php _e( 'Speedguard :: Guarded pages', 'speedguard' ); ?></h2>		
@@ -495,7 +591,13 @@ class SpeedGuard_Tests{
 					</form>
 			</div>
 			<?php 
-			}			
+			}
+
+
+
+
+
+			
 		}			
 }
 new SpeedGuard_Tests; 

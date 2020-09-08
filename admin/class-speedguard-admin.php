@@ -295,9 +295,10 @@ class SpeedGuard_Admin {
 		}
 		if (SpeedGuard_Admin::is_screen('tests')){
 			wp_enqueue_script('speedguardsearch',	plugin_dir_url( __FILE__ ) . 'assets/js/speedguard-search.js',	array( 'jquery' ), $this->version, true);
-			wp_localize_script(	'speedguardsearch',		'speedguardsearch',		array('search_api' => home_url( '/wp-json/speedguard/search' ), 
+			wp_localize_script(	'speedguardsearch',		'speedguardsearch',		array('search_api' => home_url( '/wp-json/speedguard/search' ),
+ 
 			//SpeedGuard_Tests::speedguard_search($request)
-			//'nonce' => wp_create_nonce('wp_rest')
+			'nonce' => wp_create_nonce('wp_rest')
 			));
 		}
 			
@@ -370,6 +371,7 @@ class SpeedGuard_Admin {
 		 
 		}
 		if ( ! empty( $_REQUEST['speedguard'] ) && $_REQUEST['speedguard'] == 'already_guarded' ) {
+			//$process_bulk_action = SpeedGuard_Tests::handle_bulk_retest_load_time('retest_load_time', $guarded_pages);	
 			$notices =  SpeedGuard_Admin::set_notice(__('This URL is already guarded!','speedguard'),'warning' );   												
 		}
 		if ( ! empty( $_REQUEST['speedguard'] ) && $_REQUEST['speedguard'] == 'new_url_added' ) {
