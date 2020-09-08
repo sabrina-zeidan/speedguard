@@ -106,10 +106,12 @@ On [SpeedGuard's GitHub repo](https://github.com/sabrina-zeidan/speedguard)!
 * Thanx to Baboon designs from the Noun Project for the timer icon.
 
 == Changelog ==
-= Version 1.8.1 - Septemeber 5, 2020 =
+
+= Version 1.8.1 - Septemeber 9, 2020 =
 * [Fixed] Error happened on some installs: Unexpected end of file in ../speedguard/admin/class-speedguard-admin.php on line 403
 * [Fixed] Error happened on CPT's pages in wp-admin:  Object of class WP_Error could not be converted to string in  ../speedguard/admin/includes/class.widgets.php on line 80
 * [Tweak] REST API Internal + Auth security improved
+* [Tweak] Automatically re-test if monitored page is added again
 
 = Version 1.8 - August 10, 2020 =
 

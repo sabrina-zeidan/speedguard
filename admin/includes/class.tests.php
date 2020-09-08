@@ -171,7 +171,7 @@ class SpeedGuard_List_Table extends WP_List_Table{
 
 	
 class SpeedGuard_Tests{
-	function __construct(){			
+	function __construct(){	
 		add_action( 'rest_api_init', array( $this, 'speedguard_rest_api_register_routes') );
 	}  
 	function speedguard_rest_api_register_routes() { 
@@ -185,9 +185,9 @@ class SpeedGuard_Tests{
 		$search_term = $request->get_param( 'term' );
 		if ( empty( $search_term ) ) {
 			return;
-		}	
-		//search all blogs if Network Activated TODO PRO
-		/**
+		}		
+		 
+		//TODO PRO: WP REST API Auth search all blogs if Network Activated 
 		if (defined('SPEEDGUARD_MU_NETWORK')) {    
 				$sites = get_sites();
 				$posts = array();				
@@ -201,9 +201,7 @@ class SpeedGuard_Tests{
 		}//endif network 
 		else {		
 			$posts = SpeedGuard_Tests::speedguard_search_function($search_term);
-		}
-		**/
- 		$posts = SpeedGuard_Tests::speedguard_search_function($search_term);
+		}	
 		return $posts;	
 	}
 	
