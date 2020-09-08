@@ -82,7 +82,7 @@ class SpeedGuard_Admin {
 			});
 			});
 		</script>
-	<?
+	<?php
 		}
 	}	
 

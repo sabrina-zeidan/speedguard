@@ -3,7 +3,7 @@ Contributors: sabrinazeidan
 Tags: speed, speed test, site speed, performance, optimization
 Requires at least: 4.7
 Tested up to: 5.5
-Stable tag: 1.8.1
+Stable tag: 1.8.2
 Requires PHP: 5.6
 License: GPLv2 or later 
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -106,6 +106,8 @@ On [SpeedGuard's GitHub repo](https://github.com/sabrina-zeidan/speedguard)!
 * Thanx to Baboon designs from the Noun Project for the timer icon.
 
 == Changelog ==
+= Version 1.8.2 - Septemeber 9, 2020 =
+* Typo fixed
 
 = Version 1.8.1 - Septemeber 9, 2020 =
 * [Fixed] Error happened on some installs: Unexpected end of file in ../speedguard/admin/class-speedguard-admin.php on line 403
