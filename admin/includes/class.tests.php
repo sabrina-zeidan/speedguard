@@ -90,12 +90,10 @@ class SpeedGuard_List_Table extends WP_List_Table{
 			$connection = get_post_meta( $guarded_page_id,'speedguard_page_connection', true);
 			$load_time = get_post_meta( $guarded_page_id,'load_time');			
 			$load_time = $load_time[0];	
+
 		
 			if (!is_array($load_time)){
-				
-				//$guarded_page_load_time = $load_time;
 				$guarded_page_load_time = '<div class="loading"></div>';
-						
 			}			
 			else {
 				$guarded_page_load_time = '<span data-score="'.$load_time['score'].'" class="speedguard-score"><span>●</span> '.$load_time['displayValue'].'</span>';
@@ -104,21 +102,17 @@ class SpeedGuard_List_Table extends WP_List_Table{
 							'url'=> $guarded_page_url,
 							'tab' => $connection
 							),'https://developers.google.com/speed/pagespeed/insights/' );	
-							
-			$updated = get_the_modified_date('Y-m-d H:i:s', $guarded_page_id );				
-					
+				$updated = get_the_modified_date('Y-m-d H:i:s', $guarded_page_id );				
 				$data[] = array(
 					'guarded_page_id' => $guarded_page_id,
 					'guarded_page_title' => '<a href="'.$guarded_page_url.'" target="_blank">'.$guarded_page_url.'</a>',
 					'load_time' => $guarded_page_load_time,
 					'report_link' => '<a href="'.$report_link.'" target="_blank">'.__('Report','speedguard').'</a>',
 					'report_date' => $updated,						
-                 );
-			
+                 );			
         }
 		endif;
-		wp_reset_postdata();
-        				
+		wp_reset_postdata();        				
         return $data;
     }
 	
@@ -275,32 +269,17 @@ class SpeedGuard_Tests{
 			if (!empty($posts)) return $posts;
 	}
 	
-
-
-
-	
-
-	
-	
-
 	public static function handle_bulk_retest_load_time($doaction,$post_ids){
 		if ( $doaction == 'retest_load_time' ) {
-			
 			foreach ($post_ids as $guarded_page_id){ 
-			$guarded_page_id = strval($guarded_page_id);
 				$updated = get_the_modified_date('Y-m-d H:i:s', $guarded_page_id );
-				
+				//TODO if it comes from past in >>> another message?
+				//TODO if test was deleted but speedguard on
 					if ((strtotime("-5 minutes")) > strtotime($updated)){
 						//older - go on
 						//TODO if there are a few newer and a few old - show notice accordingly						
 						$set_waiting_status = update_post_meta($guarded_page_id, 'load_time', 'waiting'); 
-						$results_updated = add_query_arg( 'speedguard', 'retest_load_time');	
-						$current = get_post_meta($guarded_page_id, 'load_time');
-var_dump($guarded_page_id); //array(1) { [0]=> string(7) "waiting" } int(3502)    array(1) { [0]=> string(7) "waiting" } bool(false)   
-//var_dump(get_post($guarded_page_id)); //array(1) { [0]=> string(7) "waiting" } int(3502)    array(1) { [0]=> string(7) "waiting" } bool(false)   
-var_dump($current); // string(3) "661" array(1) { [0]=> string(7) "waiting" } bool(false)  string(3) "840" array(1) { [0]=> string(7) "waiting" } bool(true)
-var_dump($set_waiting_status);
-			die();						
+						$results_updated = add_query_arg( 'speedguard', 'retest_load_time');						
 					}
 					else {
 						$slow_down = add_query_arg( 'speedguard', 'slow_down');	
@@ -322,10 +301,8 @@ var_dump($set_waiting_status);
 		
 		
 		
-	}		
-
-
-
+	}
+	
 	public static function is_homepage_guarded() {
 		$args = array(
 			'post_type' => SpeedGuard_Admin::$cpt_name,
@@ -399,12 +376,10 @@ var_dump($set_waiting_status);
 							}					
 						}
 						//we have: $url_to_ad, $guarded_item_type, $guarded_item_id, $guarded_post_blog_id now + $already_guarded status
-						if (!empty($already_guarded) && ($already_guarded === true) && empty($redirect_to)){
-							
-							$redirect_to = SpeedGuard_Tests::handle_bulk_retest_load_time('retest_load_time', array($guarded_item_id));	
-							//$redirect_to = add_query_arg( 'speedguard', 'already_guarded');
-						}
-						else {//Valid and not guarded yet >>> ADD						
+						if (!empty($already_guarded) && ($already_guarded === true) && empty($redirect_to) && ('publish' === get_post_status($speedguard_on[1] ))){
+								$redirect_to = SpeedGuard_Tests::handle_bulk_retest_load_time('retest_load_time', array($speedguard_on[1]));	
+						}					
+						else { //Valid and not guarded yet >>> ADD						
 							$connection = SpeedGuard_Admin::get_this_plugin_option( 'speedguard_options' )['test_connection_type'];
 							$code = $url_to_add.'|'.$connection;
 								$new_target_page = array( 
@@ -436,8 +411,7 @@ var_dump($set_waiting_status);
 		if (!get_transient( 'speedguard-notice-activation')  ){
 		wp_safe_redirect( esc_url_raw($redirect_to) );  
 		exit; 
-		}
-			
+		}	
 	}		
 	
 	
@@ -486,20 +460,6 @@ var_dump($set_waiting_status);
 								$max_load_time = max($guarded_page_load_time_all);
 							}							
 						}
-							
-							
-/**		
-
-$request = new WP_REST_Request( 'GET', '/wp/v2/posts' );
-$request = new WP_REST_Request( 'GET', '/wp-json/speedguard/search?term=hi' );
-var_dump($request);
-$request->set_query_params( [ 'per_page' => 12 ] );
-$response = rest_do_request( $request );
-$server = rest_get_server();
-$data = $server->response_to_data( $response, false );
-$json = wp_json_encode( $data );
-var_dump($json );
-**/
 		
 		?>		
 			<div class="wrap">        
@@ -520,14 +480,6 @@ var_dump($json );
 			</div>
 			<?php 
 			}
-
-
-
-
-
-			
 		}			
 }
 new SpeedGuard_Tests; 
-
-

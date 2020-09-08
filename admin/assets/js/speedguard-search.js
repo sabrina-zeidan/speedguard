@@ -50,19 +50,3 @@ jQuery(function($){
         minLength: 2,
     });
 });
-
-
-	
-/**
-	fetch('/wp-json/speedguard/search', {
-    credentials: 'include',
-    headers: {
-      'content-type': 'application/json',
-      'X-WP-Nonce': wpApiSettings.nonce
-    }
-})
-.then(response => response.json())
-.then(console.log)
-.catch(console.warn)
-**/
-
