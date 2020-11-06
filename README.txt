@@ -116,6 +116,7 @@ On [SpeedGuard's GitHub repo](https://github.com/sabrina-zeidan/speedguard)!
 * [Fixed] PHP Warning: Illegal string offset 'displayValue' in Admin bar when test is in progress
 * [Fixed] Critical error on custom post type archive page 
 * [Fixed] Tests for terms pages were not being deleted on uninstall
+* [Fixed] Styles and scripts loaded for not logged-in user after version 1.8
 * [Tweak] Wait time before retesting reduced to 3 minutes
 
 = Version 1.8.2 - Septemeber 9, 2020 =
