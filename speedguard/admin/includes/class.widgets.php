@@ -23,7 +23,7 @@ class SpeedGuardWidgets{
 			if ($speedguard_on && $speedguard_on[0] == 'true'){
 				$is_guarded = true;
 				$test_id = $speedguard_on[1];
-				$load_time = get_post_meta( $test_id,'load_time');					
+				$load_time = get_post_meta( $test_id,'load_time');			
 			}
 			else {
 				$is_guarded = false;
@@ -61,20 +61,13 @@ class SpeedGuardWidgets{
 		}
 		//The output			
 		//There is the load time
-		if (isset($is_guarded) && $load_time == 'waiting') {
-				$title = __('Testing...','speedguard');
-				$href = '';				
-				$atitle = __('Test is running currently','speedguard');
-			}
-		else if (isset($is_guarded) && $is_guarded === true) { 
-		
-			if ((!empty($load_time[0]['displayValue'])) && (!empty($load_time[0]['score']))) { 
-					$title = '<span data-score="'.$load_time[0]['score'].'" class="speedguard-score"><span>●</span> '.$load_time[0]['displayValue'].'</span>';
+		if (isset($is_guarded)) {
+			if (($is_guarded === true) && (!empty($load_time) && $load_time[0]['displayValue']!= 'waiting')) { 	
+				$title = '<span data-score="'.$load_time[0]['score'].'" class="speedguard-score"><span>●</span> '.$load_time[0]['displayValue'].'</span>';
 					$href = SpeedGuard_Admin::speedguard_page_url('tests').'#speedguard-add-new-url-meta-box';				
 					$atitle = __('This page load time','speedguard');
-			}
-		}
-		else if (isset($is_guarded) && $is_guarded === false) { //Item is not guarded or test is in process currently
+			}		
+			else if ($is_guarded === false) { //Item is not guarded or test is in process currently
 				$add_url_link = add_query_arg( array(
 						'speedguard'=> 'add_new_url',
 						'new_url_id'=> $current_item_id,
@@ -88,7 +81,7 @@ class SpeedGuardWidgets{
 				<button style="border: 0;  background: transparent; color:inherit; cursor:pointer;">'.__('Test speed','speedguard').'</button></form>';
 				$href = SpeedGuard_Admin::speedguard_page_url('tests');
 				$atitle='';
-		}			
+			}			
 			$args = array( 
 					'id'    => 'speedguard_ab',
 					'title' => isset($title) ? $title : '',
@@ -100,7 +93,7 @@ class SpeedGuardWidgets{
 					)
 				);
 			$wp_admin_bar->add_node( $args );
-	//}
+		}
 		
 	}
 	function speedguard_dashboard_widget() {  

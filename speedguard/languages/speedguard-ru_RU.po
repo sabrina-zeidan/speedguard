@@ -1,0 +1,510 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: SpeedGuard\n"
+"POT-Creation-Date: 2020-02-25 13:21+0200\n"
+"PO-Revision-Date: 2020-02-25 13:33+0200\n"
+"Last-Translator: Sabrina Zeidan <sabrinazeidan@gmail.com>\n"
+"Language-Team: \n"
+"Language: ru_RU\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
+"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"X-Generator: Poedit 2.0.7\n"
+"X-Poedit-Basepath: ..\n"
+"X-Poedit-Flags-xgettext: --add-comments=translators:\n"
+"X-Poedit-WPHeader: speedguard.php\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Poedit-KeywordsList: __;_e;_n:1,2;_x:1,2c;_ex:1,2c;_nx:4c,1,2;esc_attr__;"
+"esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c;_n_noop:1,2;"
+"_nx_noop:3c,1,2;__ngettext_noop:1,2\n"
+"X-Poedit-SearchPath-0: .\n"
+"X-Poedit-SearchPathExcluded-0: *.js\n"
+
+#. Plugin Name of the plugin/theme
+#: admin/class-speedguard-admin.php:250
+msgid "SpeedGuard"
+msgstr "SpeedGuard"
+
+#: admin/class-speedguard-admin.php:251
+msgid "Speed Tests"
+msgstr "Тесты скорости"
+
+#: admin/class-speedguard-admin.php:252
+msgid "Settings"
+msgstr "Настройки"
+
+#: admin/class-speedguard-admin.php:264
+#, php-format
+msgid "To start monitoring your site load time, please %1$senter API Key%2$s!"
+msgstr ""
+"Пожалуйста, %1$sвведите ключ API%2$s, чтобы начать отслеживать время "
+"загрузки вашего сайта!"
+
+#: admin/class-speedguard-admin.php:268
+msgid "API key you have entered is not valid."
+msgstr "Введенный ключ API не прошел проверку."
+
+#: admin/class-speedguard-admin.php:271
+#, php-format
+msgid ""
+"Everything is ready to test your site speed! %1$sAdd some pages%2$s to start "
+"testing."
+msgstr ""
+"Всё готово для тестирования скорости сайта! Чтобы  начать, %1$sдобавьте "
+"адреса%2$s, которые нужно проверить."
+
+#: admin/class-speedguard-admin.php:278
+#, php-format
+msgid ""
+"Awesome, you've been using SpeedGuard for more than 1 week. May I ask you to "
+"give it a 5-star rating on WordPress?  %1$sOk, you deserved it%2$sI already "
+"did%3$sNot good enough%4$s"
+msgstr ""
+"Супер, вы следите за скоростью сайта с помощью SpeedGuard уже больше недели. "
+"Могу я просить вас поставить этому плагину 5 баллов на сайте WordPress?  "
+"%1$sДа, плагин хорош%2$sУже поставил%3$sНе настолько хорош%4$s"
+
+#: admin/class-speedguard-admin.php:283
+#, php-format
+msgid ""
+"%1$sHow can I make SpeedGuard plugin better for you?%2$s %3$sI will be happy "
+"to receive support to my email %7$s regarding the issues I am reporting."
+"(Please include a detailed description)%4$s %5$sSend feedback%6$s"
+msgstr ""
+"%1$sКак я могу сделать SpeedGuard лучше для вас?%2$s %3$sЯ буду рад получить "
+"ответ относительно описаных проблем на имейл %7$s. (Пожалуйста, напишите "
+"подробно)%4$s %5$sОтправить отзыв%6$s"
+
+#: admin/class-speedguard-admin.php:296
+msgid "Thank you friend!"
+msgstr "Большое спасибо!"
+
+#: admin/class-speedguard-admin.php:306
+msgid "Thank you for your honest opinion!"
+msgstr "Спасибо за ваше честное мнение!"
+
+#: admin/class-speedguard-admin.php:320
+msgid "Please wait. Tests are running..."
+msgstr "Пожалуйста, подождите. Идут тесты..."
+
+#: admin/class-speedguard-admin.php:324
+#, php-format
+msgid ""
+"Test limit is reached. Please wait for tomorrow or get %1$sprivate instance"
+"%2$s."
+msgstr ""
+"Лимит тестов исчерпан. Вы можете подождать до завтра или запросить "
+"%1$sполучить индивидуальную квоту%2$s."
+
+#: admin/class-speedguard-admin.php:329
+msgid "Please select the post you want to add."
+msgstr "Пожалуйста, выберите запись, которую вы хотите добавить."
+
+#: admin/class-speedguard-admin.php:332
+msgid "SpeedGuard only monitors pages from current website."
+msgstr "SpeedGuard мониторит страницы только с данного сайта."
+
+#: admin/class-speedguard-admin.php:335
+msgid "Please enter valid URL or select the post you want to add."
+msgstr ""
+"Пожалуйста, введите корректный URL или выберите запись, которую вы хотите "
+"добавить."
+
+#: admin/class-speedguard-admin.php:338
+msgid "Settings have been updated!"
+msgstr "Настройки обновлены!"
+
+#: admin/class-speedguard-admin.php:342
+msgid "New URL is successfully added!"
+msgstr "Новый URL успешно добавлен!"
+
+#: admin/class-speedguard-admin.php:346
+msgid "Results have been successfully updated!"
+msgstr "Результаты успешно обновлены!"
+
+#: admin/class-speedguard-admin.php:349
+msgid "Selected pages are not guarded anymore!"
+msgstr "Отмеченные страницы больше не мониторятся!"
+
+#: admin/includes/class.notifications.php:17
+#, php-format
+msgid "%1$s is slow [SpeedGuard]"
+msgstr "%1$s медленно загружается [SpeedGuard]"
+
+#: admin/includes/class.notifications.php:18
+#, php-format
+msgid "%1$s takes more than %2$s seconds to load"
+msgstr "%1$s загружается дольше %2$sс"
+
+#: admin/includes/class.notifications.php:21
+#, php-format
+msgid "%1$s speed report [SpeedGuard]"
+msgstr "Отчет скорости %1$s [SpeedGuard]"
+
+#: admin/includes/class.notifications.php:42
+msgid "SpeedGuard Report"
+msgstr "Отчет SpeedGuard"
+
+#: admin/includes/class.notifications.php:46
+msgid "SpeedGuard Report for"
+msgstr "Отчет SpeedGuard для"
+
+#: admin/includes/class.notifications.php:46
+#, php-format
+msgid "You can stop guarding URLs or add new on %1$sSpeedGuard Tests%2$s page"
+msgstr ""
+"Вы можете добавить или удалить страницы, которые нужно мониторить, в "
+"%1$sразделе отчетов%2$s"
+
+#: admin/includes/class.notifications.php:53 admin/includes/class.tests.php:52
+msgid "URL"
+msgstr "Страница"
+
+#: admin/includes/class.notifications.php:54
+msgid "Load time"
+msgstr "Скорость"
+
+#: admin/includes/class.notifications.php:55
+#: admin/includes/class.notifications.php:68 admin/includes/class.tests.php:117
+msgid "Report"
+msgstr "Отчет"
+
+#: admin/includes/class.notifications.php:56 admin/includes/class.tests.php:55
+msgid "Updated"
+msgstr "Обновлено"
+
+#: admin/includes/class.notifications.php:76
+#: admin/includes/class.widgets.php:121
+msgid "Why is my website so slow?"
+msgstr "Почему мой сайт долго грузится?"
+
+#: admin/includes/class.notifications.php:82
+#, php-format
+msgid "This report was requested by administrator of %1$s"
+msgstr "Этот отчет был запрошен администратором %1$s"
+
+#: admin/includes/class.notifications.php:82
+#, php-format
+msgid "You can change SpeedGuard notification settings %1$shere%2$s any time."
+msgstr ""
+"Вы в любое время можете изменить настройки уведомлений SpeedGuard %1$sздесь"
+"%2$s."
+
+#: admin/includes/class.settings.php:253
+msgid "SpeedGuard check interval"
+msgstr "Интервал проверки SpeedGuard"
+
+#: admin/includes/class.settings.php:278
+msgid " day"
+msgid_plural " days"
+msgstr[0] " день"
+msgstr[1] " дня"
+msgstr[2] " дней"
+
+#: admin/includes/class.settings.php:280
+msgid "If you don't want any automatic tests place \"0\"."
+msgstr ""
+"Если вы не хотите, чтобы тесты проходили по автоматически расписанию, "
+"поставьте \"0\"."
+
+#: admin/includes/class.settings.php:295
+msgid "every time after tests are executed"
+msgstr "после каждого запуска тестов"
+
+#: admin/includes/class.settings.php:296
+msgid "just in case average speed worse than"
+msgstr "только в случае, если среднее время загрузки сайта превышает"
+
+#: admin/includes/class.settings.php:297
+msgid "never"
+msgstr "никогда"
+
+#: admin/includes/class.settings.php:314 admin/includes/class.widgets.php:136
+#: admin/includes/class.widgets.php:141 admin/includes/class.widgets.php:146
+msgid "s"
+msgstr "с"
+
+#: admin/includes/class.settings.php:326
+msgid "Enter API key:"
+msgstr "Введите ключ API:"
+
+#: admin/includes/class.settings.php:330
+msgid "Show site average load time on Dashboard"
+msgstr "Отображать среднюю скорость сайта в Консоли"
+
+#: admin/includes/class.settings.php:332
+msgid "Show current page load time in Admin Bar"
+msgstr "Отображать скорость текущей страницы в Админ Баре"
+
+#: admin/includes/class.settings.php:334
+msgid "Check pageload speed every"
+msgstr "Проверять скорость загрузки с регулярностью в"
+
+#: admin/includes/class.settings.php:335
+msgid "Send me report at"
+msgstr "Отправлять мне отчет на имейл"
+
+#: admin/includes/class.settings.php:378
+msgid "SpeedGuard :: Settings"
+msgstr "SpeedGuard :: Настройки"
+
+#: admin/includes/class.settings.php:411
+msgid "Save API Key"
+msgstr "Сохранить ключ API"
+
+#: admin/includes/class.settings.php:416
+#, php-format
+msgid "Fill out this %1$sshort form%2$s."
+msgstr "Заполните эту %1$sкороткую форму%2$s."
+
+#: admin/includes/class.settings.php:420
+msgid "To obtain API key and start monitor your site speed for free:"
+msgstr ""
+"Чтобы получить ключ API и начать отслеживать скорость вашего сайта бесплатно:"
+
+#: admin/includes/class.settings.php:421
+msgid "Check your email and confirm request"
+msgstr "Проверьте ваш имейл и подтвердите запрос"
+
+#: admin/includes/class.settings.php:421
+msgid ""
+"You will receive email with \"WebPagetest API Key\" subject. Copy your API "
+"key from this email into the field and press \"Save API Key\"."
+msgstr ""
+"Вы получите письмо с темой \"WebPagetest API Key\". Скопируйте из него ключ "
+"API в поле выше и нажмите \"Сохранить ключ API\"."
+
+#: admin/includes/class.settings.php:425
+msgid "Save Settings"
+msgstr "Сохранить настройки"
+
+#: admin/includes/class.tests.php:21
+msgid "No pages guarded yet. Add something in the field above for the start."
+msgstr ""
+"Ни одна страница пока не мониторится. Для начала, добавьте что-нибудь в поле "
+"выше."
+
+#: admin/includes/class.tests.php:53
+msgid "Speed Index"
+msgstr "Speed Index"
+
+#: admin/includes/class.tests.php:54
+msgid "Report link"
+msgstr "Отчет"
+
+#: admin/includes/class.tests.php:100
+msgid "test is running..."
+msgstr "идёт тест..."
+
+#: admin/includes/class.tests.php:175
+msgid "Stop guarding"
+msgstr "Удалить"
+
+#: admin/includes/class.tests.php:176
+msgid "Retest Speed Index"
+msgstr "Перепроверить Speed Index"
+
+#: admin/includes/class.tests.php:401
+msgid "Speedguard :: Guarded pages"
+msgstr "SpeedGuard :: Тесты скорости"
+
+#: admin/includes/class.webpagetest.php:70
+#, php-format
+msgid "%1$s of %2$s tests used today"
+msgstr "%1$s из %2$s тестов использованы сегодня"
+
+#: admin/includes/class.widgets.php:25
+#, php-format
+msgid "%1$ss"
+msgstr "%1$sс"
+
+#: admin/includes/class.widgets.php:28
+msgid "This page load time"
+msgstr "Время загрузки этой страницы"
+
+#: admin/includes/class.widgets.php:31
+msgid "In process"
+msgstr "В процессе"
+
+#: admin/includes/class.widgets.php:34
+msgid "Results are currently being updated"
+msgstr "Результаты как раз обновляются"
+
+#: admin/includes/class.widgets.php:51
+msgid "Test this page load time"
+msgstr "Проверить скорость этой страницы"
+
+#: admin/includes/class.widgets.php:71
+msgid "Site Speed Results [Speedguard]"
+msgstr "Скорость сайта [Speedguard]"
+
+#: admin/includes/class.widgets.php:88
+msgid "Worst"
+msgstr "Худшее"
+
+#: admin/includes/class.widgets.php:89
+msgid "Average Load Time"
+msgstr "Среднее"
+
+#: admin/includes/class.widgets.php:90
+msgid "Best"
+msgstr "Лучшее"
+
+#: admin/includes/class.widgets.php:91
+msgid "Improve"
+msgstr "Улучшить"
+
+#: admin/includes/class.widgets.php:96
+#, php-format
+msgid "First %1$sadd URLs%2$s that should be guarded."
+msgstr "Сначала %1$sдобавьте страницы%2$s, скорость которых нужно отслеживать."
+
+#: admin/includes/class.widgets.php:109
+msgid "API Key"
+msgstr "Ключ API"
+
+#: admin/includes/class.widgets.php:112
+msgid "SpeedGuard Settings"
+msgstr "Настройки плагина"
+
+#: admin/includes/class.widgets.php:113
+msgid "Site Speed Results"
+msgstr "Скорость сайта"
+
+#: admin/includes/class.widgets.php:114
+msgid "Add new"
+msgstr "Добавить новую страницу"
+
+#: admin/includes/class.widgets.php:115
+msgid "Test results"
+msgstr "Результаты тестов"
+
+#: admin/includes/class.widgets.php:116
+msgid "Speed Score"
+msgstr "Оценка скорости"
+
+#: admin/includes/class.widgets.php:120
+msgid "API Credits"
+msgstr "Баланс API"
+
+#: admin/includes/class.widgets.php:137
+msgid ""
+"Better than average. Your site speed propably has no direct negative impact "
+"on search ranking. However, you may improve user experience significantly "
+"(which is another important search ranking factor) by reducing site load "
+"time. This is especially true for e-commerce websites. In most cases for "
+"WordPress websites Speed Index can be improved to 2 seconds without "
+"significant changes."
+msgstr ""
+"Быстрее, чем большинство. Скорее всего, скорость вашего сайта не оказывает "
+"прямого негативного влияния на позиции в поиске. Тем не менее, сократив "
+"время загрузки, вы можете значительно улучшить поведение пользователей на "
+"сайте (также серьёзный фактор в ранжировании). Это особенно важно для "
+"интернет-магазинов. В большинстве случаев, время загрузки можно "
+"оптимизировать до 2с."
+
+#: admin/includes/class.widgets.php:142
+msgid ""
+"Not bad, but not good either. Average Speed Index is 6s [2018], so this a is "
+"mediocre result. Reducing your site speed index to at least to 3 seconds "
+"will help you to outrank your competitors on Google."
+msgstr ""
+"Неплохо, но и не хорошо. Среднее время загрузки составляет 6с [на 2018 год], "
+"так что это средний результат. Если вы сократите время загрузки до 3с, ваш "
+"сайт получит преимущество в поисковой выдаче и сможет потеснить конкурентов."
+
+#: admin/includes/class.widgets.php:146
+msgid "and more"
+msgstr "и более"
+
+#: admin/includes/class.widgets.php:147
+msgid ""
+"Worse than the average. Your SE rankings are definitely harmed by your site "
+"speed. There might be a long list of reasons why your website is slow, and "
+"potentially a lot of work to do. But the good news is, you may see the first "
+"positive results as soon as you start."
+msgstr ""
+"Хуже, чем большинство. Позиции вашего сайта в поиске однозначно могли бы "
+"быть лучше. Скорее всего, целый ряд проблем замедляют работу вашего сайта и "
+"они понадобится немало работы, чтобы их устранить. Но плюс в том, что вы "
+"заметите положительную динамику, как только начнёте."
+
+#: admin/includes/class.widgets.php:156
+msgid "Start typing the title of the post, page or custom post type..."
+msgstr ""
+"Начните писать название обычной записи, страницы или пользовательского типа "
+"записи..."
+
+#: admin/includes/class.widgets.php:161
+msgid "Add"
+msgstr "Добавить"
+
+#: speedguard.php:47
+msgid ""
+"This plugin is not compatible with Multisite at the moment, but it will be "
+"soon."
+msgstr "Этот плагин пока не совместим с Multisite, но скоро будет!"
+
+#: speedguard.php:54
+msgid "Network activation is only available in PRO version"
+msgstr "Активация для Сети is only available in PRO version"
+
+#. Plugin URI of the plugin/theme
+msgid "http://wordpress.org/plugins/speedguard/"
+msgstr "http://wordpress.org/plugins/speedguard/"
+
+#. Description of the plugin/theme
+msgid ""
+"Monitors load time of 65 most important pages of your website. Every single "
+"day. For free."
+msgstr ""
+"Тестирует скорость важных страниц вашего сайта. Каждый день. Бесплатно."
+
+#. Author of the plugin/theme
+msgid "Sabrina Zeidan"
+msgstr "Сабрина Зейдан"
+
+#. Author URI of the plugin/theme
+msgid "http://sabrinazeidan.com/"
+msgstr "http://sabrinazeidan.com/"
+
+#~ msgid "Retest load time"
+#~ msgstr "Обновить результаты"
+
+#~ msgid "Tests Results"
+#~ msgstr "Результаты тестов"
+
+#~ msgid "%1$sReport%2$s"
+#~ msgstr "%1$sСсылка%2$s"
+
+#~ msgid "%1$s is already guarded!"
+#~ msgstr "%1$s уже мониторится!"
+
+#~ msgid ""
+#~ "Awesome, you've been using SpeedGuard for more than 1 week. May I ask you "
+#~ "to give it a 5-star rating on WordPress?  %1$sOk, you deserved it%2$sI "
+#~ "already did%3$sNot good enough%4$s%5$sHow can I make SpeedGuard plugin "
+#~ "better for you?%6$s%7$sSend feedback%8$s"
+#~ msgstr ""
+#~ "Супер, вы мониторите скорость сайта с помощью SpeedGuard уже больше "
+#~ "недели. Могу я просить вас поставить этому плагину 5 баллов на сайте "
+#~ "WordPress?  %1$sДа, плагин хорош%2$sУже поставил%3$sНе настолько хорош%4$s"
+#~ "%5$sКак я могу сделать SpeedGuard лучше для вас?%6$s%7$sОтправить отзыв"
+#~ "%8$s"
+
+#~ msgid "speedguard"
+#~ msgstr "speedguard"
+
+#~ msgid "Once a minute"
+#~ msgstr "Раз в минуту"
+
+#~ msgid "Show Dashboard widget"
+#~ msgstr "Показывать средние показатели по сайту в Консоли"
+
+#~ msgid "Show Admin Bar widget"
+#~ msgstr "Показывать скорость страницы в Админ Баре"
+
+#~ msgid "days"
+#~ msgstr "дней"

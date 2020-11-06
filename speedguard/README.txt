@@ -2,7 +2,7 @@
 Contributors: sabrinazeidan
 Tags: speed, speed test, site speed, performance, optimization
 Requires at least: 4.7
-Tested up to: 5.6
+Tested up to: 5.5
 Stable tag: 1.8.3
 Requires PHP: 5.6
 License: GPLv2 or later 
@@ -109,15 +109,6 @@ On [SpeedGuard's GitHub repo](https://github.com/sabrina-zeidan/speedguard)!
 * Thanx to Baboon designs from the Noun Project for the timer icon.
 
 == Changelog ==
-= Version 1.8.3 - November 7, 2020 =
-* [Fixed] Threshold error (5 minutes + timezone) after WordPress 5.3  
-* [Fixed] Settings are being reset to defaults
-* [Fixed] Settings are being reset to defaults
-* [Fixed] PHP Warning: Illegal string offset 'displayValue' in Admin bar when test is in progress
-* [Fixed] Critical error on custom post type archive page 
-* [Fixed] Tests for terms pages were not being deleted on uninstall
-* [Tweak] Wait time before retesting reduced to 3 minutes
-
 = Version 1.8.2 - Septemeber 9, 2020 =
 * Typo fixed
 

@@ -60,7 +60,7 @@ class SpeedGuard_List_Table extends WP_List_Table{
     }
 	//Table data
     private function table_data(string $client_id = '')    {
-		$data = array();		
+        $data = array();		
 		$args = array(
 					'post_type' => SpeedGuard_Admin::$cpt_name,
 					'post_status' => 'publish',
@@ -270,9 +270,11 @@ class SpeedGuard_Tests{
 	public static function handle_bulk_retest_load_time($doaction,$post_ids){
 		if ( $doaction == 'retest_load_time' ) {
 			foreach ($post_ids as $guarded_page_id){ 
-		$updated_ts = get_post_timestamp($guarded_page_id,'modified'); //no timezone
-		$updated_plus_three = $updated_ts + 3*60;
-					if (time() > $updated_plus_three) {
+				$updated = get_the_modified_date('Y-m-d H:i:s', $guarded_page_id );
+				//TODO if it comes from past in >>> another message?
+				//TODO if test was deleted but speedguard on
+					if ((strtotime("-5 minutes")) > strtotime($updated)){
+						//older - go on
 						//TODO if there are a few newer and a few old - show notice accordingly						
 						$set_waiting_status = update_post_meta($guarded_page_id, 'load_time', 'waiting'); 
 						$results_updated = add_query_arg( 'speedguard', 'retest_load_time');						
