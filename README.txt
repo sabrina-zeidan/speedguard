@@ -117,6 +117,7 @@ On [SpeedGuard's GitHub repo](https://github.com/sabrina-zeidan/speedguard)!
 * [Fixed] Critical error on custom post type archive page 
 * [Fixed] Tests for terms pages were not being deleted on uninstall
 * [Fixed] Styles and scripts loaded for not logged-in user after version 1.8
+* [Fixed] 504 admin-ajax.php error (or inifinite spinning) on bulk retest
 * [Tweak] Wait time before retesting reduced to 3 minutes
 
 = Version 1.8.2 - Septemeber 9, 2020 =

@@ -87,13 +87,11 @@ class SpeedGuard_Admin {
 	}	
 
 	function run_waiting_tests() {
-		global $wpdb; 
 		$posts_ids = $_POST['post_ids'] ;
 		foreach ($posts_ids as $post_id){
 			$test_created = SpeedGuard_Lighthouse::lighthouse_new_test($post_id);
+			wp_die();
 		}
-		echo count($posts_ids);
-		wp_die();
 	}
 
 	

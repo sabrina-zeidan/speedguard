@@ -320,10 +320,7 @@ class SpeedGuard_Settings{
 			<?php 
 			}
 	}	
-		
-	public static function tips_meta_box(){
-		echo SpeedGuardWidgets::tips_meta_box();
-	}			 
+				 
 	public static function settings_meta_box(){
 		settings_fields('speedguard');
 		do_settings_sections( 'speedguard' );
