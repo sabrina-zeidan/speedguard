@@ -4,7 +4,7 @@ Tags: speed, speed test, site speed, performance, optimization
 Requires at least: 4.7
 Tested up to: 5.6
 Stable tag: 1.8.3
-Requires PHP: 5.6
+Requires PHP: 7.0
 License: GPLv2 or later 
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Keeps an eye on your website’s speed for you; every single day for free. 
@@ -118,6 +118,7 @@ On [SpeedGuard's GitHub repo](https://github.com/sabrina-zeidan/speedguard)!
 * [Fixed] Tests for terms pages were not being deleted on uninstall
 * [Fixed] Styles and scripts loaded for not logged-in user after version 1.8
 * [Fixed] 504 admin-ajax.php error (or inifinite spinning) on bulk retest
+* [Tweak] Backward compatibility with PHP 5.6
 * [Tweak] Wait time before retesting reduced to 3 minutes
 
 = Version 1.8.2 - Septemeber 9, 2020 =

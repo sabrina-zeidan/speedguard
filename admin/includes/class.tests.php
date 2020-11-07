@@ -15,7 +15,7 @@ class SpeedGuard_List_Table extends WP_List_Table{
 	public function no_items() {
 		_e('No pages guarded yet. Add something in the field above for the start.','speedguard');
 	}
-    public function prepare_items(string $client_id = ''){
+    public function prepare_items($client_id = ''){
         $columns = $this->get_columns();
         $hidden = $this->get_hidden_columns();
         $sortable = $this->get_sortable_columns();
@@ -59,7 +59,7 @@ class SpeedGuard_List_Table extends WP_List_Table{
         return array('guarded_page_title' => array('guarded_page_title', false),'load_time' => array('load_time', false),'report_date' => array('report_date', false));
     }
 	//Table data
-    private function table_data(string $client_id = '')    {
+    private function table_data($client_id = '')    {
 		$data = array();		
 		$args = array(
 					'post_type' => SpeedGuard_Admin::$cpt_name,
@@ -327,7 +327,7 @@ class SpeedGuard_Tests{
 	}		
 	
 		
-	public static function add_test(string $url_to_add = '' , string $guarded_item_type = '', string $guarded_item_id = '', string $guarded_post_blog_id = '', bool $already_guarded = false ) { //blog id 1
+	public static function add_test($url_to_add = '' , $guarded_item_type = '', $guarded_item_id = '', $guarded_post_blog_id = '', $already_guarded = false ) { //blog id 1
 		if (empty($url_to_add)) { 
 			$redirect_to = add_query_arg( 'speedguard', 'add_new_url_error_empty'); 
 		}
@@ -372,7 +372,7 @@ class SpeedGuard_Tests{
 							}					
 						}
 						//we have: $url_to_ad, $guarded_item_type, $guarded_item_id, $guarded_post_blog_id now + $already_guarded status
-						if (!empty($already_guarded) && ($already_guarded === true) && empty($redirect_to) && ('publish' === get_post_status($speedguard_on[1] ))){
+						if (!empty($already_guarded) && ($already_guarded === true) && empty($redirect_to) && !empty($speedguard_on) && ('publish' === get_post_status($speedguard_on[1] ))){
 								$redirect_to = SpeedGuard_Tests::handle_bulk_retest_load_time('retest_load_time', array($speedguard_on[1]));	
 						}					
 						else { //Valid and not guarded yet >>> ADD						
