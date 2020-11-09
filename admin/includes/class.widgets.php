@@ -61,7 +61,7 @@ class SpeedGuardWidgets{
 		}
 		//The output			
 		//There is the load time
-		if (isset($is_guarded) && $load_time == 'waiting') {
+		if (isset($is_guarded) && !empty($load_time) && $load_time == 'waiting') {
 				$title = __('Testing...','speedguard');
 				$href = '';				
 				$atitle = __('Test is running currently','speedguard');

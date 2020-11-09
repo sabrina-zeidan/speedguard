@@ -113,20 +113,22 @@ class SpeedGuard_Settings{
 						if (count($guarded_pages) > 0) {		
 							foreach($guarded_pages as $guarded_page) {
 								$guarded_page_load_time = get_post_meta(  $guarded_page,'load_time');  
-								if (!empty($guarded_page_load_time[0]['numericValue']) &&$guarded_page_load_time[0]['numericValue'] > 0){
+								if (!empty($guarded_page_load_time[0]['numericValue']) && $guarded_page_load_time[0]['numericValue'] > 0){
 									$guarded_page_load_time = round(($guarded_page_load_time[0]['numericValue']/1000),1);			
 									$guarded_page_load_time_all[] = $guarded_page_load_time;
 								}
 							}
-							$average_load_time = round(array_sum($guarded_page_load_time_all)/count($guarded_page_load_time_all),1); 
-							$min_load_time = min($guarded_page_load_time_all);
-							$max_load_time = max($guarded_page_load_time_all);	
-							$new_averages = array(
-								'average_load_time'=> $average_load_time,
-								'min_load_time'=> $min_load_time,
-								'max_load_time' => $max_load_time,
-								'guarded_pages_count' => count($guarded_page_load_time_all)
-							); 
+							if (!empty($guarded_page_load_time_all )){
+								$average_load_time = round(array_sum($guarded_page_load_time_all)/count($guarded_page_load_time_all),1); 
+								$min_load_time = min($guarded_page_load_time_all);
+								$max_load_time = max($guarded_page_load_time_all);	
+								$new_averages = array(
+									'average_load_time'=> $average_load_time,
+									'min_load_time'=> $min_load_time,
+									'max_load_time' => $max_load_time,
+									'guarded_pages_count' => count($guarded_page_load_time_all)
+								); 
+							}
 						}						
 						else {
 							$new_averages = array(

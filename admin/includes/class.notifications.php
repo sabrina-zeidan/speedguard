@@ -92,8 +92,8 @@ class SpeedGuard_Notifications{
 														echo '</tbody>
 														</table>													
 														<div style="padding: 1em; color:#000;"> 
-														<p style="font-size: 1.2em; font-weight: bold;" >'.__('Why is my website so slow?','speedguard').'</p>';											
-														str_replace( "utm_medium=sidebar", "utm_medium=email_report", SpeedGuardWidgets::tips_meta_box()); 		
+														<p style="font-size: 1.2em; font-weight: bold;" >'.__('Important questions:','speedguard').'</p>';											
+														str_replace( "utm_medium=sidebar", "utm_medium=email_report", SpeedGuardWidgets::important_questions_meta_box()); 		
 														echo '
 														</div>
 													</td> 
