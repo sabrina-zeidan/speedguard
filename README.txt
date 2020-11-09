@@ -1,6 +1,6 @@
 === Site Speed Test - SpeedGuard === 
 Contributors: sabrinazeidan
-Tags: speed, speed test, site speed, performance, optimization
+Tags: speed, page speed, test speed, performance, optimization
 Requires at least: 4.7
 Tested up to: 5.6
 Stable tag: 1.8.3
@@ -109,7 +109,7 @@ On [SpeedGuard's GitHub repo](https://github.com/sabrina-zeidan/speedguard)!
 * Thanx to Baboon designs from the Noun Project for the timer icon.
 
 == Changelog ==
-= Version 1.8.3 - November 7, 2020 =
+= Version 1.8.3 - November 9, 2020 =
 * [Fixed] Threshold error (5 minutes + timezone) after WordPress 5.3  
 * [Fixed] Settings are being reset to defaults
 * [Fixed] Settings are being reset to defaults
