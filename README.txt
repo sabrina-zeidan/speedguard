@@ -109,6 +109,10 @@ On [SpeedGuard's GitHub repo](https://github.com/sabrina-zeidan/speedguard)!
 * Thanx to Baboon designs from the Noun Project for the timer icon.
 
 == Changelog ==
+= Version 1.8.4 - March 22, 2020 =
+* [Fixed] Error on date archive pages 
+
+
 = Version 1.8.3 - November 9, 2020 =
 * [Fixed] Threshold error (5 minutes + timezone) after WordPress 5.3  
 * [Fixed] Settings are being reset to defaults

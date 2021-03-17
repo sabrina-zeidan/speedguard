@@ -29,7 +29,7 @@ class SpeedGuardWidgets{
 				$is_guarded = false;
 			}							
 		}
-		else if (is_archive() & !is_post_type_archive()) {
+		else if (is_archive() && !is_post_type_archive() && !is_date()) {
 			$type = 'archive';
 			$current_item_id = get_queried_object()->term_id;
 			$current_item_link = get_term_link($current_item_id);
