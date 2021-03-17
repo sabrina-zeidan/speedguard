@@ -180,7 +180,7 @@ class SpeedGuardWidgets{
 		<input type="hidden" id="speedguard_item_type" name="speedguard_item_type" value=""/> 
 		<input type="hidden" id="speedguard_new_url_id" name="speedguard_new_url_id" value=""/>
 		<input type="hidden" name="speedguard" value="add_new_url" />
-		<input type="submit" name="Submit" value="'.__('Add','speedguard').'" />
+		<input type="submit" name="Submit" class="button action" value="'.__('Add','speedguard').'" />
 		</form>';
 		echo $content;
 	}

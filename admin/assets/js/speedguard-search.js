@@ -1,52 +1,69 @@
-jQuery(function($){
-    var getData = function (request, response) {
-		jQuery.ajax({
-            url: speedguardsearch.search_url + request.term,
-            type: "GET",
-            contentType: 'application/json; charset=utf-8',
-			beforeSend: function ( xhr ) {
-				xhr.setRequestHeader( 'X-WP-Nonce', speedguardsearch.nonce ); //no need to verify that the nonce is valid inside your custom end point
-			},
-            success: function(data) {
-				if ( data !== null ) {
+document.addEventListener('DOMContentLoaded', function() {
+//if ( document.readyState === "complete" ) {
+ //document.readyState === "complete" ) {
+	 
+    const min_letters = 2; 
+    var autocomplete_field = document.getElementById('speedguard_new_url');
+	console.log(autocomplete_field);
+    var awesomplete_field = new Awesomplete(autocomplete_field);
+	
+    // When the user presses and releases a key, get the input value
+    autocomplete_field.addEventListener('keyup', function() {
+        var user_input = this.value;  // Use another variable for developer clarity
+        // If there's enough letters in the field
+        if ( user_input.length >= min_letters ) {			
+			fetch(   speedguardsearch.search_url + user_input, {
+				method: 'GET',
+				headers: {
+						'Content-Type': 'application/json',
+						'X-WP-Nonce': speedguardsearch.nonce
+					  }
+			})
+			.then( response => {
+				  if (response.status !== 200) {
+					console.log('Problem! Status Code: ' +
+					  response.status);
+					return;
+				  }				
+					response.json().then( posts => {
 					var results = [];
-					console.log(results);
-					for(var key in data) {
-						var valueToPush = { }; // or "var valueToPush = new Object();" which is the same
-						valueToPush["label"] = data[key].label;
-						valueToPush["value"] = data[key].ID;
-						valueToPush["permalink"] = data[key].permalink;
-						valueToPush["type"] = data[key].type;
-						results.push(valueToPush);	
+					for(var key in posts) {
+						var valueToPush = {}; 
+						valueToPush["label"] = posts[key].label;	
+						valueToPush["value"] = { id: posts[key].ID, permalink: posts[key].permalink, type: posts[key].type};
+						results.push(valueToPush);
 					}					
-				 var result_to_show = response(results.slice(0, 6));
-				}      
-            },
-            error : function(xhr, textStatus, errorThrown) {
-				 //console.log('error message here');
-            },
-
-            timeout: 5000,
-        });
+					
+					awesomplete_field.list = results;  // Update the Awesomplete list
+					awesomplete_field.evaluate();  // And tell Awesomplete that we've done so
+					
+				
+					
+					});
+					
+					
+					
+				})
+				.catch(function(err) {
+					console.log('Error: ', err);
+				});
 		
+		
+        }
+    });
+
+
+	awesomplete_field.replace = function(suggestion) {
+	this.input.value = suggestion.value.permalink; //input field 
+	document.getElementById("speedguard_new_url_permalink").value = suggestion.value.permalink;
+	document.getElementById("speedguard_item_type").value = suggestion.value.type;
+	document.getElementById("speedguard_new_url_id").value = suggestion.value.id;
+	//document.getElementById("blog_id").value = suggestion.value.id; //Multisite TODO
+	
 		
     };
- 
- 
-    var selectItem = function (event, ui) {
-		event.preventDefault();
-		$("#speedguard_new_url").val(ui.item.label);
-		$("#speedguard_new_url_permalink").val(ui.item.permalink);
-		$("#speedguard_item_type").val(ui.item.type);
-		$("#speedguard_new_url_id").val(ui.item.value);
-		$("#blog_id").val(ui.item.blog_id);
-		
 
-    }
- 
-    $('input[name="speedguard_new_url"]').autocomplete({
-        source: getData,
-        select: selectItem,
-        minLength: 2,
-    });
 });
+
+
+

@@ -15,12 +15,12 @@
 /** Results Page**/
 .toplevel_page_speedguard_tests .page-title-action {display:none;}
 .toplevel_page_speedguard_tests #speedguard_add_url {width:100%;} 
-.toplevel_page_speedguard_tests #speedguard_add_url #speedguard_new_url{width:80%; outline: 5px solid transparent;}
+.toplevel_page_speedguard_tests #speedguard_new_url {width:80%;} 
+.toplevel_page_speedguard_tests .awesomplete {width:80% !important; }
+.toplevel_page_speedguard_tests .awesomplete #speedguard_new_url {width:100%;} 
+ 
 .toplevel_page_speedguard_tests .speedguard-results .button {display:none;}
-.toplevel_page_speedguard_tests .autocomplete-suggestions { text-align: left; cursor: default; border: 1px solid #ccc; border-top: 0; background: #fff; box-shadow: -1px 1px 3px rgba(0,0,0,.1);position: absolute; display: none; z-index: 9999; max-height: 254px; overflow: hidden; overflow-y: auto; box-sizing: border-box;}
-.toplevel_page_speedguard_tests .autocomplete-suggestion { position: relative; padding: 0 .6em; line-height: 23px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 1.02em; color: #333; }
-.toplevel_page_speedguard_tests .autocomplete-suggestion b { font-weight: normal; color: #1f8dd6; }
-.autocomplete-suggestion.selected { background: #f0f0f0; }
+
 
 #speed-score-legend-meta-box table td {padding: 1.2em 0.5em; min-width: 80px; border:0px;}
 #speed-score-legend-meta-box .speedguard-score {font-size: 2em; margin-left:1em;}

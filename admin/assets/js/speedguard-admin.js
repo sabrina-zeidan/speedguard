@@ -4,22 +4,7 @@ jQuery(document).ready(function($){
        
     });     
 	
-	//Feedback notice
-	$( "#leave-feedback" ).click(function() {
-		$( "#feedback-form" ).toggle( 'slow');
-	});
-	//On SG activation
-	if ($("body").hasClass("plugins-php") && $("body").hasClass("speedguard-just-activated")) {
-		//$('#toplevel_page_speedguard').focus();	
-		setInterval(function() { 
-			$("#toplevel_page_speedguard").animate({backgroundColor: "#0073aa;"});
-			$("#toplevel_page_speedguard").animate({backgroundColor: "transparent" });
-			$("#toplevel_page_speedguard").animate({backgroundColor: "#0073aa;"});
-			$("#toplevel_page_speedguard").animate({backgroundColor: "transparent" }); 
-			$("#toplevel_page_speedguard").animate({backgroundColor: "#0073aa;"});
-			$("#toplevel_page_speedguard").animate({backgroundColor: "" }); 
-		},3000);
-	}	
+	
 	
 	//All SpeedGuard pages  
 	if ($("body").hasClass("post-type-guarded-page") || $("body").hasClass("speedguard_page_speedguard_clients")  || $("body").hasClass("toplevel_page_speedguard_tests") || $("body").hasClass("speedguard_page_speedguard_settings") || $("body").hasClass("speedguard_page_speedguard_settings")){
