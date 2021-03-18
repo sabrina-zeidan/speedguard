@@ -283,11 +283,12 @@ class SpeedGuard_Admin {
 	//Plugin Scripts 
 	public function enqueue_scripts() {
 		if (is_admin_bar_showing() && (SpeedGuard_Admin::is_screen('dashboard,settings,tests,plugins,clients') || !is_admin())){
-			wp_enqueue_script('jquery');
+			//wp_enqueue_script('jquery');
 			wp_enqueue_script('common');
 			wp_enqueue_script('wp-lists');
 			wp_enqueue_script('postbox');  
-			wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'assets/js/speedguard-admin.js', array( 'jquery','jquery-ui-autocomplete'), date('h:i:s'), false  );
+		//	wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'assets/js/speedguard-admin.js', array( 'jquery','jquery-ui-autocomplete'), date('h:i:s'), false  );
+			wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'assets/js/speedguard-admin.js', array(), date('h:i:s'), false  );
 		}
 		if (is_admin_bar_showing() && SpeedGuard_Admin::is_screen('tests')){			
 			//search field without jquery

@@ -64,9 +64,9 @@
 
 
 .speedguard-score {font-weight: 600; font-size: 1.2em;}
-.speedguard-score  .score-green {color:#33a849; margin-left: 0.4em;}
-.speedguard-score  .score-yellow {color:#f9d30d; margin-left: 0.4em;}
-.speedguard-score  .score-red { color:#e6493a; margin-left: 0.4em;}
+.speedguard-score.score-green span{color:#33a849; margin-left: 0.4em;}
+.speedguard-score.score-yellow span{color:#f9d30d; margin-left: 0.4em;}
+.speedguard-score.score-red span { color:#e6493a; margin-left: 0.4em;}
 
 #speedguard-about-meta-box #szpic {background-image: url(../images/sabrina.png); height:75px; width:75px; float: right; margin:1em;}
 
