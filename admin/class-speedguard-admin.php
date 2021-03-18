@@ -275,25 +275,22 @@ class SpeedGuard_Admin {
 	//Plugin Styles
 	public function enqueue_styles() { 
 		if ((is_admin_bar_showing()) && (SpeedGuard_Admin::is_screen('dashboard,settings,tests') || !is_admin())){		 
-			wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'assets/css/speedguard-admin.css', array(),  date('h:i:s')); 
-			wp_enqueue_style( $this->plugin_name.'awesompletecss', plugin_dir_url( __FILE__ ) . 'assets/awesomplete/awesomplete.css', array(), $this->version); 
+			wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'assets/css/speedguard-admin.css', array(), $this->version);			
+		}
+		if (is_admin_bar_showing() && SpeedGuard_Admin::is_screen('tests')){	
+			wp_enqueue_style( $this->plugin_name.'-awesompletecss', plugin_dir_url( __FILE__ ) . 'assets/awesomplete/awesomplete.css', array(), $this->version); 		
 		}
 		
 	}
 	//Plugin Scripts 
 	public function enqueue_scripts() {
-		if (is_admin_bar_showing() && (SpeedGuard_Admin::is_screen('dashboard,settings,tests,plugins,clients') || !is_admin())){
-			//wp_enqueue_script('jquery');
-			wp_enqueue_script('common');
-			wp_enqueue_script('wp-lists');
-			wp_enqueue_script('postbox');  
-		//	wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'assets/js/speedguard-admin.js', array( 'jquery','jquery-ui-autocomplete'), date('h:i:s'), false  );
-			wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'assets/js/speedguard-admin.js', array(), date('h:i:s'), false  );
+		if (is_admin_bar_showing() && (SpeedGuard_Admin::is_screen('dashboard,settings,tests,plugins,clients') || !is_admin())){ 
+			wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'assets/js/speedguard-admin.js', array(), $this->version, false  );
 		}
 		if (is_admin_bar_showing() && SpeedGuard_Admin::is_screen('tests')){			
-			//search field without jquery
-			wp_enqueue_script('sg-awesompletejs', plugin_dir_url( __FILE__ ) . 'assets/awesomplete/awesomplete.js');
-	     	wp_enqueue_script('speedguardsearch', plugin_dir_url( __FILE__ ) . 'assets/js/speedguard-search.js', ['sg-awesompletejs'] ,$this->version, true );
+			//search field without with autocomplete jquery 
+			wp_enqueue_script($this->plugin_name.'-awesompletejs', plugin_dir_url( __FILE__ ) . 'assets/awesomplete/awesomplete.js');
+	     	wp_enqueue_script('speedguardsearch', plugin_dir_url( __FILE__ ) . 'assets/js/speedguard-search.js', array($this->plugin_name.'-awesompletejs'),$this->version, true );
 			wp_localize_script('speedguardsearch', 'speedguardsearch', array(
 				'search_url' => home_url( '/wp-json/speedguard/search?term=' ),
 				'nonce' => wp_create_nonce('wp_rest') )

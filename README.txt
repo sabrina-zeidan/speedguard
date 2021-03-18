@@ -111,7 +111,7 @@ On [SpeedGuard's GitHub repo](https://github.com/sabrina-zeidan/speedguard)!
 == Changelog ==
 = Version 1.8.4 - March 22, 2020 =
 * [Fixed] Error on date archive pages 
-
+* [Tweak] Search autocomplete, close postbox, colors change > Vanilla JS
 
 = Version 1.8.3 - November 9, 2020 =
 * [Fixed] Threshold error (5 minutes + timezone) after WordPress 5.3  
