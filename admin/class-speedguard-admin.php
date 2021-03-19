@@ -70,25 +70,36 @@ class SpeedGuard_Admin {
 				
 	?>
 		<script type="text/javascript" >
-			jQuery(document).ready(function($) {
-				var data = {
-					'action': 'run_waiting_tests',
-					'post_ids': <?php echo json_encode( array_values( $waiting_pages ) ); ?>,
-				};
-			jQuery.post(ajaxurl, data, function(response) {
-				setTimeout(function () {
+		var waiting_posts = <?php echo json_encode( array_values( $waiting_pages ) ); ?>;
+		const params = new URLSearchParams();
+		params.append('action', 'run_waiting_tests');
+		for (var i = 0; i < waiting_posts.length; i++) {
+			params.append('post_ids[]', waiting_posts[i]);
+		}
+		fetch(ajaxurl, {
+			method: 'POST',
+			credentials: 'same-origin',
+			headers: {
+				'Content-Type': 'application/x-www-form-urlencoded',
+				'Cache-Control': 'no-cache',
+			},
+			body: params,
+		})
+		.then(response => {
+			response.json()
+			setTimeout(function () {
 					window.location.replace(window.location.href + "&speedguard=load_time_updated");
 					}, 10000) 
-			});
-			});
+		})
+		.catch(err => console.log(err));
 		</script>
 	<?php
 		}
 	}	
 
 	function run_waiting_tests() {
-		$posts_ids = $_POST['post_ids'] ;
-		foreach ($posts_ids as $post_id){
+	$posts_ids = $_POST['post_ids'] ;
+		foreach ($posts_ids as $post_id){		
 			$test_created = SpeedGuard_Lighthouse::lighthouse_new_test($post_id);
 			wp_die();
 		}
@@ -288,7 +299,7 @@ class SpeedGuard_Admin {
 			wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'assets/js/speedguard-admin.js', array(), $this->version, false  );
 		}
 		if (is_admin_bar_showing() && SpeedGuard_Admin::is_screen('tests')){			
-			//search field without with autocomplete jquery 
+			//search field with vanilla js
 			wp_enqueue_script($this->plugin_name.'-awesompletejs', plugin_dir_url( __FILE__ ) . 'assets/awesomplete/awesomplete.js');
 	     	wp_enqueue_script('speedguardsearch', plugin_dir_url( __FILE__ ) . 'assets/js/speedguard-search.js', array($this->plugin_name.'-awesompletejs'),$this->version, true );
 			wp_localize_script('speedguardsearch', 'speedguardsearch', array(
