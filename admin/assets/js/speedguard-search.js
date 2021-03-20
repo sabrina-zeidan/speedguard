@@ -21,18 +21,21 @@ document.addEventListener('DOMContentLoaded', function() {
 					console.log('Problem! Status Code: ' +
 					  response.status);
 					return;
-				  }				
-					response.json().then( posts => {
-					var results = [];
+				  }	
+				response.json().then( posts => {		  
+				var results = [];
 					for(var key in posts) {
 						var valueToPush = {}; 
 						valueToPush["label"] = posts[key].label;	
 						valueToPush["value"] = { id: posts[key].ID, permalink: posts[key].permalink, type: posts[key].type};
 						results.push(valueToPush);
 					}
-					awesomplete_field.list = results;  // Update the Awesomplete list
-					awesomplete_field.evaluate();  // And tell Awesomplete that we've done so
-					});					
+				awesomplete_field.list = results;  // Update the Awesomplete list
+				awesomplete_field.evaluate();  // And tell Awesomplete that we've done so
+				})
+				.catch(function(err) {
+				//	console.log('No results');
+				})
 				})
 				.catch(function(err) {
 					console.log('Error: ', err);
