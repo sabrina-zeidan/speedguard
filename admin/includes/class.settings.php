@@ -80,36 +80,24 @@ class SpeedGuard_Settings{
 	}
 		
 	function load_time_updated_function( $meta_id, $post_id, $meta_key, $meta_value ){
-			if ( 'load_time' == $meta_key && $meta_value != 'waiting' ) {
+			if ( 'load_time' == $meta_key ) {
 				$args = array(
-				'no_found_rows' => true, 
-				'post_type' => SpeedGuard_Admin::$cpt_name,
-				'post_status' => 'publish',
-				'posts_per_page'   => -1, 
-				'fields' =>'ids',
-				'meta_query' => array(
-									array(	
-										'key' => 'load_time',
-										'value' => 'waiting', 
-										'compare' => 'LIKE'
-										)
-								)
-						);
-				$the_query = new WP_Query( $args );
-				$waiting_tests = $the_query->get_posts();
-					if (count($waiting_tests) == 0){					
-						$args = array(
-							'post_type' => SpeedGuard_Admin::$cpt_name,
-							'post_status' => 'publish',
-							'posts_per_page'   => -1, 
-							'fields' =>'ids'								
+					'no_found_rows' => true, 
+					'post_type' => SpeedGuard_Admin::$cpt_name,
+					'post_status' => 'publish',
+					'posts_per_page'   => -1, 
+					'fields' =>'ids',
+					'meta_query' => array(
+										array(	
+											'key' => 'load_time',
+											'value' => 'waiting', 
+											'compare' => 'NOT LIKE'
+											)
+									)
 							);
-						$the_query = new WP_Query( $args );
-	
-						$guarded_pages = $the_query->get_posts();
-						$guarded_page_load_time_all = array();
-						
-									
+				$the_query = new WP_Query( $args );
+				$guarded_pages = $the_query->get_posts();
+					$guarded_page_load_time_all = array();		
 						if (count($guarded_pages) > 0) {		
 							foreach($guarded_pages as $guarded_page) {
 								$guarded_page_load_time = get_post_meta(  $guarded_page,'load_time');  
@@ -139,11 +127,9 @@ class SpeedGuard_Settings{
 												);
 							}
 						if ($new_averages) SpeedGuard_Admin::update_this_plugin_option('speedguard_average', $new_averages);						
-						wp_reset_postdata();
-					}
-				wp_reset_postdata();
 		}
 	}	
+	
 	function update_results_cron_function() {					
 			//if send report on: schedule cron job 
 			$speedguard_options = SpeedGuard_Admin::get_this_plugin_option('speedguard_options' );	

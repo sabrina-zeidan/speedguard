@@ -248,7 +248,7 @@ class SpeedGuard_Tests{
 		//Include Terms too
 		$the_terms = get_terms( array(
 		  'name__like' => $search_term,
-		  'hide_empty' => false,
+		  'hide_empty' => true,
 		  'meta_query' => $meta_query
 		));
 		if ( count($the_terms) > 0 ) {
@@ -426,8 +426,7 @@ class SpeedGuard_Tests{
 							'post_type' => SpeedGuard_Admin::$cpt_name,
 							'post_status' => 'publish',
 							'posts_per_page'   => -1, 
-							'fields' =>'ids',
-							
+							'fields' =>'ids',							
 							'meta_query' => array(
 									array(	
 										'key' => 'load_time',
@@ -435,11 +434,10 @@ class SpeedGuard_Tests{
 										'compare' => '>'
 										)
 								)
-								
-											);
+									);
 						$the_query = new WP_Query( $args );						
 						$guarded_pages = $the_query->get_posts();
-						$guarded_page_load_time_all = array();				
+						$guarded_page_load_time_all = array();						
 						if (count($guarded_pages) > 0) {		
 							foreach($guarded_pages as $guarded_page) {
 								$guarded_page_load_time = get_post_meta(  $guarded_page,'load_time');						
