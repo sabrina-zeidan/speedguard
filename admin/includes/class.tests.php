@@ -346,13 +346,19 @@ class SpeedGuard_Tests{
 						if (empty($guarded_item_type)) {//find out the type, item id and blog id //TODO
 							if (trailingslashit($url_to_add) === trailingslashit(get_site_url())) { //homepage
 								$guarded_item_type = 'homepage';							
-								$already_guarded = (!empty(SpeedGuard_Tests::is_homepage_guarded())) ? true: false;
+								$is_homepage_guarded = SpeedGuard_Tests::is_homepage_guarded();
+								//var_dump($is_homepage_guarded);
+								//die();
+								$already_guarded = (!empty($is_homepage_guarded)) ? true: false;
+								$existing_test_id = (!empty($is_homepage_guarded)) ? $is_homepage_guarded : false;
 							}
 							else {//single or archive
 								$guarded_item_id = url_to_postid($url_to_add);
 								if ($guarded_item_id != 0) { 
 									$guarded_item_type = 'single'; 								
-									$speedguard_on = get_post_meta($guarded_item_id,'speedguard_on', true);	$already_guarded = (!empty($speedguard_on) && ($speedguard_on[0] == 'true')) ? true : false;									
+									$speedguard_on = get_post_meta($guarded_item_id,'speedguard_on', true);	
+									$already_guarded = (!empty($speedguard_on) && ($speedguard_on[0] == 'true')) ? true : false;	
+									$existing_test_id = (!empty($speedguard_on) && ($speedguard_on[0] == 'true')) ? ($speedguard_on[1]) : false;	
 								}
 								else if ($guarded_item_id === 0 ){ //it's archive. Let's find the term															
 									//$slug = basename($url_to_add).PHP_EOL;
@@ -367,13 +373,14 @@ class SpeedGuard_Tests{
 										}
 									}
 									$speedguard_on = get_term_meta($guarded_item_id,'speedguard_on', true);	
-									$already_guarded = (!empty($speedguard_on) && ($speedguard_on[0] == 'true')) ? true : false;		
+									$already_guarded = (!empty($speedguard_on) && ($speedguard_on[0] == 'true')) ? true : false;
+									$existing_test_id = (!empty($speedguard_on) && ($speedguard_on[0] == 'true')) ? ($speedguard_on[1]) : false;									
 								}
 							}					
 						}
-						//we have: $url_to_ad, $guarded_item_type, $guarded_item_id, $guarded_post_blog_id now + $already_guarded status
-						if (!empty($already_guarded) && ($already_guarded === true) && empty($redirect_to) && !empty($speedguard_on) && ('publish' === get_post_status($speedguard_on[1] ))){
-								$redirect_to = SpeedGuard_Tests::handle_bulk_retest_load_time('retest_load_time', array($speedguard_on[1]));	
+						//we have: $url_to_add, $guarded_item_type, $guarded_item_id, $guarded_post_blog_id now + $already_guarded status
+						if (!empty($already_guarded) && ($already_guarded === true) && empty($redirect_to) && !empty($existing_test_id) && ('publish' === get_post_status($existing_test_id ))){
+								$redirect_to = SpeedGuard_Tests::handle_bulk_retest_load_time('retest_load_time', array($existing_test_id));	
 						}					
 						else { //Valid and not guarded yet >>> ADD						
 							$connection = SpeedGuard_Admin::get_this_plugin_option( 'speedguard_options' )['test_connection_type'];

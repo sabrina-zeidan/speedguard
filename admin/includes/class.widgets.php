@@ -13,8 +13,23 @@ class SpeedGuardWidgets{
 	}
 
 	function speedguard_admin_bar_widget($wp_admin_bar ) { 
-			if (!current_user_can('manage_options')) return;	
-		if (is_singular(SpeedGuard_Admin::supported_post_types())) {
+		if (!current_user_can('manage_options')) return;	
+		if (is_front_page()) {
+			$type = 'homepage'; 
+			$current_item_id = '';
+			$current_item_link = get_site_url(); //TODO Multisite
+			//Check if it's already guarded				
+				$homepage_found = SpeedGuard_Tests::is_homepage_guarded();
+				if (!empty($homepage_found)){							
+					$is_guarded = true;
+					$test_id = $homepage_found;
+					$load_time = get_post_meta( $test_id,'load_time');							
+				}
+				else {
+					$is_guarded = false;
+				}							
+		}
+		else if (is_singular(SpeedGuard_Admin::supported_post_types())) {
 			global $post; 
 			$type = 'single';
 			$current_item_id = $post->ID;
@@ -44,21 +59,7 @@ class SpeedGuardWidgets{
 			}					
 			
 		}
-		else if (is_home()) {
-			$type = 'homepage'; 
-			$current_item_id = '';
-			$current_item_link = get_site_url(); //TODO Multisite
-			//Check if it's already guarded				
-				$homepage_found = SpeedGuard_Tests::is_homepage_guarded();
-				if (!empty($homepage_found)){							
-					$is_guarded = true;
-					$test_id = $homepage_found;
-					$load_time = get_post_meta( $test_id,'load_time');							
-				}
-				else {
-					$is_guarded = false;
-				}							
-		}
+		
 		//The output			
 		//There is the load time
 		if (isset($is_guarded) && !empty($load_time) && $load_time == 'waiting') {
