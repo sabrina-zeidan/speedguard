@@ -20,7 +20,7 @@ class SpeedGuard_List_Table extends WP_List_Table{
         $hidden = $this->get_hidden_columns();
         $sortable = $this->get_sortable_columns();
         $data = $this->table_data($client_id);
-        usort( $data, array( &$this, 'sort_data' ) );
+		usort( $data, array( &$this, 'sort_data' ) );
         $perPage = 20;
         $currentPage = $this->get_pagenum();
         $totalItems = count($data);
@@ -70,6 +70,7 @@ class SpeedGuard_List_Table extends WP_List_Table{
 					'no_found_rows' => true, 		
 					);
 		$the_query = new WP_Query( $args );
+		$guarded_pages = $the_query->posts;
 			if (!empty($client_id)){
 			$meta_query = array();
 				$meta_query[] = array(
@@ -77,13 +78,11 @@ class SpeedGuard_List_Table extends WP_List_Table{
 					array(
 						'key' => 'speedguard_page_client_id',
 						'compare' => '=',
-						'value' => $client_id
-					
+						'value' => $client_id					
 					)
 				);				
 				$the_query->set('meta_query',$meta_query);	
 			}
-		$guarded_pages = $the_query->get_posts();
 		if( $guarded_pages ) :
 		foreach($guarded_pages as $guarded_page_id) {  
 			$guarded_page_url = get_post_meta( $guarded_page_id,'speedguard_page_url', true);
@@ -112,7 +111,8 @@ class SpeedGuard_List_Table extends WP_List_Table{
                  );			
         }
 		endif;
-		wp_reset_postdata();        				
+	
+		//wp_reset_postdata();        				
         return $data;
     }
 	
@@ -231,7 +231,7 @@ class SpeedGuard_Tests{
 				'meta_query' => $meta_query				 
 				);
 			$the_query = new WP_Query( $args );								
-			$this_blog_found_posts = $the_query->get_posts();
+			$this_blog_found_posts = $the_query->posts;
 				$temp = array();
 				foreach( $this_blog_found_posts as $key => $post_id) { 
 					//$key = 'ID';
@@ -315,7 +315,7 @@ class SpeedGuard_Tests{
 				)										
 		);
 		$the_query = new WP_Query( $args );
-		$homepage_found = $the_query->get_posts();
+		$homepage_found = $the_query->posts;
 		if (!empty($homepage_found[0])){
 			set_transient( 'speedguard-homepage-added-previousely', true, 10);
 			return $homepage_found[0];
@@ -427,41 +427,8 @@ class SpeedGuard_Tests{
 		}
 		
 		public static function tests_page() { 
-			if (SpeedGuard_Admin::is_screen('tests')){
+			if (SpeedGuard_Admin::is_screen('tests')){			
 				SpeedGuardWidgets::add_meta_boxes();	
-				$args = array(
-							'post_type' => SpeedGuard_Admin::$cpt_name,
-							'post_status' => 'publish',
-							'posts_per_page'   => -1, 
-							'fields' =>'ids',							
-							'meta_query' => array(
-									array(	
-										'key' => 'load_time',
-										'value' => '0', 
-										'compare' => '>'
-										)
-								)
-									);
-						$the_query = new WP_Query( $args );						
-						$guarded_pages = $the_query->get_posts();
-						$guarded_page_load_time_all = array();						
-						if (count($guarded_pages) > 0) {		
-							foreach($guarded_pages as $guarded_page) {
-								$guarded_page_load_time = get_post_meta(  $guarded_page,'load_time');						
-								if ($guarded_page_load_time != 'waiting'){
-									if (!empty($guarded_page_load_time[0]['numericValue']) && $guarded_page_load_time[0]['numericValue'] > 0){
-										$guarded_page_load_time = round(($guarded_page_load_time[0]['numericValue']/1000),1);
-										$guarded_page_load_time_all[] = $guarded_page_load_time;								
-									}
-								}
-							}
-							
-							if (!empty($guarded_page_load_time_all)){
-								$average_load_time = round(array_sum($guarded_page_load_time_all)/count($guarded_pages),1);$min_load_time = min($guarded_page_load_time_all);
-								$max_load_time = max($guarded_page_load_time_all);
-							}							
-						}
-		
 		?>		
 			<div class="wrap">        
 				<h2><?php _e( 'Speedguard :: Guarded pages', 'speedguard' ); ?></h2>		

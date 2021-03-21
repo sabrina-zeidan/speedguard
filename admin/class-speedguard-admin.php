@@ -64,7 +64,7 @@ class SpeedGuard_Admin {
 				);
 			
 				$the_query = new WP_Query( $args );
-				$waiting_pages = $the_query->get_posts();
+				$waiting_pages = $the_query->posts;
 				wp_reset_postdata();
 				if (count($waiting_pages) < 1) return;
 				
@@ -140,7 +140,7 @@ class SpeedGuard_Admin {
 				'no_found_rows' => true 
 			);
 			$the_query = new WP_Query( $args );
-			$guarded_pages = $the_query->get_posts();			
+			$guarded_pages = $the_query->posts;			
 				if( $guarded_pages ){
 				$process_bulk_action = SpeedGuard_Tests::handle_bulk_retest_load_time('retest_load_time', $guarded_pages);	
 				}
@@ -196,7 +196,7 @@ class SpeedGuard_Admin {
 							
 						);
 						$the_query = new WP_Query( $args );
-						$connected_guarded_page = $the_query->get_posts();
+						$connected_guarded_page = $the_query->posts;
 						if( $connected_guarded_page ) :
 							foreach ($connected_guarded_page as $connected_guarded_page_id){
 								wp_delete_post( $connected_guarded_page_id, true); 

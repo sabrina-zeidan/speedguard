@@ -140,7 +140,6 @@ class SpeedGuardWidgets{
 	/*Meta boxes*/ 
 	public static function add_meta_boxes(){
 		wp_nonce_field('closedpostboxes', 'closedpostboxesnonce', false ); 		
-			
 			add_meta_box( 'settings-meta-box', __('SpeedGuard Settings','speedguard'), array('SpeedGuard_Settings','settings_meta_box'), '', 'normal', 'core' );		
 			add_meta_box( 'speedguard-speedresults-meta-box', __('Site Speed Results','speedguard'), array('SpeedGuardWidgets', 'speedguard_dashboard_widget_function'			), '', 'main-content', 'core' );
 			add_meta_box( 'speedguard-add-new-url-meta-box', __('Add new','speedguard'), array('SpeedGuardWidgets', 'add_new_url_meta_box'), '', 'main-content', 'core' );

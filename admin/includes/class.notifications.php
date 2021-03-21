@@ -18,7 +18,7 @@ class SpeedGuard_Notifications{
 					'no_found_rows' => true, 
 				);			
 				$the_query = new WP_Query( $args );
-				$waiting_pages = $the_query->get_posts();
+				$waiting_pages = $the_query->posts;
 				wp_reset_postdata();
 				if (count($waiting_pages) > 0) {
 					//In 10 minutes
@@ -48,7 +48,7 @@ class SpeedGuard_Notifications{
 					'no_found_rows' => true 
 				);
 				$the_query = new WP_Query( $args );
-				$guarded_pages = $the_query->get_posts();			
+				$guarded_pages = $the_query->posts;			
 					if( $guarded_pages ) :	
 						ob_start();							
 								echo '<html><head>
