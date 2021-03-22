@@ -2,20 +2,17 @@
 Contributors: sabrinazeidan
 Tags: speed, page speed, test speed, performance, optimization
 Requires at least: 4.7
-Tested up to: 5.6
-Stable tag: 1.8.3
+Tested up to: 5.7
+Stable tag: 1.8.4
 Requires PHP: 5.6
 License: GPLv2 or later 
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Keeps an eye on your website’s speed for you; every single day for free. 
 
 == Description ==
-= 1. Test site speed performance daily =
-= 2. Get notified if it's slow =
-= 3. Get detailed reports =
-
 **Google PageSpeed Insights right in your WordPress dashboard. 
 It's free.**
+<strong>Test site speed performance daily, get notified if it's slow, get detailed reports.</strong>
 
 [youtube https://www.youtube.com/watch?v=y_RvQEhdq9c]
 
@@ -111,11 +108,12 @@ On [SpeedGuard's GitHub repo](https://github.com/sabrina-zeidan/speedguard)!
 == Changelog ==
 = Version 1.8.4 - March 22, 2020 =
 * [Fixed] Error on date archive pages 
-* [Tweak] Search autocomplete, close postbox, colors change > Vanilla JS
+* [Fixed] Homepage can be added multiple times 
+* [Fixed] Site's average is not updated properly when tests are deleted
+* [Tweak] jQuery independence: all functions use vanilla JS now
 
 = Version 1.8.3 - November 9, 2020 =
 * [Fixed] Threshold error (5 minutes + timezone) after WordPress 5.3  
-* [Fixed] Settings are being reset to defaults
 * [Fixed] Settings are being reset to defaults
 * [Fixed] PHP Warning: Illegal string offset 'displayValue' in Admin bar when test is in progress
 * [Fixed] Critical error on custom post type archive page 

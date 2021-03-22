@@ -69,6 +69,7 @@
 .speedguard-score.score-red span { color:#e6493a; margin-left: 0.4em;}
 
 #speedguard-about-meta-box #szpic {background-image: url(../images/sabrina.png); height:75px; width:75px; float: right; margin:1em;}
+#speedguard-about-meta-box .rate-link {text-decoration:none;}
 
 /**Notices**/
 

@@ -164,7 +164,7 @@ class SpeedGuardWidgets{
 									<tr>
 									<td>
 									<img 
-    src="/wp-content/plugins/speedguard/admin/assets/images/lcp.svg" 
+    src="'.plugin_dir_url( __DIR__ ) . 'assets/images/lcp.svg" 
     alt="Largest Contentful Paint chart"/>
 									</td>
 									</tr>									
@@ -187,29 +187,34 @@ class SpeedGuardWidgets{
 
 	
 	public static function important_questions_meta_box(){
-		$link_one = 'https://sabrinazeidan.com/how-fast-should-my-website-load/?utm_source=speedguard&utm_medium=sidebar&utm_campaign=important_questions';
-		$question_one = sprintf(__( '%1$sHow fast should a website load in 2020?%2$s', 'speedguard' ),
-					'<a href="' .$link_one. '" target="_blank">','</a>');	
-		$link_two = 'https://sabrinazeidan.com/serve-scaled-images-wordpress/?utm_source=speedguard&utm_medium=sidebar&utm_campaign=important_questions';
-		$question_two = sprintf(__( '%1$sHow to serve scaled images to speed up your site?%2$s', 'speedguard' ),
-					'<a href="' .$link_two. '" target="_blank">','</a>');	
-					
-		$link_three = 'https://sabrinazeidan.com/embed-youtube-video-wordpress-without-slowing/?utm_source=speedguard&utm_medium=sidebar&utm_campaign=important_questions';
-		$question_three = sprintf(__( '%1$sHow to speed up YouTube videos on your site?%2$s', 'speedguard' ),
-					'<a href="' .$link_three. '" target="_blank">','</a>');	
-					
-					
-					
-		$content = '<ul><li>'.$question_one.'</li><li>'.$question_two.'</li><li>'.$question_three.'</li></ul>'; 
-		echo $content;
+		$links = array(
+					sprintf(__( '%1$sHow fast should a website load?%2$s', 'speedguard' ),
+					'<a href="https://sabrinazeidan.com/how-fast-should-my-website-load/?utm_source=speedguard&utm_medium=sidebar&utm_campaign=important_questions" target="_blank">','</a>'),					
+					sprintf(__( '%1$sHow to serve scaled images to speed up your site?%2$s', 'speedguard' ),
+					'<a href="https://sabrinazeidan.com/serve-scaled-images-wordpress/?utm_source=speedguard&utm_medium=sidebar&utm_campaign=important_questions" target="_blank">','</a>'),
+					sprintf(__( '%1$sHow to speed up YouTube videos on your site?%2$s', 'speedguard' ),
+					'<a href="https://sabrinazeidan.com/embed-youtube-video-wordpress-without-slowing/?utm_source=speedguard&utm_medium=sidebar&utm_campaign=important_questions" target="_blank">','</a>'),
+					sprintf(__( '%1$s5 popular recommendations that don’t work%2$s', 'speedguard' ),
+					'<a href="https://sabrinazeidan.com/how-to-speed-up-wordpress-this-dont-work/?utm_source=speedguard&utm_medium=sidebar&utm_campaign=important_questions" target="_blank">','</a>')	
+					);
+		echo '<ul>';
+		foreach ($links as $link){
+			echo '<li>'.$link.'</li>';
+			
+		}
+		echo '</ul>';
 	}	
 	
 	public static function about_meta_box(){
 		$picture = '<a href="https://sabrinazeidan.com/?utm_source=speedguard&utm_medium=sidebar&utm_campaign=avatar" target="_blank"><div id="szpic"></div></a>';
-		$hey = sprintf(__( 'Hey!%1$s My name is %3$sSabrina%4$s, I\'m the author of this plugin. %2$s', 'speedguard' ),'<p>','</p>','<a href="https://sabrinazeidan.com/?utm_source=speedguard&utm_medium=sidebar&utm_campaign=sabrina" target="_blank">','</a>');	
+		$hey = sprintf(__( 'Hey!%1$s My name is %3$sSabrina%4$s. 
+		%1$sI speed up websites everyday, and I built this plugin because I needed a simple tool to monitor site speed and notify me if something is not right.%2$s
+		%1$sHope it will be helpful for you too.%2$s
+		%2$s', 'speedguard' ),'<p>','</p>','<a href="https://sabrinazeidan.com/?utm_source=speedguard&utm_medium=sidebar&utm_campaign=sabrina" target="_blank">','</a>');	
+	
 		$rate_link = 'https://wordpress.org/support/plugin/speedguard/reviews/?rate=5#new-post';
 		$rate_it = sprintf(__( 'If you like it, I would greatly appreciate if you add your %1$s★★★★★%2$s to spread the love.', 'speedguard' ),
-					'<a href="' .$rate_link. '" target="_blank">','</a>'	);	
+					'<a class="rate-link" href="' .$rate_link. '" target="_blank">','</a>'	);	
 		$translate_link = 'https://translate.wordpress.org/projects/wp-plugins/speedguard/';
 		$translate_it = sprintf(__( 'You can also help to %1$stranslate it to your language%2$s so that more people will be able to use it ❤︎', 'speedguard' ),
 					'<a href="' .$translate_link. '" target="_blank">','</a>');	
