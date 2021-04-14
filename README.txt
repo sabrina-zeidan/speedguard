@@ -1,6 +1,6 @@
 === Site Speed Test - SpeedGuard === 
 Contributors: sabrinazeidan
-Tags: speed, page speed, test speed, performance, optimization
+Tags: speed, site speed, test speed, performance, optimization
 Requires at least: 4.7
 Tested up to: 5.7
 Stable tag: 1.8.4
@@ -106,7 +106,7 @@ On [SpeedGuard's GitHub repo](https://github.com/sabrina-zeidan/speedguard)!
 * Thanx to Baboon designs from the Noun Project for the timer icon.
 
 == Changelog ==
-= Version 1.8.4 - March 22, 2020 =
+= Version 1.8.4 - March 22, 2021 =
 * [Fixed] Error on date archive pages 
 * [Fixed] Homepage can be added multiple times 
 * [Fixed] Site's average is not updated properly when tests are deleted
