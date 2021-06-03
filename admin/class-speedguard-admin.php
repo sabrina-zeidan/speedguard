@@ -49,6 +49,9 @@ class SpeedGuard_Admin {
 
 		add_action( 'admin_footer', array($this, 'run_waiting_tests_ajax')); 	
 		add_action( 'wp_ajax_run_waiting_tests', array($this, 'run_waiting_tests' ));
+		
+		
+		
 
 	}
 	function run_waiting_tests_ajax(){ 
@@ -317,7 +320,6 @@ class SpeedGuard_Admin {
 		if (SpeedGuard_Admin::is_screen('plugins')){	
 			if (get_transient('speedguard-notice-activation')){
 				$classes = $classes.' speedguard-just-activated'; 
-			//	delete_transient( 'speedguard-notice-activation' );
 			}
 		}		
 		return $classes;
@@ -328,76 +330,79 @@ class SpeedGuard_Admin {
     $this->tests_page_hook = add_submenu_page('speedguard_tests', __('Speed Tests','speedguard'), __('Speed Tests','speedguard'), 'manage_options', 'speedguard_tests' ); 
     $this->settings_page_hook = add_submenu_page('speedguard_tests',  __( 'Settings', 'speedguard' ),  __( 'Settings', 'speedguard' ), 'manage_options', 'speedguard_settings',array( 'SpeedGuard_Settings', 'my_settings_page_function') );		
 	}   
+	
+	
+	
+	
 	//Plugin Admin Notices	
 	public static function set_notice( $message, $class) {  return "<div class='notice notice-$class is-dismissible'><p>$message</p></div>"; }
 	public static function show_admin_notices() {
-	$speedguard_average = SpeedGuard_Admin::get_this_plugin_option('speedguard_average' );	
 		if (!current_user_can('manage_options')) return;
-			$speedguard_options = SpeedGuard_Admin::get_this_plugin_option('speedguard_options' );		
-		if (!(SpeedGuard_Admin::is_screen('tests')) && (!isset($speedguard_average['guarded_pages_count']) )) {
-			$message = sprintf(__( 'Everything is ready to test your site speed! %1$sAdd some pages%2$s to start testing.', 'speedguard' ),'<a href="' .SpeedGuard_Admin::speedguard_page_url('tests'). '">','</a>');
-			//$notices =  SpeedGuard_Admin::set_notice( $message,'warning' );	
-			//TODO Notice, if nothing except homepage is added
+		$speedguard_average = SpeedGuard_Admin::get_this_plugin_option('speedguard_average' );	
+		$speedguard_options = SpeedGuard_Admin::get_this_plugin_option('speedguard_options' );		
+		//All screens
+		//Dashboard and SpeedGuard Settigns screens
+		if (SpeedGuard_Admin::is_screen('settings,dashboard')){		
+			if ($speedguard_average['guarded_pages_count'] < 2) { //TODO: set transient/user meta on dissmissal action
+				$message = sprintf(__( 'You only have the speed of 1 page monitored currently. Would you like to %1$sadd other pages%2$s to see the whole picture of the site speed?', 'speedguard' ),'<a href="' .SpeedGuard_Admin::speedguard_page_url('tests'). '">','</a>');
+				$notices =  SpeedGuard_Admin::set_notice( $message,'warning' );	
+			}
 		}
-		
-		if((SpeedGuard_Admin::is_screen('plugins')) && (get_transient( 'speedguard-notice-activation'))){   
-			$add_homepage = SpeedGuard_Tests::add_test(get_site_url());
-			delete_transient( 'speedguard-notice-deactivation' );	
-			if (empty(get_transient( 'speedguard-homepage-added-previousely'))){
+		//Plugins screen		
+		if (SpeedGuard_Admin::is_screen('plugins')){
+			//homepage was added/updated on activation
+			if (get_transient( 'speedguard-notice-activation')) {   
 				$message = sprintf(__( 'Homepage speed test has just started. Would you like to %1$stest some other pages%2$s as well?', 'speedguard' ),'<a href="' .SpeedGuard_Admin::speedguard_page_url('tests'). '">','</a>');
 				$notices =  SpeedGuard_Admin::set_notice( $message,'success' );	  
 			}
-				
-		} 		 		
-		
-		if ( ! empty( $_POST['speedguard'] ) && $_POST['speedguard'] == 'add_new_url' ) {
+			//TODO: On plugin deactivation   
+			if((SpeedGuard_Admin::is_screen('plugins')) && (get_transient( 'speedguard-notice-deactivation'))){   
+			//	$notices =  SpeedGuard_Admin::set_notice(__('Shoot me an email if something didn\'t work as expected','speedguard'),'warning' );	
+			//	delete_transient( 'speedguard-notice-deactivation' );		 	
+			} 	 
+		}		
+		 		
+		//Tests screen
+		if (SpeedGuard_Admin::is_screen('tests')){
+			//Errors
+			if ( ! empty( $_REQUEST['speedguard'] ) && $_REQUEST['speedguard'] == 'add_new_url_error_empty' ) {
+				$notices =  SpeedGuard_Admin::set_notice(__('Please select the post you want to add.','speedguard'),'warning' );	  
+			}
+			if ( ! empty( $_REQUEST['speedguard'] ) && $_REQUEST['speedguard'] == 'add_new_url_error_not_current_domain' ) {
+				$notices =  SpeedGuard_Admin::set_notice(__('SpeedGuard only monitors pages from current website.','speedguard'),'warning' );	  
+			}
+			if ( ! empty( $_REQUEST['speedguard'] ) && $_REQUEST['speedguard'] == 'add_new_url_error_not_url' ) {
+				$notices =  SpeedGuard_Admin::set_notice(__('Please enter valid URL or select the post you want to add.','speedguard'),'warning' );	  
+			}
+			if ( ! empty( $_REQUEST['speedguard'] ) && $_REQUEST['speedguard'] == 'already_guarded' ) {
+				$notices =  SpeedGuard_Admin::set_notice(__('This URL is already guarded!','speedguard'),'warning' );
+				//TODO: offer to retest/ retest automatically 												
+			}
 			
-			//$notices = SpeedGuard_Tests::add_test($_POST);
-			//$notices = SpeedGuard_Tests::add_test($_POST['speedguard_new_url_permalink'], $_POST['speedguard_item_type'],$_POST['speedguard_new_url_id'],$_POST['blog_id']);
-			$url = (!empty($_POST['speedguard_new_url_permalink'])) ? $_POST['speedguard_new_url_permalink'] : $_POST['speedguard_new_url'];
-			$notices = SpeedGuard_Tests::add_test($url, $_POST['speedguard_item_type'],$_POST['speedguard_new_url_id'],$_POST['blog_id']);
+			//Success
+			if ( ! empty( $_REQUEST['speedguard'] ) && $_REQUEST['speedguard'] == 'new_url_added' ) {
+				$notices =  SpeedGuard_Admin::set_notice(__('New URL is successfully added!','speedguard'),'success' );		
+			}
+			if ( ! empty( $_REQUEST['speedguard'] ) && $_REQUEST['speedguard'] == 'speedguard_test_being_updated' ) { 			
+				$notices =  SpeedGuard_Admin::set_notice(__('Tests are running...','speedguard'),'success' );						
+			}
+			if ( ! empty( $_REQUEST['speedguard'] ) && $_REQUEST['speedguard'] == 'load_time_updated' ) { 
+			//TODO: This doesn't work properly, load_time_updated is added via JS
+				$notices =  SpeedGuard_Admin::set_notice(__('Results have been updated!','speedguard'),'success' );	  
+			}
+			if ( ! empty( $_REQUEST['speedguard'] ) && $_REQUEST['speedguard'] == 'slow_down' ) { 
+				$notices =  SpeedGuard_Admin::set_notice(__('You are moving too fast. Wait at least 3 minutes before updating the tests','speedguard'),'warning' );	  
+			}	
+			if ( ! empty( $_REQUEST['speedguard'] ) && $_REQUEST['speedguard'] == 'delete_guarded_pages' ) { 			
+				$notices =  SpeedGuard_Admin::set_notice(__('Selected pages are not guarded anymore!','speedguard'),'success' );				
+			}	
 		}
-		//TODO show notice while tests are running
-		if ( ! empty( $_REQUEST['speedguard'] ) && $_REQUEST['speedguard'] == 'retest_load_time' ) {
-			$notices = SpeedGuard_Admin::set_notice(__('Tests are running...','speedguard'),'success' );	 
+			
+		if (SpeedGuard_Admin::is_screen('settings')){
+			if ( ! empty( $_REQUEST['settings-updated'] ) && $_REQUEST['settings-updated'] == 'true' ) {
+				$notices =  SpeedGuard_Admin::set_notice(__('Settings have been updated!'),'success' );   			 
+			}
 		}
-		
-		if ( ! empty( $_REQUEST['speedguard'] ) && $_REQUEST['speedguard'] == 'add_new_url_error_empty' ) {
-			$notices =  SpeedGuard_Admin::set_notice(__('Please select the post you want to add.','speedguard'),'warning' );	  
-		}
-		if ( ! empty( $_REQUEST['speedguard'] ) && $_REQUEST['speedguard'] == 'add_new_url_error_not_current_domain' ) {
-			$notices =  SpeedGuard_Admin::set_notice(__('SpeedGuard only monitors pages from current website.','speedguard'),'warning' );	  
-		}
-		if ( ! empty( $_REQUEST['speedguard'] ) && $_REQUEST['speedguard'] == 'add_new_url_error_not_url' ) {
-			$notices =  SpeedGuard_Admin::set_notice(__('Please enter valid URL or select the post you want to add.','speedguard'),'warning' );	  
-		}
-		if ( ! empty( $_REQUEST['settings-updated'] ) && $_REQUEST['settings-updated'] == 'true' ) {
-			$notices =  SpeedGuard_Admin::set_notice(__('Settings have been updated!'),'success' );   			 
-		 
-		}
-		if ( ! empty( $_REQUEST['speedguard'] ) && $_REQUEST['speedguard'] == 'already_guarded' ) {
-			//$process_bulk_action = SpeedGuard_Tests::handle_bulk_retest_load_time('retest_load_time', $guarded_pages);	
-			$notices =  SpeedGuard_Admin::set_notice(__('This URL is already guarded!','speedguard'),'warning' );   												
-		}
-		if ( ! empty( $_REQUEST['speedguard'] ) && $_REQUEST['speedguard'] == 'new_url_added' ) {
-			$notices =  SpeedGuard_Admin::set_notice(__('New URL is successfully added!','speedguard'),'success' );   						
-							
-		}
-		if ( ! empty( $_REQUEST['speedguard'] ) && $_REQUEST['speedguard'] == 'slow_down' ) { 
-			$notices =  SpeedGuard_Admin::set_notice(__('You are moving too fast. Wait at least 3 minutes before updating the tests','speedguard'),'warning' );	  
-		}
-		if ( ! empty( $_REQUEST['speedguard'] ) && $_REQUEST['speedguard'] == 'load_time_updated' ) { 
-			$notices =  SpeedGuard_Admin::set_notice(__('Results are being updated!','speedguard'),'success' );	  
-		}
-		if ( ! empty( $_REQUEST['speedguard'] ) && $_REQUEST['speedguard'] == 'delete_guarded_pages' ) { 			
-			$notices =  SpeedGuard_Admin::set_notice(__('Selected pages are not guarded anymore!','speedguard'),'success' );						
-		}
-		
-		//On plugin deactivation   
-		if((SpeedGuard_Admin::is_screen('plugins')) && (get_transient( 'speedguard-notice-deactivation'))){   
-		//	$notices =  SpeedGuard_Admin::set_notice(__('Bye!','speedguard'),'success' );	
-		//	delete_transient( 'speedguard-notice-deactivation' );		 	
-		} 	 		
 		if (isset($notices)) print $notices;
 	}
 	

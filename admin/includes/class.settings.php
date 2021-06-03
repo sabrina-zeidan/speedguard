@@ -149,8 +149,12 @@ class SpeedGuard_Settings{
 				);	
 			$the_query = new WP_Query( $args );
 			$guarded_pages = $the_query->get_posts();				
-			if(!empty($guarded_pages)) SpeedGuard_Tests::handle_bulk_retest_load_time('retest_load_time', $guarded_pages);
-			wp_reset_postdata();
+			if(!empty($guarded_pages)) { 
+				foreach ($guarded_pages as $guarded_page_id){
+					$result = SpeedGuard_Tests::update_speedguard_test($guarded_page_id);
+				}
+			}
+			//wp_reset_postdata();
 		}	         
 	function email_test_results_function() {
 			$speedguard_options = SpeedGuard_Admin::get_this_plugin_option('speedguard_options' );	
