@@ -1,6 +1,6 @@
 /**
  * All of the CSS for your admin-specific functionality should be
- * included in this file. 
+ * included in this file.
  */
 /**General**/
 #adminmenu #toplevel_page_speedguard div.wp-menu-image {background-size: 18px auto;}
@@ -14,10 +14,10 @@
 
 /** Results Page**/
 .toplevel_page_speedguard_tests .page-title-action {display:none;}
-.toplevel_page_speedguard_tests #speedguard_add_url {width:100%;} 
-.toplevel_page_speedguard_tests #speedguard_new_url {width:80%;} 
+.toplevel_page_speedguard_tests #speedguard_add_url {width:100%;}
+.toplevel_page_speedguard_tests #speedguard_new_url {width:80%;}
 .toplevel_page_speedguard_tests .awesomplete {width:80% !important; }
-.toplevel_page_speedguard_tests .awesomplete #speedguard_new_url {width:100%;} 
+.toplevel_page_speedguard_tests .awesomplete #speedguard_new_url {width:100%;}
  
 .toplevel_page_speedguard_tests .speedguard-results .button {display:none;}
 
@@ -38,15 +38,15 @@
 #settings-meta-box .form-table th {width: 300px;}
 #settings-meta-box #speedguard_options[check_recurrence], #settings-meta-box #speedguard_options[critical_load_time] {max-width: 30px;text-align: center;}
 #settings-meta-box input[type="text"].numbers {max-width: 40px;text-align: center;}
-#settings-meta-box #speedguard_options[type="email_me_at"]{max-width: 70px;} 
+#settings-meta-box #speedguard_options[type="email_me_at"]{max-width: 70px;}
 #settings-meta-box td label{line-height:2.8;}
-#settings-meta-box .note {font-size:0.8em; font-style:italic;} 
+#settings-meta-box .note {font-size:0.8em; font-style:italic;}
 
 /** Widgets**/
-.no-guarded-pages #speedguard-tips-meta-box {display:none;} 
-.no-guarded-pages #speedguard-speedresults-meta-box {display:none;} 
-.no-guarded-pages #speedguard_dashboard_widget {display:none;} 
-.no-guarded-pages #speedguard-site-speed-score {display:none;}  
+.no-guarded-pages #speedguard-tips-meta-box {display:none;}
+.no-guarded-pages #speedguard-speedresults-meta-box {display:none;}
+.no-guarded-pages #speedguard_dashboard_widget {display:none;}
+.no-guarded-pages #speedguard-site-speed-score {display:none;}
 
 
 #speedguard-tips-meta-box{ width: 280px;}
