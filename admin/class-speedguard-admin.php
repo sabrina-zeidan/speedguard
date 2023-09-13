@@ -82,7 +82,8 @@ class SpeedGuard_Admin {
 				$waiting_pages = $the_query->posts;
 				wp_reset_postdata();
 			if ( count( $waiting_pages ) < 1 ) {
-				return;
+				delete_transient( 'speedguard-tests-running' );
+                return;
 			}
 
 			?>
@@ -117,6 +118,7 @@ class SpeedGuard_Admin {
 	function run_waiting_tests() {
 		$posts_ids = $_POST['post_ids'];
 		foreach ( $posts_ids as $post_id ) {
+			if ( ! get_transient( 'speedguard-tests-running' ) ) set_transient( 'speedguard-tests-running', true);
 			$test_created = SpeedGuard_Lighthouse::lighthouse_new_test( $post_id );
 			wp_die();
 		}
