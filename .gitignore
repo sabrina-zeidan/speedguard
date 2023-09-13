@@ -14,3 +14,6 @@ phpcs.xml
 .idea/php.xml
 .idea/speedguard.iml
 composer.lock
+.idea/codeStyles/Project.xml
+.idea/inspectionProfiles/Project_Default.xml
+.idea/php.xml
