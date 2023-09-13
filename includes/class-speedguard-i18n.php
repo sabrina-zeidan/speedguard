@@ -24,22 +24,21 @@
  * @subpackage Speedguard/includes
  * @author     Sabrina Zeidan <sabrinazeidan@gmail.com>
  */
-class Speedguard_i18n
-{
+class Speedguard_i18n {
 
 
-    /**
-     * Load the plugin text domain for translation.
-     *
-     * @since    1.0.0
-     */
-    public function load_plugin_textdomain()
-    {
 
-        load_plugin_textdomain(
-            'speedguard',
-            false,
-            dirname(dirname(plugin_basename(__FILE__))) . '/languages/'
-        );
-    }
+	/**
+	 * Load the plugin text domain for translation.
+	 *
+	 * @since    1.0.0
+	 */
+	public function load_plugin_textdomain() {
+
+		load_plugin_textdomain(
+			'speedguard',
+			false,
+			dirname( dirname( plugin_basename( __FILE__ ) ) ) . '/languages/'
+		);
+	}
 }

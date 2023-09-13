@@ -20,11 +20,10 @@
  * @subpackage Speedguard/includes
  * @author     Sabrina Zeidan <sabrinazeidan@gmail.com>
  */
-class Speedguard_Activator
-{
-    public static function activate()
-    {
-        set_transient('speedguard-notice-activation', true, 20);
-        $add_homepage = SpeedGuard_Tests::try_add_speedguard_test(get_site_url());
-    }
+class Speedguard_Activator {
+
+	public static function activate() {
+		set_transient( 'speedguard-notice-activation', true, 20 );
+		$add_homepage = SpeedGuard_Tests::try_add_speedguard_test( get_site_url() );
+	}
 }
