@@ -76,7 +76,7 @@ class SpeedGuard_Settings {
 			// if just activated + if options are not set yet
 			$new_value = $this->default_options_set( array() );
 			SpeedGuard_Admin::update_this_plugin_option( 'speedguard_options', $new_value );
-		} elseif ( ! empty( $speedguard_options ) && $option == 'speedguard_options' ) { // if updating options
+		} elseif ( ! empty( $speedguard_options ) && $option === 'speedguard_options' ) { // if updating options
 			$speedguard_options = SpeedGuard_Admin::get_this_plugin_option( 'speedguard_options' );
 			$admin_email        = $speedguard_options['email_me_at'];
 			$check_recurrence   = $speedguard_options['check_recurrence'];
@@ -115,7 +115,7 @@ class SpeedGuard_Settings {
 	}
 
 	function speedguard_options_updated( $option, $old_value, $value ) {
-		if ( $option == 'speedguard_options' ) {
+		if ( $option === 'speedguard_options' ) {
 			$speedguard_options = SpeedGuard_Admin::get_this_plugin_option( 'speedguard_options' );
 			$admin_email        = $speedguard_options['email_me_at'];
 			$check_recurrence   = $speedguard_options['check_recurrence'];
@@ -128,7 +128,7 @@ class SpeedGuard_Settings {
 	}
 
 	function load_time_updated_function( $meta_id, $post_id, $meta_key, $meta_value ) {
-		if ( 'sg_mobile' == $meta_key ) {
+		if ( 'sg_mobile' === $meta_key ) {
 			$args                       = array(
 				'no_found_rows'  => true,
 				'post_type'      => SpeedGuard_Admin::$cpt_name,
@@ -209,9 +209,9 @@ class SpeedGuard_Settings {
 	function email_test_results_function() {
 		$speedguard_options = SpeedGuard_Admin::get_this_plugin_option( 'speedguard_options' );
 		$email_me_case      = $speedguard_options['email_me_case'];
-		if ( $email_me_case == 'every time after tests are executed' ) {
+		if ( $email_me_case === 'every time after tests are executed' ) {
 			SpeedGuard_Notifications::test_results_email( 'regular' );
-		} elseif ( $email_me_case == 'just in case average speed worse than' ) {
+		} elseif ( $email_me_case === 'just in case average speed worse than' ) {
 			$critical_load_time = $speedguard_options['critical_load_time'];
 			$average_load_time  = SpeedGuard_Admin::get_this_plugin_option( 'speedguard_average' )['average_load_time'];
 			if ( $average_load_time > $critical_load_time ) {
@@ -236,7 +236,7 @@ class SpeedGuard_Settings {
 	function show_dashboard_widget_fn( $args ) {
 		$options    = SpeedGuard_Admin::get_this_plugin_option( 'speedguard_options' );
 		$field_name = esc_attr( $args['label_for'] );
-		if ( $options[ $field_name ] == 'on' ) {
+		if ( $options[ $field_name ] === 'on' ) {
 			$checked = ' checked="checked" ';
 		} else {
 			$checked = '';
@@ -247,7 +247,7 @@ class SpeedGuard_Settings {
 	function show_ab_widget_fn( $args ) {
 		$options    = SpeedGuard_Admin::get_this_plugin_option( 'speedguard_options' );
 		$field_name = esc_attr( $args['label_for'] );
-		if ( $options[ $field_name ] == 'on' ) {
+		if ( $options[ $field_name ] === 'on' ) {
 			$checked = ' checked="checked" ';
 		} else {
 			$checked = '';
@@ -283,11 +283,11 @@ class SpeedGuard_Settings {
 			'never'                                 => __( 'never', 'speedguard' ),
 		);
 		foreach ( $items as $item => $item_label ) {
-			$checked = ( $options[ $field_name ] == $item ) ? ' checked="checked" ' : '';
+			$checked = ( $options[ $field_name ] === $item ) ? ' checked="checked" ' : '';
 
 			echo '<input ' . $checked . " type='radio' name='speedguard_options[" . $field_name . "]' id='" . $item . "' value='" . $item . "' /><label for='" . $item . "'>" . $item_label . '</label>';
 			$critical_load_time = $options['critical_load_time'];
-			if ( $item == 'just in case average speed worse than' ) {
+			if ( $item === 'just in case average speed worse than' ) {
 				$this->critical_load_time_fn(
 					array(
 						'label_for' => 'critical_load_time',
@@ -300,7 +300,7 @@ class SpeedGuard_Settings {
 	}
 
 	function critical_load_time_fn( $args ) {
-		if ( isset( $args['show'] ) && $args['show'] == true ) {
+		if ( isset( $args['show'] ) && $args['show'] === true ) {
 			$options    = SpeedGuard_Admin::get_this_plugin_option( 'speedguard_options' );
 			$field_name = esc_attr( $args['label_for'] );
 			echo " <input type='text' id='speedguard_options[critical_load_time]' name='speedguard_options[critical_load_time]'  class='numbers'  size='2' value='" . $options[ $field_name ] . "'> " . __( 's', 'speedguard' );
@@ -316,7 +316,7 @@ class SpeedGuard_Settings {
 		);
 		echo "<select id='speedguard_options[" . $field_name . "]' name='speedguard_options[" . $field_name . "]' >";
 		foreach ( $items as $item => $item_label ) {
-			$selected = ( $options[ $field_name ] == $item ) ? ' selected="selected" ' : '';
+			$selected = ( $options[ $field_name ] === $item ) ? ' selected="selected" ' : '';
 			echo '<option ' . $selected . " value='$item'>$item_label</option>";
 		}
 		echo '</select>';

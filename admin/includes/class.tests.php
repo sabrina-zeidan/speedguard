@@ -14,9 +14,8 @@ if ( ! class_exists( 'WP_List_Table' ) ) {
  */
 class SpeedGuard_List_Table extends WP_List_Table {
 	public function no_items() {
-		_e( 'No pages guarded yet. Add something in the field above for the start.', 'speedguard' );
+		esc_html_e( 'No pages guarded yet. Add something in the field above for the start.', 'speedguard' );
 	}
-
 
 
 	public function prepare_items( $client_id = '' ) {
@@ -24,169 +23,110 @@ class SpeedGuard_List_Table extends WP_List_Table {
 		$hidden   = $this->get_hidden_columns();
 		$sortable = $this->get_sortable_columns();
 		$data     = $this->table_data( $client_id );
-		usort( $data, array( &$this, 'sort_data' ) );
+		usort( $data, [ &$this, 'sort_data' ] );
 		$perPage     = 20;
 		$currentPage = $this->get_pagenum();
 		$totalItems  = count( $data );
 		$this->set_pagination_args(
-			array(
+			[
 				'total_items' => $totalItems,
 				'per_page'    => $perPage,
-			)
+			]
 		);
 		$data                  = array_slice( $data, ( ( $currentPage - 1 ) * $perPage ), $perPage );
-		$this->_column_headers = array( $columns, $hidden, $sortable );
+		$this->_column_headers = [ $columns, $hidden, $sortable ];
 		$this->items           = $data;
-        $this->get_table_classes();
+		$this->get_table_classes();
 		$this->process_bulk_action();
 	}
-	function get_table_classes() {
-		$sg_options = SpeedGuard_Admin::get_this_plugin_option( 'speedguard_options' );
-		if ($sg_options['test_type'] == 'cwv') $test_type = 'cwv-test-type';
-		elseif ($sg_options['test_type'] == 'psi') $test_type = 'psi-test-type';
-			return array('wp-list-table', 'widefat', 'striped', 'table-view-list','toplevel_page_speedguard_tests', $test_type);
-	}
 
-	// Prepare columns
 	public function get_columns() {
-		//Display Columns set based on Test type choice in Settigns
+		// Display Columns set based on Test type choice in Settigns
 		$sg_options = SpeedGuard_Admin::get_this_plugin_option( 'speedguard_options' );
 
 		$columns = [
 			'cb'                 => '<input type="checkbox" />',
-			'guarded_page_title' => __( 'URL', 'speedguard' )
-        ];
-		//CWV
-		if ($sg_options['test_type'] == 'cwv'){
-			//Mobile
+			'guarded_page_title' => __( 'URL', 'speedguard' ),
+		];
+		// CWV
+		if ( $sg_options['test_type'] === 'cwv' ) {
+			// Mobile
 			$columns['cwv_mobile_lcp'] = __( 'LCP', 'speedguard' );
 			$columns['cwv_mobile_cls'] = __( 'CLS', 'speedguard' );
 			$columns['cwv_mobile_fid'] = __( 'FID', 'speedguard' );
-			//Desktop
-            $columns['cwv_desktop_lcp'] = __( 'LCP', 'speedguard' );
+			// Desktop
+			$columns['cwv_desktop_lcp'] = __( 'LCP', 'speedguard' );
 			$columns['cwv_desktop_cls'] = __( 'CLS', 'speedguard' );
 			$columns['cwv_desktop_fid'] = __( 'FID', 'speedguard' );
+		} // PSI
+		elseif ( $sg_options['test_type'] === 'psi' ) {
+			// Mobile
+			$columns['psi_mobile_lcp'] = __( 'LCP', 'speedguard' );
+			$columns['psi_mobile_cls'] = __( 'CLS', 'speedguard' );
+			// Desktop
+			$columns['psi_desktop_lcp'] = __( 'LCP', 'speedguard' );
+			$columns['psi_desktop_cls'] = __( 'CLS', 'speedguard' );
 		}
-        //PSI
-        elseif ($sg_options['test_type'] == 'psi'){
-	        //Mobile
-	        $columns['psi_mobile_lcp'] = __( 'LCP', 'speedguard' );
-	        $columns['psi_mobile_cls'] = __( 'CLS', 'speedguard' );
-	        //Desktop
-	        $columns['psi_desktop_lcp'] = __( 'LCP', 'speedguard' );
-	        $columns['psi_desktop_cls'] = __( 'CLS', 'speedguard' );
-        }
 
-        $columns['report_date'] =  __( 'Updated', 'speedguard' );
+		$columns['report_date'] = __( 'Updated', 'speedguard' );
 
-//var_dump($columns);
+		// var_dump($columns);
 
 		return $columns;
 	}
 
+	// Prepare columns
 
+	public function get_hidden_columns() {
+		return [];
+	}
 
-	public function get_columnsss() {
-        //Display Columns set based on Test type choice in Settigns
-		$sg_options = SpeedGuard_Admin::get_this_plugin_option( 'speedguard_options' );
-		//First 2 columns
-        $columns = array();
-        $columns[] = [
-			'cb'                 => '<
-input type="checkbox" />',
-			'guarded_page_title' => __( 'URL', 'speedguard' )
+	public function get_sortable_columns() {
+		return [
+			'guarded_page_title' => [ 'guarded_page_title', false ],
+			'psi_mobile_lcp'     => [ 'psi_mobile_lcp', false ],
+			'psi_mobile_cls'     => [ 'psi_mobile_cls', false ],
+			'cwv_mobile_lcp'     => [ 'cwv_mobile_lcp', false ],
+			'cwv_mobile_cls'     => [ 'cwv_mobile_cls', false ],
+			'cwv_mobile_fid'     => [ 'cwv_mobile_fid', false ],
+			'cwv_desktop_lcp'    => [ 'cwv_desktop_lcp', false ],
+			'cwv_desktop_cls'    => [ 'cwv_desktop_cls', false ],
+			'cwv_desktop_fid'    => [ 'cwv_desktop_fid', false ],
+			'psi_desktop_lcp'    => [ 'psi_desktop_lcp', false ],
+			'psi_desktop_cls'    => [ 'psi_desktop_cls', false ],
+			'report_date'        => [ 'report_date', false ],
 		];
-
-		//Mobile
-		if ($sg_options['test_type'] == 'cwv'){
-			$columns[] = [
-				'cwv_mobile_lcp'     => __( 'LCP', 'speedguard' ),
-				'cwv_mobile_cls'     => __( 'CLS', 'speedguard' ),
-				'cwv_mobile_fid'     => __( 'FID', 'speedguard' )
-			];
-		}
-        elseif ($sg_options['test_type'] == 'psi') {
-			$columns[] = [
-				'psi_mobile_lcp' => __( 'LCP', 'speedguard' ),
-				'psi_mobile_cls' => __( 'CLS', 'speedguard' )
-			];
-		}
-		//Desktop
-		if ($sg_options['test_type'] == 'cwv'){
-			$columns[] = [
-				'cwv_desktop_lcp'    => __( 'LCP', 'speedguard' ),
-				'cwv_desktop_cls'    => __( 'CLS', 'speedguard' ),
-				'cwv_desktop_fid'    => __( 'FID', 'speedguard' ),
-			];
-		}
-        elseif ($sg_options['test_type'] == 'psi') {
-			$columns[] = [
-				'psi_desktop_lcp' => __( 'LCP', 'speedguard' ),
-				'psi_desktop_cls' => __( 'CLS', 'speedguard' )
-			];
-		}
-
-		//Date column
-		$columns[] = [
-			'report_date'        => __( 'Updated', 'speedguard' )
-		];
-
-
-        return $columns;
 	}
 
 	// Columns names
 
-	public function get_hidden_columns() {
-		return array();
-	}
-
-
-	public function get_sortable_columns() {
-		return array(
-			'guarded_page_title' => array( 'guarded_page_title', false ),
-			'psi_mobile_lcp'     => array( 'psi_mobile_lcp', false ),
-			'psi_mobile_cls'     => array( 'psi_mobile_cls', false ),
-			'cwv_mobile_lcp'     => array( 'cwv_mobile_lcp', false ),
-			'cwv_mobile_cls'     => array( 'cwv_mobile_cls', false ),
-			'cwv_mobile_fid'     => array( 'cwv_mobile_fid', false ),
-			'cwv_desktop_lcp'    => array( 'cwv_desktop_lcp', false ),
-			'cwv_desktop_cls'    => array( 'cwv_desktop_cls', false ),
-			'cwv_desktop_fid'    => array( 'cwv_desktop_fid', false ),
-			'psi_desktop_lcp'    => array( 'psi_desktop_lcp', false ),
-			'psi_desktop_cls'    => array( 'psi_desktop_cls', false ),
-			'report_date'        => array( 'report_date', false ),
-		);
-	}
-
-	// Columns data
 	private function table_data( $client_id = '' ) {
 		// Data we will return in the end
-		$data = array();
+		$data = [];
 
 		// Get all guarded pages
-		$args          = array(
+		$args          = [
 			'post_type'      => SpeedGuard_Admin::$cpt_name,
 			'post_status'    => 'publish',
 			// TODO limit the number, ajax chunks
 			'posts_per_page' => - 1,
 			'fields'         => 'ids',
 			'no_found_rows'  => true,
-		);
+		];
 		$the_query     = new WP_Query( $args );
 		$guarded_pages = $the_query->posts;
 
 		// SpeedGuard PRO
 		if ( ! empty( $client_id ) ) { // TODO SpeedGuard PRO
-			$meta_query   = array();
-			$meta_query[] = array(
+			$meta_query   = [];
+			$meta_query[] = [
 				'relation' => 'AND',
-				array(
+				[
 					'key'     => 'speedguard_page_client_id',
 					'compare' => '=',
 					'value'   => $client_id,
-				),
-			);
+				],
+			];
 			$the_query->set( 'meta_query', $meta_query );
 		}
 		// If there are any guarded pages:
@@ -196,48 +136,48 @@ input type="checkbox" />',
 
 				// NEW and good
 				// Prepare other columns
-				$report_link = add_query_arg( array( 'url' => $guarded_page_url ), 'https://developers.google.com/speed/pagespeed/insights/' );
+				$report_link = add_query_arg( [ 'url' => $guarded_page_url ], 'https://developers.google.com/speed/pagespeed/insights/' );
 				$updated     = get_the_modified_date( 'Y-m-d H:i:s', $guarded_page_id );
 
 				// Define basic data for the item
-				$thisItem = array(
+				$thisItem = [
 					'guarded_page_id'    => $guarded_page_id,
 					'guarded_page_title' => '<a href="' . $guarded_page_url . '" target="_blank">' . $guarded_page_url . '</a>',
 					'report_date'        => $updated . '<a href="' . $report_link . '" target="_blank">🔗</a>',
-				);
+				];
 
 				// Start Prepare PSI data and CWV data with the loop
-				$devices = array( 'mobile', 'desktop' );
+				$devices = [ 'mobile', 'desktop' ];
 				foreach ( $devices as $device ) {
 					// Get needed post_meta for DEVICE
 					$device_test_data  = 'sg_' . $device;
 					$$device_test_data = get_post_meta( $guarded_page_id, 'sg_' . $device, true );
 
-					$tests_types_array = array(
-						'psi' => array( 'lcp', 'cls' ),
-						'cwv' => array( 'lcp', 'cls', 'fid' ),
-					);
+					$tests_types_array = [
+						'psi' => [ 'lcp', 'cls' ],
+						'cwv' => [ 'lcp', 'cls', 'fid' ],
+					];
 					foreach ( $tests_types_array as $test_type => $metrics ) {
 						foreach ( $metrics as $metric ) {
-							if ( $$device_test_data == 'waiting' ) { // in case test is currently running
+							if ( $$device_test_data === 'waiting' ) { // in case test is currently running
 								// update all cells with default value
 								$core_value = '<div class="loading"></div>';
 							} elseif ( is_array( $$device_test_data ) ) { // there is available data in DB (perhaps test is not running at the moment)
 								// var_dump($$device_test_data);
 								$metrics_value = $$device_test_data[ $test_type ][ $metric ];
 								// Value to Display for this metric $core_value
-								if ( $test_type == 'psi' ) {
+								if ( $test_type === 'psi' ) {
 
 									$core_value = '<span data-score="' . $metrics_value['score'] . '" class="speedguard-score">' . $metrics_value['displayValue'] . '</span>';
-								} elseif ( $test_type == 'cwv' ) {
+								} elseif ( $test_type === 'cwv' ) {
 									if ( ! isset( $metrics_value ) ) { // no CWV data for individual CWV
 										$core_value = 'N/A';
 									} else {
-										if ( $metric == 'lcp' ) {
+										if ( $metric === 'lcp' ) {
 											$display_value = round( $metrics_value['percentile'] / 1000, 2 ) . ' s';
-										} elseif ( $metric == 'cls' ) {
+										} elseif ( $metric === 'cls' ) {
 											$display_value = $metrics_value['percentile'] / 100;
-										} elseif ( $metric == 'fid' ) {
+										} elseif ( $metric === 'fid' ) {
 											$display_value = $metrics_value['percentile'] . ' ms';
 										}
 
@@ -260,18 +200,34 @@ input type="checkbox" />',
 
 		return $data;
 	}
-	// END
 
+	function get_table_classes() {
+		$sg_options = SpeedGuard_Admin::get_this_plugin_option( 'speedguard_options' );
+		if ( $sg_options['test_type'] === 'cwv' ) {
+			$test_type = 'cwv-test-type';
+		} elseif ( $sg_options['test_type'] === 'psi' ) {
+			$test_type = 'psi-test-type';
+		}
 
-	// Table data
+		return [
+			'wp-list-table',
+			'widefat',
+			'striped',
+			'table-view-list',
+			'toplevel_page_speedguard_tests',
+			$test_type,
+		];
+	}
+
+	// Columns data
 
 	public function process_bulk_action() {
 		$doaction = $this->current_action();
 		if ( ! empty( $doaction ) && ! empty( $_POST['guarded-pages'] ) ) {
 			foreach ( $_POST['guarded-pages'] as $guarded_page_id ) {
-				if ( $doaction == 'retest_load_time' ) {
+				if ( $doaction === 'retest_load_time' ) {
 					$result = SpeedGuard_Tests::update_speedguard_test( $guarded_page_id );
-				} elseif ( $doaction == 'delete' ) {
+				} elseif ( $doaction === 'delete' ) {
 					wp_delete_post( $guarded_page_id, true ); // TODO check error
 					$result = 'delete_guarded_pages';
 				}
@@ -282,6 +238,56 @@ input type="checkbox" />',
 			wp_safe_redirect( esc_url_raw( $redirect_to ) );
 			exit;
 		}
+	}
+	// END
+
+
+	// Table data
+
+	public function get_columnsss() {
+		// Display Columns set based on Test type choice in Settigns
+		$sg_options = SpeedGuard_Admin::get_this_plugin_option( 'speedguard_options' );
+		// First 2 columns
+		$columns   = [];
+		$columns[] = [
+			'cb'                 => '<
+input type="checkbox" />',
+			'guarded_page_title' => __( 'URL', 'speedguard' ),
+		];
+
+		// Mobile
+		if ( $sg_options['test_type'] === 'cwv' ) {
+			$columns[] = [
+				'cwv_mobile_lcp' => __( 'LCP', 'speedguard' ),
+				'cwv_mobile_cls' => __( 'CLS', 'speedguard' ),
+				'cwv_mobile_fid' => __( 'FID', 'speedguard' ),
+			];
+		} elseif ( $sg_options['test_type'] === 'psi' ) {
+			$columns[] = [
+				'psi_mobile_lcp' => __( 'LCP', 'speedguard' ),
+				'psi_mobile_cls' => __( 'CLS', 'speedguard' ),
+			];
+		}
+		// Desktop
+		if ( $sg_options['test_type'] === 'cwv' ) {
+			$columns[] = [
+				'cwv_desktop_lcp' => __( 'LCP', 'speedguard' ),
+				'cwv_desktop_cls' => __( 'CLS', 'speedguard' ),
+				'cwv_desktop_fid' => __( 'FID', 'speedguard' ),
+			];
+		} elseif ( $sg_options['test_type'] === 'psi' ) {
+			$columns[] = [
+				'psi_desktop_lcp' => __( 'LCP', 'speedguard' ),
+				'psi_desktop_cls' => __( 'CLS', 'speedguard' ),
+			];
+		}
+
+		// Date column
+		$columns[] = [
+			'report_date' => __( 'Updated', 'speedguard' ),
+		];
+
+		return $columns;
 	}
 
 	// Columns names
@@ -320,10 +326,10 @@ input type="checkbox" />',
 	// Edit actions
 
 	public function get_bulk_actions() {
-		$actions = array(
+		$actions = [
 			'delete'           => __( 'Stop guarding', 'speedguard' ),
 			'retest_load_time' => __( 'Retest', 'speedguard' ),
-		);
+		];
 
 		return $actions;
 	}
@@ -351,13 +357,13 @@ input type="checkbox" />',
 
 class SpeedGuard_Tests {
 	function __construct() {
-		add_action( 'rest_api_init', array( $this, 'speedguard_rest_api_register_routes' ) );
-		add_action( 'admin_init', array( $this, 'process_speedguard_actions' ) );
+		add_action( 'rest_api_init', [ $this, 'speedguard_rest_api_register_routes' ] );
+		add_action( 'admin_init', [ $this, 'process_speedguard_actions' ] );
 	}
 
 	public static function process_speedguard_actions() {
 		// add new test via form
-		if ( ! empty( $_POST['speedguard'] ) && $_POST['speedguard'] == 'add_new_url' ) {
+		if ( ! empty( $_POST['speedguard'] ) && $_POST['speedguard'] === 'add_new_url' ) {
 			$url    = ( ! empty( $_POST['speedguard_new_url_permalink'] ) ) ? $_POST['speedguard_new_url_permalink'] : $_POST['speedguard_new_url'];
 			$result = self::try_add_speedguard_test( $url, $_POST['speedguard_item_type'], $_POST['speedguard_new_url_id'], $_POST['blog_id'] );
 		}
@@ -391,8 +397,8 @@ class SpeedGuard_Tests {
 							if ( $guarded_item_id != 0 ) {
 								$guarded_item_type = 'single';
 								$speedguard_on     = get_post_meta( $guarded_item_id, 'speedguard_on', true );
-								$already_guarded   = ( ! empty( $speedguard_on ) && ( $speedguard_on[0] == 'true' ) ) ? true : false;
-								$existing_test_id  = ( ! empty( $speedguard_on ) && ( $speedguard_on[0] == 'true' ) ) ? ( $speedguard_on[1] ) : false;
+								$already_guarded   = ( ! empty( $speedguard_on ) && ( $speedguard_on[0] === 'true' ) ) ? true : false;
+								$existing_test_id  = ( ! empty( $speedguard_on ) && ( $speedguard_on[0] === 'true' ) ) ? ( $speedguard_on[1] ) : false;
 							} elseif ( $guarded_item_id === 0 ) { // it's archive. Let's find the term
 								// $slug = basename($url_to_add).PHP_EOL;
 								$taxonomies = get_taxonomies();
@@ -406,8 +412,8 @@ class SpeedGuard_Tests {
 									}
 								}
 								$speedguard_on    = get_term_meta( $guarded_item_id, 'speedguard_on', true );
-								$already_guarded  = ( ! empty( $speedguard_on ) && ( $speedguard_on[0] == 'true' ) ) ? true : false;
-								$existing_test_id = ( ! empty( $speedguard_on ) && ( $speedguard_on[0] == 'true' ) ) ? ( $speedguard_on[1] ) : false;
+								$already_guarded  = ( ! empty( $speedguard_on ) && ( $speedguard_on[0] === 'true' ) ) ? true : false;
+								$existing_test_id = ( ! empty( $speedguard_on ) && ( $speedguard_on[0] === 'true' ) ) ? ( $speedguard_on[1] ) : false;
 							}
 						}
 					}
@@ -434,20 +440,20 @@ class SpeedGuard_Tests {
 	}
 
 	public static function is_homepage_guarded() {
-		$args           = array(
+		$args           = [
 			'post_type'      => SpeedGuard_Admin::$cpt_name,
 			'post_status'    => 'publish',
 			'posts_per_page' => 1,
 			'fields'         => 'ids',
 			'no_found_rows'  => true,
-			'meta_query'     => array(
-				array(
+			'meta_query'     => [
+				[
 					'key'     => 'speedguard_item_type',
 					'compare' => 'LIKE',
 					'value'   => 'homepage',
-				),
-			),
-		);
+				],
+			],
+		];
 		$the_query      = new WP_Query( $args );
 		$homepage_found = $the_query->posts;
 		if ( ! empty( $homepage_found[0] ) ) {
@@ -483,11 +489,11 @@ class SpeedGuard_Tests {
 		// $connection      = SpeedGuard_Admin::get_this_plugin_option( 'speedguard_options' )['test_connection_type'];
 		// $code            = $url_to_add . '|' . $connection;
 		$code            = $url_to_add;
-		$new_target_page = array(
+		$new_target_page = [
 			'post_title'  => $code,
 			'post_status' => 'publish',
 			'post_type'   => SpeedGuard_Admin::$cpt_name,
-		);
+		];
 		if ( defined( 'SPEEDGUARD_MU_NETWORK' ) ) {
 			switch_to_blog( get_network()->site_id );
 		}
@@ -504,16 +510,16 @@ class SpeedGuard_Tests {
 				update_post_meta( $target_page_id, 'guarded_post_blog_id', $guarded_post_blog_id );
 			}
 			// check url as guarded
-			if ( ( $guarded_item_type == 'single' ) || ( $guarded_item_type == 'archive' ) ) {
+			if ( ( $guarded_item_type === 'single' ) || ( $guarded_item_type === 'archive' ) ) {
 				update_post_meta( $target_page_id, 'guarded_post_id', $guarded_item_id );
 				$set_speedguard_on = ( $guarded_item_type === 'single' ) ? update_post_meta(
 					$guarded_item_id,
 					'speedguard_on',
-					array(
+					[
 						'true',
 						$target_page_id,
-					)
-				) : update_term_meta( $guarded_item_id, 'speedguard_on', array( 'true', $target_page_id ) );
+					]
+				) : update_term_meta( $guarded_item_id, 'speedguard_on', [ 'true', $target_page_id ] );
 			}
 			if ( defined( 'SPEEDGUARD_MU_NETWORK' ) ) {
 				restore_current_blog();
@@ -563,14 +569,14 @@ class SpeedGuard_Tests {
 		register_rest_route(
 			'speedguard',
 			'/search',
-			array(
+			[
 				'methods'             => 'GET',
-				'callback'            => array( $this, 'speedguard_rest_api_search' ),
+				'callback'            => [ $this, 'speedguard_rest_api_search' ],
 				// this part fetches the right $_GET params //For internal calls
 				'permission_callback' => function ( WP_REST_Request $request ) {
 					return current_user_can( 'manage_options' );
 				},
-			)
+			]
 		);
 	}
 
@@ -583,7 +589,7 @@ class SpeedGuard_Tests {
 		// TODO PRO: WP REST API Auth search all blogs if Network Activated
 		if ( defined( 'SPEEDGUARD_MU_NETWORK' ) ) {
 			$sites = get_sites();
-			$posts = array();
+			$posts = [];
 			foreach ( $sites as $site ) {
 				$blog_id = $site->blog_id;
 				switch_to_blog( $blog_id );
@@ -600,20 +606,20 @@ class SpeedGuard_Tests {
 	}
 
 	function speedguard_search_function( $search_term ) {
-		$meta_query            = array(
+		$meta_query            = [
 			'relation' => 'OR',
-			array(
+			[
 				'key'     => 'speedguard_on',
 				'compare' => 'NOT EXISTS',
 				'value'   => '',
-			),
-			array(
+			],
+			[
 				'key'     => 'speedguard_on',
 				'compare' => '==',
 				'value'   => 'false',
-			),
-		);
-		$args                  = array(
+			],
+		];
+		$args                  = [
 			'post_type'              => SpeedGuard_Admin::supported_post_types(),
 			'post_status'            => 'publish',
 			'posts_per_page'         => 3,
@@ -623,39 +629,39 @@ class SpeedGuard_Tests {
 			'update_post_meta_cache' => false,
 			'update_post_term_cache' => false,
 			'meta_query'             => $meta_query,
-		);
+		];
 		$the_query             = new WP_Query( $args );
 		$this_blog_found_posts = $the_query->posts;
-		$temp                  = array();
+		$temp                  = [];
 		foreach ( $this_blog_found_posts as $key => $post_id ) {
 			// $key = 'ID';
-			$temp    = array(
+			$temp    = [
 				'ID'        => $post_id,
 				'permalink' => get_permalink( $post_id ),
 				'blog_id'   => get_current_blog_id(),
 				'label'     => get_the_title( $post_id ),
 				'type'      => 'single',
-			);
+			];
 			$posts[] = $temp;
 		}
 
 		// Include Terms too
 		$the_terms = get_terms(
-			array(
+			[
 				'name__like' => $search_term,
 				'hide_empty' => true,
 				'meta_query' => $meta_query,
-			)
+			]
 		);
 		if ( count( $the_terms ) > 0 ) {
 			foreach ( $the_terms as $term ) {
-				$temp    = array(
+				$temp    = [
 					'ID'        => $term->term_id,
 					'permalink' => get_term_link( $term ),
 					'blog_id'   => get_current_blog_id(),
 					'label'     => $term->name,
 					'type'      => 'archive',
-				);
+				];
 				$posts[] = $temp;
 			}
 		}

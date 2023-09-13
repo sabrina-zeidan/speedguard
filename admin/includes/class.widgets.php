@@ -17,7 +17,7 @@ class SpeedGuardWidgets {
 					]
 				);
 			}
-			if ( ( $options['show_ab_widget'] === 'on' ) && ! is_admin() ) {
+			if ( ( 'on' === $options['show_ab_widget'] ) && ! is_admin() ) {
 				add_action( 'admin_bar_menu', [ $this, 'speedguard_admin_bar_widget' ], 710 );
 			}
 		}
@@ -58,12 +58,12 @@ class SpeedGuardWidgets {
 
 					$current_metric = $device . '_' . $metric;
 
-					if ( $metric == 'lcp' ) {
+					if ( $metric === 'lcp' ) {
 						$display_value = round( $metrics_value / 1000, 2 ) . ' s';
-					} elseif ( $metric == 'cls' ) {
+					} elseif ( $metric === 'cls' ) {
 						$display_value = $metrics_value;
 						$display_value = $metrics_value / 100;
-					} elseif ( $metric == 'fid' ) {
+					} elseif ( $metric === 'fid' ) {
 						$display_value = $metrics_value . ' ms';
 					}
 					$$current_metric = '<span data-score-category="' . $speedguard_cwv_origin[ $device ][ $metric ]['category'] . '" class="speedguard-score">' . $display_value . ' </span>';
@@ -92,7 +92,8 @@ class SpeedGuardWidgets {
 	</thbody>
 	</table>
 	<div><br>
-	' // TODO link to the video
+	'
+						// TODO link to the video
 						. sprintf( __( 'N/A means that there is no data from Google available -- most likely your website have not got enough traffic for Google to make evaluation (Not enough usage data in the last 90 days for this device type)', 'speedguard' ), '<a href="#">', '</a>' ) . '</div>';
 		} else {
 			$content = 'Updating';
@@ -100,6 +101,9 @@ class SpeedGuardWidgets {
 		echo $content;
 	}
 
+	/**
+	 * Define all metaboxes fro plugin's admin pages (Tests and Settings)
+	 */
 	public static function add_meta_boxes() {
 		wp_nonce_field( 'closedpostboxes', 'closedpostboxesnonce', false );
 		add_meta_box(
@@ -124,7 +128,6 @@ class SpeedGuardWidgets {
 			'main-content',
 			'core'
 		);
-
 		add_meta_box(
 			'speedguard-speedresults-meta-box',
 			__( 'PageSpeed Insights (lab tests)', 'speedguard' ),
@@ -148,29 +151,28 @@ class SpeedGuardWidgets {
 			'core'
 		);
 		$sg_options = SpeedGuard_Admin::get_this_plugin_option( 'speedguard_options' );
-		if ( $sg_options['test_type'] == 'cwv' ) {
+		if ( 'cwv' === $sg_options['test_type'] ) {
 			$test_type = ' -- Core Web Vitals';
-		} elseif ( $sg_options['test_type'] == 'psi' ) {
+		} elseif ( 'psi' === $sg_options['test_type'] ) {
 			$test_type = ' -- PageSpeed Insights';
 		}
-
+			add_meta_box(
+				'tests-list-meta-box',
+				sprintf( __( 'Test results for specific URLs %s', 'speedguard' ), $test_type ),
+				[
+					'SpeedGuard_Tests',
+					'tests_list_metabox',
+				],
+				'',
+				'main-content',
+				'core'
+			);
 		add_meta_box(
-			'tests-list-meta-box',
-			__( 'Test results for specific URLs' . $test_type, 'speedguard' ),
-			[
-				'SpeedGuard_Tests',
-				'tests_list_metabox',
-			],
-			'',
-			'main-content',
-			'core'
-		);
-		add_meta_box(
-			'speed-score-legend-meta-box',
-			__( 'Largest Contentful Paint (LCP)', 'speedguard' ),
+			'speedguard-legend-meta-box',
+			__( 'How to understand the information above?', 'speedguard' ),
 			[
 				'SpeedGuardWidgets',
-				'speed_score_legend_meta_box',
+				'speedguard_legend_meta_box',
 			],
 			'',
 			'main-content',
@@ -200,35 +202,45 @@ class SpeedGuardWidgets {
 		);
 	}
 
-	public static function speed_score_legend_meta_box() {
+	/**
+	 * Tests Page -> Info Metabox output
+	 */
+	public static function speedguard_legend_meta_box() {
+		// Set the variable for the Core Web Vitals link.
 		$cwv_link = 'https://web.dev/lcp/';
-		$content  = '<table>
-									<tr><td><p>' . __( '', 'speedguard' ) . '
-									
-									' . sprintf( __( 'We all know that site\'s loading speed was impacting Google ranking for quite a while now. But recently (late May 2020) company has revealed more details about %1$sCore Web Vitals%2$s — metrics that Google will be using to rank websites.', 'speedguard' ), '<a href="' . $cwv_link . '" target="_blank">', '</a>' ) . '</p><p>								
-									' . sprintf(
-										__( '%1$sLargest Contentful Paint%2$s is one of them. It measures how quickly the page\'s "main content" loads	— the bulk of the text or image (within the viewport, so before the user scrolls). ', 'speedguard' ),
-										'<stron
-g>',
-										'</strong>'
-									) . '</p><p>
-									' . __( 'The intention of these changes is to improve how users perceive the experience of interacting with a web page.', 'speedguard' ) . '
-									</p>
-									</td></tr>
-									<tr>
-									<td>
-									<img 
-    src="' . plugin_dir_url( __DIR__ ) . 'assets/images/lcp.svg" 
-    alt="Largest Contentful Paint chart"/>
-									</td>
-									</tr>									
-									</table>
-									';
+
+		// Create the table.
+		$content = '<table>
+  <tr>
+    <td>
+      <p>' . sprintf(
+			__( 'We all know that site\'s loading speed was impacting Google ranking for quite a while now. But recently (late May 2020) company has revealed more details about %1$sCore Web Vitals%2$s — metrics that Google will be using to rank websites.', 'speedguard' ),
+			'<a href="' . $cwv_link . '" target="_blank">',
+			'</a>'
+		) . '</p>
+      <p>' . sprintf(
+			__( '%1$sLargest Contentful Paint%2$s is one of them. It measures how quickly the page\'s "main content" loads — the bulk of the text or image (within the viewport, so before the user scrolls). ', 'speedguard' ),
+			'<strong>',
+			'</strong>'
+		) . '</p>
+      <p>
+        ' . __( 'The intention of these changes is to improve how users perceive the experience of interacting with a web page.', 'speedguard' ) . '
+      </p>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <img src="' . plugin_dir_url( __DIR__ ) . 'assets/images/lcp.svg" alt="Largest Contentful Paint chart">
+    </td>
+  </tr>
+</table>';
+
+		// Echo the content.
 		echo $content;
 	}
 
-	/*Meta boxes*/
 
+	/*Meta boxes*/
 	public static function add_new_url_meta_box() {
 		$content = '<form name="speedguard_add_url" id="speedguard_add_url"  method="post" action="">   
 		<input class="form-control"  type="text" id="speedguard_new_url" name="speedguard_new_url" value="" placeholder="' . __( 'Start typing the title of the post, page or custom post type...', 'speedguard' ) . '" autofocus="autofocus"/>
@@ -285,7 +297,7 @@ g>',
 		echo $content;
 	}
 
-	function speedguard_admin_bar_widget( $wp_admin_bar ) {
+	private function speedguard_admin_bar_widget( $wp_admin_bar ) {
 		if ( ! current_user_can( 'manage_options' ) ) {
 			return;
 		}
@@ -308,7 +320,7 @@ g>',
 			$current_item_id   = $post->ID;
 			$current_item_link = get_permalink( $current_item_id );
 			$speedguard_on     = get_post_meta( $current_item_id, 'speedguard_on', true );
-			if ( $speedguard_on && $speedguard_on[0] == 'true' ) {
+			if ( $speedguard_on && $speedguard_on[0] === 'true' ) {
 				$is_guarded = true;
 				$test_id    = $speedguard_on[1];
 				$load_time  = get_post_meta( $test_id, 'sg_mobile' );
@@ -320,7 +332,7 @@ g>',
 			$current_item_id   = get_queried_object()->term_id;
 			$current_item_link = get_term_link( $current_item_id );
 			$speedguard_on     = get_term_meta( $current_item_id, 'speedguard_on', true );
-			if ( $speedguard_on && $speedguard_on[0] == 'true' ) {
+			if ( $speedguard_on && $speedguard_on[0] === 'true' ) {
 				$is_guarded = true;
 				$test_id    = $speedguard_on[1];
 				$load_time  = get_post_meta( $test_id, 'sg_mobile' );
@@ -331,7 +343,7 @@ g>',
 
 		// The output
 		// There is the load time
-		if ( isset( $is_guarded ) && ! empty( $load_time ) && $load_time == 'waiting' ) {
+		if ( isset( $is_guarded ) && ! empty( $load_time ) && $load_time === 'waiting' ) {
 			$title  = __( 'Testing...', 'speedguard' );
 			$href   = '';
 			$atitle = __( 'Test is running currently', 'speedguard' );

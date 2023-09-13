@@ -1,13 +1,10 @@
 <?php
 
 /**
- * Fired during plugin activation
+ * Fired during plugin activation.
  *
- * @link       http://sabrinazeidan.com/
+ * @see       http://sabrinazeidan.com/
  * @since      1.0.0
- *
- * @package    Speedguard
- * @subpackage Speedguard/includes
  */
 
 /**
@@ -16,8 +13,7 @@
  * This class defines all code necessary to run during the plugin's activation.
  *
  * @since      1.0.0
- * @package    Speedguard
- * @subpackage Speedguard/includes
+ *
  * @author     Sabrina Zeidan <sabrinazeidan@gmail.com>
  */
 class Speedguard_Activator {

@@ -11,6 +11,7 @@
 
 class SpeedGuard_Admin {
 
+
 	public static $cpt_name = 'guarded-page';
 	private $plugin_name;
 	private $version;
@@ -185,16 +186,16 @@ class SpeedGuard_Admin {
 	}
 	// Remove meta when test is deleted
 	public static function before_delete_test_hook( $postid ) {
-		if ( get_post_type( $postid ) == self::$cpt_name ) {
+		if ( get_post_type( $postid ) === self::$cpt_name ) {
 			$guarded_item_id   = get_post_meta( $postid, 'guarded_post_id', true );
 			$guarded_item_type = get_post_meta( $postid, 'speedguard_item_type', true );
 			if ( defined( 'SPEEDGUARD_MU_NETWORK' ) ) {
 				$blog_id = get_post_meta( $postid, 'guarded_post_blog_id', true );
 				switch_to_blog( $blog_id );
 			}
-			if ( $guarded_item_type == 'single' ) {
+			if ( $guarded_item_type === 'single' ) {
 				update_post_meta( $guarded_item_id, 'speedguard_on', 'false' );
-			} elseif ( $guarded_item_type == 'archive' ) {
+			} elseif ( $guarded_item_type === 'archive' ) {
 				update_term_meta( $guarded_item_id, 'speedguard_on', 'false' );
 			}
 
@@ -205,9 +206,9 @@ class SpeedGuard_Admin {
 	}
 	public static function guarded_page_unpublished_hook( $new_status, $old_status, $post ) {
 		// Delete test data when original post got unpublished
-		if ( ( $old_status == 'publish' ) && ( $new_status != 'publish' ) && ( get_post_type( $post->ID ) ) != self::$cpt_name ) {
+		if ( ( $old_status === 'publish' ) && ( $new_status != 'publish' ) && ( get_post_type( $post->ID ) ) != self::$cpt_name ) {
 				$speedguard_on = get_post_meta( $post->ID, 'speedguard_on', true );
-			if ( $speedguard_on && $speedguard_on[0] == 'true' ) {
+			if ( $speedguard_on && $speedguard_on[0] === 'true' ) {
 				// delete test on the main blog
 				if ( defined( 'SPEEDGUARD_MU_NETWORK' ) ) {
 					switch_to_blog( 1 );
@@ -245,9 +246,9 @@ class SpeedGuard_Admin {
 	}
 
 	public static function speedguard_page_url( $page ) {
-		if ( $page == 'tests' ) {
+		if ( $page === 'tests' ) {
 			$admin_page_url = defined( 'SPEEDGUARD_MU_NETWORK' ) ? network_admin_url( 'admin.php?page=speedguard_tests' ) : admin_url( 'admin.php?page=speedguard_tests' );
-		} elseif ( $page == 'settings' ) {
+		} elseif ( $page === 'settings' ) {
 			$admin_page_url = defined( 'SPEEDGUARD_MU_NETWORK' ) ? network_admin_url( 'admin.php?page=speedguard_settings' ) : admin_url( 'admin.php?page=speedguard_settings' );
 		}
 		return $admin_page_url;
@@ -403,41 +404,41 @@ class SpeedGuard_Admin {
 		// Tests screen
 		if ( self::is_screen( 'tests' ) ) {
 			// Errors
-			if ( ! empty( $_REQUEST['speedguard'] ) && $_REQUEST['speedguard'] == 'add_new_url_error_empty' ) {
+			if ( ! empty( $_REQUEST['speedguard'] ) && $_REQUEST['speedguard'] === 'add_new_url_error_empty' ) {
 				$notices = self::set_notice( __( 'Please select the post you want to add.', 'speedguard' ), 'warning' );
 			}
-			if ( ! empty( $_REQUEST['speedguard'] ) && $_REQUEST['speedguard'] == 'add_new_url_error_not_current_domain' ) {
+			if ( ! empty( $_REQUEST['speedguard'] ) && $_REQUEST['speedguard'] === 'add_new_url_error_not_current_domain' ) {
 				$notices = self::set_notice( __( 'SpeedGuard only monitors pages from current website.', 'speedguard' ), 'warning' );
 			}
-			if ( ! empty( $_REQUEST['speedguard'] ) && $_REQUEST['speedguard'] == 'add_new_url_error_not_url' ) {
+			if ( ! empty( $_REQUEST['speedguard'] ) && $_REQUEST['speedguard'] === 'add_new_url_error_not_url' ) {
 				$notices = self::set_notice( __( 'Please enter valid URL or select the post you want to add.', 'speedguard' ), 'warning' );
 			}
-			if ( ! empty( $_REQUEST['speedguard'] ) && $_REQUEST['speedguard'] == 'already_guarded' ) {
+			if ( ! empty( $_REQUEST['speedguard'] ) && $_REQUEST['speedguard'] === 'already_guarded' ) {
 				$notices = self::set_notice( __( 'This URL is already guarded!', 'speedguard' ), 'warning' );
 				// TODO: offer to retest/ retest automatically
 			}
 
 			// Success
-			if ( ! empty( $_REQUEST['speedguard'] ) && $_REQUEST['speedguard'] == 'new_url_added' ) {
+			if ( ! empty( $_REQUEST['speedguard'] ) && $_REQUEST['speedguard'] === 'new_url_added' ) {
 				$notices = self::set_notice( __( 'New URL is successfully added!', 'speedguard' ), 'success' );
 			}
-			if ( ! empty( $_REQUEST['speedguard'] ) && $_REQUEST['speedguard'] == 'speedguard_test_being_updated' ) {
+			if ( ! empty( $_REQUEST['speedguard'] ) && $_REQUEST['speedguard'] === 'speedguard_test_being_updated' ) {
 				$notices = self::set_notice( __( 'Tests are running...', 'speedguard' ), 'success' );
 			}
-			if ( ! empty( $_REQUEST['speedguard'] ) && $_REQUEST['speedguard'] == 'load_time_updated' ) {
+			if ( ! empty( $_REQUEST['speedguard'] ) && $_REQUEST['speedguard'] === 'load_time_updated' ) {
 				// TODO: This doesn't work properly, load_time_updated is added via JS
 				$notices = self::set_notice( __( 'Results have been updated!', 'speedguard' ), 'success' );
 			}
-			if ( ! empty( $_REQUEST['speedguard'] ) && $_REQUEST['speedguard'] == 'slow_down' ) {
+			if ( ! empty( $_REQUEST['speedguard'] ) && $_REQUEST['speedguard'] === 'slow_down' ) {
 				$notices = self::set_notice( __( 'You are moving too fast. Wait at least 3 minutes before updating the tests', 'speedguard' ), 'warning' );
 			}
-			if ( ! empty( $_REQUEST['speedguard'] ) && $_REQUEST['speedguard'] == 'delete_guarded_pages' ) {
+			if ( ! empty( $_REQUEST['speedguard'] ) && $_REQUEST['speedguard'] === 'delete_guarded_pages' ) {
 				$notices = self::set_notice( __( 'Selected pages are not guarded anymore!', 'speedguard' ), 'success' );
 			}
 		}
 
 		if ( self::is_screen( 'settings' ) ) {
-			if ( ! empty( $_REQUEST['settings-updated'] ) && $_REQUEST['settings-updated'] == 'true' ) {
+			if ( ! empty( $_REQUEST['settings-updated'] ) && $_REQUEST['settings-updated'] === 'true' ) {
 				$notices = self::set_notice( __( 'Settings have been updated!' ), 'success' );
 			}
 		}
