@@ -1,1 +1,10 @@
 /vendor/
+.idea/codeStyles/Project.xml
+.idea/codeStyles/Project.xml
+.idea/inspectionProfiles/Project_Default.xml
+.idea/php.xml
+.idea/speedguard.iml
+composer.json
+composer.lock
+composer.phar
+phpcs.xml

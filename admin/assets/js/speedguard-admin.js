@@ -1,25 +1,53 @@
-document.addEventListener('DOMContentLoaded', function () {
-    //Mark tests according to scores
-    var testscore = document.getElementsByClassName("speedguard-score");
-    var i;
-    for (i = 0; i < testscore.length; i++) {
-        var datascore = testscore[i].getAttribute('data-score');
-        if ( datascore > 0.7 ) {
-            testscore[i].classList.add("score-green");
-        } else if ( datascore > 0.4 ) {
-            testscore[i].classList.add("score-yellow");
-        } else {
-            testscore[i].classList.add("score-red");
+/**
+ * SpeedGuard JavaScript for Admin
+ */
+document.addEventListener(
+    'DOMContentLoaded',
+    function () {
+        // Adding SG headers to the default WP list table
+        const table = document.querySelector("table.toplevel_page_speedguard_tests");
+        const thead = table.getElementsByTagName("thead")[0];
+        const testTypeRow = document.createElement("tr");
+        if (table.classList.contains('psi-test-type')) {
+            console.log('it does psi!');
+            testTypeRow.innerHTML = '< th colspan      = "2" > < / th > < th colspan      = "2" class = "test-type-thead psi-mobile"> PSI < / th > < th colspan      = "2" class = "test-type-thead psi-desktop" > PSI < / th >';
+            var column_count = 2;
+        }
+
+        if (table.classList.contains('cwv-test-type')) {
+            console.log('it does cwv!');
+            testTypeRow.innerHTML = '< th colspan      = "2" > < / th > < th colspan      = "3" class ="test-type-thead cwv-mobile" > CWV < / th > < th colspan      = "3" class = "test-type-thead cwv-desktop" > CWV < / th > ';
+            var column_count = 3;
+        }
+
+        // For Debugging Only    thead.prepend(testTypeRow);
+        const deviceRow = document.createElement("tr");
+        deviceRow.innerHTML = "<th colspan='2'></th><th colspan='" + column_count + "'><i class='sg-device-column mobile' aria-hidden='true' title='Mobile'></i></th><th colspan='" + column_count + "'><i class='sg-device-column desktop' aria-hidden='true' title='Desktop'></i></th>";
+        thead.prepend(deviceRow);
+
+        // Mark scores with colors
+        const testscore = document.querySelectorAll(".speedguard-score");
+        for (const testScore of testscore) {
+            const dataScore = testScore.getAttribute("data-score");
+            const dataCategory = testScore.getAttribute("data-score-category");
+            if (dataScore > 0.7 || dataCategory === "FAST") {
+                testScore.classList.add("score-green");
+            } else if (dataScore > 0.4 || dataCategory === "AVERAGE") {
+                testScore.classList.add("score-yellow");
+            } else {
+                testScore.classList.add("score-red");
+            }
+        }
+
+        const metaboxes = document.querySelectorAll(".postbox");
+        for (const metabox of metaboxes) {
+            const toggleButton = metabox.querySelector(".handlediv");
+            toggleButton.addEventListener(
+                "click",
+                () => {
+                    metabox.classList.toggle("closed");
+                }
+            );
         }
     }
-    
-    //WP Dashboard Metaboxes open/close
-    var a = document.getElementsByClassName("postbox");
-    var i;
-    for (let i = 0; i < a.length; i++) {
-        var togglebutton = a[i].querySelector('.handlediv');
-        togglebutton.addEventListener('click', function () {
-            a[i].classList.toggle("closed");
-        });
-    }
-});
+);
