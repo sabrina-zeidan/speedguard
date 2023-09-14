@@ -23,7 +23,8 @@ class SpeedGuardWidgets {
 		}
 	}
 
-	/* Function responsible for displaying widget with PSI Average results widget on the admin dashboard
+	/*
+	Function responsible for displaying widget with PSI Average results widget on the admin dashboard
 	 *
 	 * @param $post
 	 * @param $args
@@ -50,7 +51,42 @@ class SpeedGuardWidgets {
 	}
 
 	/**
+	 * Function responsible for formatting CWV data for display
+	 *
+	 * @param $post
+	 * @param $args
+	 */
+	public static function cwv_metric_display( $speedguard_cwv_origin, $device, $metric ) {
+		if ( $speedguard_cwv_origin === 'waiting' ) {  // tests are currently running
+			$class         = 'waiting';
+			$display_value = '';
+		} elseif ( ( is_array( $speedguard_cwv_origin[ $device ] ) ) ) {// tests are not currently running and there is CWV data available for this device
+			$metrics_value = $speedguard_cwv_origin[ $device ][ $metric ]['percentile'];
+			// Format metrics output for display
+			$class = 'score';
+			if ( $metric === 'lcp' ) {
+				$display_value = round( $metrics_value / 1000, 2 ) . ' s';
+			} elseif ( $metric === 'cls' ) {
+				$display_value = $metrics_value;
+				$display_value = $metrics_value / 100;
+			} elseif ( $metric === 'fid' ) {
+				$display_value = $metrics_value . ' ms';
+			}
+		} else {
+			$class         = 'na';
+			$display_value = 'N/A';
+		}
+		$category             = isset( $speedguard_cwv_origin[ $device ][ $metric ]['category'] ) ? $speedguard_cwv_origin[ $device ][ $metric ]['category'] : '';
+		$category             = 'data-score-category="' . $category . '"';
+		$class                = 'class="speedguard-' . $class . '"';
+		$metric_display_value = '<span ' . $category . ' ' . $class . '>' . $display_value . '</span>';
+
+		return $metric_display_value;
+	}
+
+	/**
 	 * Function responsible for displaying widget with CWV side-wide results widget on Tests page
+	 *
 	 * @param $post
 	 * @param $args
 	 *
@@ -61,32 +97,12 @@ class SpeedGuardWidgets {
 		$speedguard_cwv_origin = SpeedGuard_Admin::get_this_plugin_option( 'speedguard_cwv_origin' );
 			// Preparing data to display
 			$devices = [ 'mobile', 'desktop' ];
-			foreach ( $devices as $device ) {
+		foreach ( $devices as $device ) {
 			$cwv = [ 'lcp', 'cls', 'fid' ];
 			foreach ( $cwv as $metric ) {
 				$current_metric = $device . '_' . $metric;
-				if ($speedguard_cwv_origin === 'waiting'){ //tests are currently running
-					$metric_display_value = '<div class="loading"></div>';
-				}
-				else if ( (is_array($speedguard_cwv_origin[ $device ]))){//tests are not currently running and there is CWV data available for this device
-					$metrics_value  = $speedguard_cwv_origin[ $device ][ $metric ]['percentile'];
-					//Format metrics output for display
-						if ( $metric === 'lcp' ) {
-							$display_value = round( $metrics_value / 1000, 2 ) . ' s';
-						} elseif ( $metric === 'cls' ) {
-							$display_value = $metrics_value;
-							$display_value = $metrics_value / 100;
-						} elseif ( $metric === 'fid' ) {
-							$display_value = $metrics_value . ' ms';
-						}
-					$metric_display_value = '<span data-score-category="' . $speedguard_cwv_origin[ $device ][ $metric ]['category'] . '" class="speedguard-score">' . $display_value . ' </span>';
-
-				}
-				else {
-					$metric_display_value = '<span>'.__("N/A","speedguard").'</span>';
-				}
-
-				$$current_metric = $metric_display_value;
+				// unified function to format data for display
+				$$current_metric = self::cwv_metric_display( $speedguard_cwv_origin, $device, $metric );
 			}
 		}
 
