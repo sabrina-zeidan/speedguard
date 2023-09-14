@@ -16,6 +16,8 @@ class SpeedGuard_Lighthouse {
 		$guarded_page_url = get_post_meta( $guarded_page_id, 'speedguard_page_url', true );
 		$devices    = [ 'desktop', 'mobile' ];
 		$cwv_origin = [];
+
+		$both_devices_values = []; //for post_meta sg_test_result
 		foreach ( $devices as $device ) {
 			sleep( 3 ); // So we can use LightHouse without API
 			$request  = add_query_arg(
@@ -34,10 +36,10 @@ class SpeedGuard_Lighthouse {
 			$response      = wp_remote_retrieve_body( $response );
 			$json_response = json_decode( $response, true, 1512 );
 
-			// If test has PSI results:
+			// If test has PSI results (request was successful)
 			if ( ! empty( $json_response['lighthouseResult'] ) ) {
-				// Save PSI and CWV together by device to meta sg_mobile and sg_desktop
-				$device_values        = [];
+				// Save PSI and CWV together to meta sg_test_result as device array
+			//	$device_values        = [];
 				$device_values['psi'] = [
 					'lcp' => $json_response['lighthouseResult']['audits']['largest-contentful-paint'],
 					// title, description, score, scoreDisplayMode, displayValue, numericValue
@@ -50,37 +52,47 @@ class SpeedGuard_Lighthouse {
 					'cls' => $json_response['loadingExperience']['metrics']['CUMULATIVE_LAYOUT_SHIFT_SCORE'],
 					'fid' => $json_response['loadingExperience']['metrics']['FIRST_INPUT_DELAY_MS'],
 				];
+				$both_devices_values[$device] = $device_values;
 
-				update_post_meta( $guarded_page_id, 'sg_' . $device, $device_values );
+				// Prepare data for side-wide widget
 				// If site has Origin CWV data -- save it
+				//TODO format this to be universal
 				if ( ! empty( $json_response['originLoadingExperience'] ) ) {
-					// CWV Origin for this Device -- TODO
-					$LCP                   = $json_response['originLoadingExperience']['metrics']['LARGEST_CONTENTFUL_PAINT_MS']; // percentile,distributions, category
-					$CLS                   = $json_response['originLoadingExperience']['metrics']['CUMULATIVE_LAYOUT_SHIFT_SCORE']; // percentile,distributions, category
-					$FID                   = $json_response['originLoadingExperience']['metrics']['FIRST_INPUT_DELAY_MS']; // percentile,distributions, category
-					$cwv_origin[ $device ] = [
-						'lcp' => $LCP,
-						'cls' => $CLS,
-						'fid' => $FID,
-					];
-					// Save Origin CWV
+					// CWV Origin for this Device
+
+					$notavailable = "N/A";
+					$LCP = isset($json_response['originLoadingExperience']['metrics']['LARGEST_CONTENTFUL_PAINT_MS']) ? $json_response['originLoadingExperience']['metrics']['LARGEST_CONTENTFUL_PAINT_MS']: $notavailable ; // percentile,distributions, category
+					$CLS = isset($json_response['originLoadingExperience']['metrics']['CUMULATIVE_LAYOUT_SHIFT_SCORE']) ? $json_response['originLoadingExperience']['metrics']['CUMULATIVE_LAYOUT_SHIFT_SCORE'] : $notavailable; // percentile,distributions, category
+					$FID = isset($json_response['originLoadingExperience']['metrics']['FIRST_INPUT_DELAY_MS'])? $json_response['originLoadingExperience']['metrics']['FIRST_INPUT_DELAY_MS']: $notavailable; // percentile,distributions, category
+
 
 				}
 				else{ //if no sidewide CWV available
-					$cwv_origin[ $device ] = "N/A";
+					$origin_cwv[ $device ] = "N/A";
 				}
-				SpeedGuard_Admin::update_this_plugin_option( 'speedguard_cwv_origin', $cwv_origin );
-			} else { // If no PSI data
+				$origin[ $device ] ['cwv'] = [
+					'lcp' => $LCP,
+					'cls' => $CLS,
+					'fid' => $FID,
+				];
 
+			} else {
+				// If no PSI data -- meaning test failed to execute
+				//TODO -- add error message
 			}
 		}
 
-		// Create a new test
+		// Create a new test CPT
 		$new_test_cpt     = array(
 			'ID'         => $guarded_page_id,
 			'post_title' => $guarded_page_url,
 		);
-		$updated = wp_update_post( $new_test_cpt  );
+		wp_update_post( $new_test_cpt  );
+		//And save all data
+		//TODO make this unoversal too -- rename to sg_origin_result [mobile, desktop]
+		SpeedGuard_Admin::update_this_plugin_option( 'sg_origin_result', $origin );
+		//TODO move site average PSI to here?
+		$updated = update_post_meta( $guarded_page_id, 'sg_test_result', $both_devices_values);
 		return $updated;
 	}
 }

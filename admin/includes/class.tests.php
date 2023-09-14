@@ -133,25 +133,29 @@ class SpeedGuard_List_Table extends WP_List_Table {
 		if ( $guarded_pages ) :
 			foreach ( $guarded_pages as $guarded_page_id ) {
 				$guarded_page_url = get_post_meta( $guarded_page_id, 'speedguard_page_url', true );
-
 				// NEW and good
-				// Prepare other columns
+				// Prepare basic columns
 				$report_link = add_query_arg( [ 'url' => $guarded_page_url ], 'https://developers.google.com/speed/pagespeed/insights/' );
 				$updated     = get_the_modified_date( 'Y-m-d H:i:s', $guarded_page_id );
-
 				// Define basic data for the item
 				$thisItem = [
 					'guarded_page_id'    => $guarded_page_id,
 					'guarded_page_title' => '<a href="' . $guarded_page_url . '" target="_blank">' . $guarded_page_url . '</a>',
 					'report_date'        => $updated . '<a href="' . $report_link . '" target="_blank">🔗</a>',
 				];
+                //Get test result data
+                $sg_test_result = get_post_meta( $guarded_page_id, 'sg_test_result', true);
+
+		//	if (is_array($sg_test_result)){
+
 
 				// Start Prepare PSI data and CWV data with the loop
 				$devices = [ 'mobile', 'desktop' ];
 				foreach ( $devices as $device ) {
 					// Get needed post_meta for DEVICE
 					$device_test_data  = 'sg_' . $device;
-					$$device_test_data = get_post_meta( $guarded_page_id, 'sg_' . $device, true );
+					//$$device_test_data = get_post_meta( $guarded_page_id, 'sg_' . $device, true );
+				//	$$device_test_data = $sg_test_result[ $device ];
 
 					$tests_types_array = [
 						'psi' => [ 'lcp', 'cls' ],
@@ -159,32 +163,15 @@ class SpeedGuard_List_Table extends WP_List_Table {
 					];
 					foreach ( $tests_types_array as $test_type => $metrics ) {
 						foreach ( $metrics as $metric ) {
-							if ( $$device_test_data === 'waiting' ) { // in case test is currently running
-								// update all cells with default value
-								$core_value = '<div class="loading"></div>';
-							} elseif ( is_array( $$device_test_data ) ) { // there is available data in DB (perhaps test is not running at the moment)
-								// var_dump($$device_test_data);
-								$metrics_value = $$device_test_data[ $test_type ][ $metric ];
+
+							//	$metrics_value = $$device_test_data[ $test_type ][ $metric ];
 								// Value to Display for this metric $core_value
 								if ( $test_type === 'psi' ) {
-
-									$core_value = '<span data-score="' . $metrics_value['score'] . '" class="speedguard-score">' . $metrics_value['displayValue'] . '</span>';
+									//$core_value = '<span data-score="' . $metrics_value['score'] . '" class="speedguard-score">' . $metrics_value['displayValue'] . '</span>';
+									$core_value = 'temp';
 								} elseif ( $test_type === 'cwv' ) {
-									if ( ! isset( $metrics_value ) ) { // no CWV data for individual CWV
-										$core_value = 'N/A';
-									} else {
-										if ( $metric === 'lcp' ) {
-											$display_value = round( $metrics_value['percentile'] / 1000, 2 ) . ' s';
-										} elseif ( $metric === 'cls' ) {
-											$display_value = $metrics_value['percentile'] / 100;
-										} elseif ( $metric === 'fid' ) {
-											$display_value = $metrics_value['percentile'] . ' ms';
-										}
-
-										$core_value = '<span data-score-category="' . $metrics_value['category'] . '" class="speedguard-score">' . $display_value . ' </span>';
-									}
+									$core_value = SpeedGuardWidgets::cwv_metric_display( $sg_test_result, $device, $test_type, $metric);
 								}
-							} //end elseif
 
 							$thisItem[ $test_type . '_' . $device . '_' . $metric ] = $core_value; // this is a string to display // TODO rename
 						} //end foreach metrics as metric
@@ -479,9 +466,8 @@ class SpeedGuard_Tests {
 			// TODO if there are a few newer and a few old - show notice accordingly
 
 			// Set waiting status for the tests and sidewide
-			update_post_meta( $guarded_page_id, 'sg_mobile', 'waiting' );
-			update_post_meta( $guarded_page_id, 'sg_desktop', 'waiting' );
-			SpeedGuard_Admin::update_this_plugin_option( 'speedguard_cwv_origin', 'waiting' );
+			update_post_meta( $guarded_page_id, 'sg_test_result', 'waiting' );
+			SpeedGuard_Admin::update_this_plugin_option( 'sg_origin_result', 'waiting' );
 
 			// TODO: Replace with action
 			$response = 'speedguard_test_being_updated'; // TODO: true, false, error
@@ -514,9 +500,8 @@ class SpeedGuard_Tests {
 			update_post_meta( $target_page_id, 'speedguard_item_type', $guarded_item_type );
 
 			// Set waiting status for the tests and sidewide
-			SpeedGuard_Admin::update_this_plugin_option( 'speedguard_cwv_origin', 'waiting' );
-			update_post_meta( $target_page_id, 'sg_mobile', 'waiting' );
-			update_post_meta( $target_page_id, 'sg_desktop', 'waiting' );
+			SpeedGuard_Admin::update_this_plugin_option( 'sg_origin_result', 'waiting' );
+			update_post_meta( $target_page_id, 'sg_test_result', 'waiting' );
 
 			// TODO always pass blog id
 			if ( ! empty( $guarded_post_blog_id ) ) {

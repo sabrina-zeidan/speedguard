@@ -19,7 +19,7 @@ class SpeedGuard_Notifications {
 			'fields'         => 'ids',
 			'meta_query'     => [
 				[
-					'key'     => 'sg_mobile',
+					'key'     => 'sg_test_result',
 					'value'   => 'waiting',
 					'compare' => 'LIKE',
 				],
@@ -89,7 +89,7 @@ class SpeedGuard_Notifications {
 				foreach ( $guarded_pages as $guarded_page_id ) {
 					// $guarded_page_url = get_the_title($guarded_page_id);
 					$guarded_page_url       = get_post_meta( $guarded_page_id, 'speedguard_page_url', true );
-					$load_time              = get_post_meta( $guarded_page_id, 'sg_mobile' ); // TODO replace sg_mobile
+					$load_time              = get_post_meta( $guarded_page_id, 'sg_test_result' );
 					$guarded_page_load_time = $load_time[0]['displayValue'];
 
 					echo '<tr style="border: 1px solid #ccc;">

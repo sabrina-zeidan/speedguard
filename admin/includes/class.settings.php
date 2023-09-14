@@ -128,7 +128,7 @@ class SpeedGuard_Settings {
 	}
 
 	function load_time_updated_function( $meta_id, $post_id, $meta_key, $meta_value ) {
-		if ( 'sg_mobile' === $meta_key ) {
+		if ( 'sg_test_result' === $meta_key ) {
 			$args                       = array(
 				'no_found_rows'  => true,
 				'post_type'      => SpeedGuard_Admin::$cpt_name,
@@ -137,7 +137,7 @@ class SpeedGuard_Settings {
 				'fields'         => 'ids',
 				'meta_query'     => array(
 					array(
-						'key'     => 'sg_mobile',
+						'key'     => 'sg_test_result',
 						'value'   => 'waiting',
 						'compare' => 'NOT LIKE',
 					),
@@ -148,7 +148,7 @@ class SpeedGuard_Settings {
 			$guarded_page_load_time_all = array();
 			if ( count( $guarded_pages ) > 0 ) {
 				foreach ( $guarded_pages as $guarded_page ) {
-					$guarded_page_load_time = get_post_meta( $guarded_page, 'sg_mobile' );
+					$guarded_page_load_time = get_post_meta( $guarded_page, 'sg_test_result' );
 					if ( ! empty( $guarded_page_load_time[0]['numericValue'] ) && $guarded_page_load_time[0]['numericValue'] > 0 ) {
 						$guarded_page_load_time       = round( ( $guarded_page_load_time[0]['numericValue'] / 1000 ), 1 );
 						$guarded_page_load_time_all[] = $guarded_page_load_time;

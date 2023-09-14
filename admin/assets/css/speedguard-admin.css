@@ -12,6 +12,7 @@
 	height: 18px;
 	width: 18px;
 	margin: 0 auto;
+	display: block;
 }
 
 #tests-list-meta-box td.column-guarded_page_title {

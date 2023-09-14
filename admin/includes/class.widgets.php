@@ -56,27 +56,35 @@ class SpeedGuardWidgets {
 	 * @param $post
 	 * @param $args
 	 */
-	public static function cwv_metric_display( $speedguard_cwv_origin, $device, $metric ) {
-		if ( $speedguard_cwv_origin === 'waiting' ) {  // tests are currently running
+	public static function cwv_metric_display( $results_array, $device, $test_type, $metric ) {
+		//var_dump( $results_array);
+		if (  $results_array === 'waiting' ) {  // tests are currently running
 			$class         = 'waiting';
 			$display_value = '';
-		} elseif ( ( is_array( $speedguard_cwv_origin[ $device ] ) ) ) {// tests are not currently running and there is CWV data available for this device
-			$metrics_value = $speedguard_cwv_origin[ $device ][ $metric ]['percentile'];
-			// Format metrics output for display
-			$class = 'score';
-			if ( $metric === 'lcp' ) {
-				$display_value = round( $metrics_value / 1000, 2 ) . ' s';
-			} elseif ( $metric === 'cls' ) {
-				$display_value = $metrics_value;
-				$display_value = $metrics_value / 100;
-			} elseif ( $metric === 'fid' ) {
-				$display_value = $metrics_value . ' ms';
-			}
-		} else {
-			$class         = 'na';
-			$display_value = 'N/A';
 		}
-		$category             = isset( $speedguard_cwv_origin[ $device ][ $metric ]['category'] ) ? $speedguard_cwv_origin[ $device ][ $metric ]['category'] : '';
+		elseif ( ( is_array(  $results_array) ) ) {// tests are not currently running
+
+			// Check if metric data is available for this device
+			if (isset( $results_array[ $device ][ $test_type ][ $metric ] ) && is_array( $results_array[ $device ][ $test_type ][ $metric ] ) ) {
+			//	var_dump($results_array);
+				$metrics_value = $results_array[ $device ][ $test_type ][ $metric ]['percentile'];
+				// Format metrics output for display
+				$class = 'score';
+				if ( $metric === 'lcp' ) {
+					$display_value = round( $metrics_value / 1000, 2 ) . ' s';
+				} elseif ( $metric === 'cls' ) {
+					$display_value = $metrics_value;
+					$display_value = $metrics_value / 100;
+				} elseif ( $metric === 'fid' ) {
+					$display_value = $metrics_value . ' ms';
+				}
+			} else { //No data available for the me
+				$class         = 'na';
+				$display_value = 'N/A';
+			}
+		}
+
+		$category = isset( $results_array[ $device ][$test_type][ $metric ]['category'] ) ? $results_array[ $device ][$test_type][ $metric ]['category'] : '';
 		$category             = 'data-score-category="' . $category . '"';
 		$class                = 'class="speedguard-' . $class . '"';
 		$metric_display_value = '<span ' . $category . ' ' . $class . '>' . $display_value . '</span>';
@@ -93,16 +101,19 @@ class SpeedGuardWidgets {
 	 * @return void
 	 */
 	public static function speedguard_cwv_sidewide_function( $post = '', $args = '' ) {
+		$test_type = 'cwv'; //PSI widget has different output
 		// Retrieving data to display
-		$speedguard_cwv_origin = SpeedGuard_Admin::get_this_plugin_option( 'speedguard_cwv_origin' );
+		$speedguard_cwv_origin = SpeedGuard_Admin::get_this_plugin_option( 'sg_origin_result' );
+
 			// Preparing data to display
+		//TODO make this constant
 			$devices = [ 'mobile', 'desktop' ];
 		foreach ( $devices as $device ) {
 			$cwv = [ 'lcp', 'cls', 'fid' ];
 			foreach ( $cwv as $metric ) {
 				$current_metric = $device . '_' . $metric;
 				// unified function to format data for display
-				$$current_metric = self::cwv_metric_display( $speedguard_cwv_origin, $device, $metric );
+				$$current_metric = self::cwv_metric_display( $speedguard_cwv_origin, $device, $test_type, $metric );
 			}
 		}
 
@@ -346,7 +357,7 @@ class SpeedGuardWidgets {
 			if ( ! empty( $homepage_found ) ) {
 				$is_guarded = true;
 				$test_id    = $homepage_found;
-				$load_time  = get_post_meta( $test_id, 'sg_mobile' );
+				$load_time  = get_post_meta( $test_id, 'sg_test_result' );
 			} else {
 				$is_guarded = false;
 			}
@@ -359,7 +370,7 @@ class SpeedGuardWidgets {
 			if ( $speedguard_on && $speedguard_on[0] === 'true' ) {
 				$is_guarded = true;
 				$test_id    = $speedguard_on[1];
-				$load_time  = get_post_meta( $test_id, 'sg_mobile' );
+				$load_time  = get_post_meta( $test_id, 'sg_test_result' );
 			} else {
 				$is_guarded = false;
 			}
@@ -371,7 +382,7 @@ class SpeedGuardWidgets {
 			if ( $speedguard_on && $speedguard_on[0] === 'true' ) {
 				$is_guarded = true;
 				$test_id    = $speedguard_on[1];
-				$load_time  = get_post_meta( $test_id, 'sg_mobile' );
+				$load_time  = get_post_meta( $test_id, 'sg_test_result' );
 			} else {
 				$is_guarded = false;
 			}

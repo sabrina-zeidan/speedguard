@@ -69,7 +69,7 @@ class SpeedGuard_Admin {
 				'fields'         => 'ids',
 				'meta_query'     => array(
 					array(
-						'key'     => 'sg_mobile',
+						'key'     => 'sg_test_result',
 						'value'   => 'waiting',
 						'compare' => 'LIKE',
 					),
