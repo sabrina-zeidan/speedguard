@@ -5,7 +5,7 @@
  *   Class responsible for adding metaboxes
  */
 class SpeedGuardWidgets {
-	function __construct() {
+	public function __construct() {
 		$options = SpeedGuard_Admin::get_this_plugin_option( 'speedguard_options' );
 		if ( ! empty( $options ) ) {
 			if ( $options['show_dashboard_widget'] === 'on' ) {
@@ -23,6 +23,11 @@ class SpeedGuardWidgets {
 		}
 	}
 
+	/* Function responsible for displaying widget with PSI Average results widget on the admin dashboard
+	 *
+	 * @param $post
+	 * @param $args
+	*/
 	public static function speedguard_dashboard_widget_function( $post = '', $args = '' ) {
 		$speedguard_average = SpeedGuard_Admin::get_this_plugin_option( 'speedguard_average' );
 		if ( is_array( $speedguard_average ) ) {
@@ -44,32 +49,48 @@ class SpeedGuardWidgets {
 		echo $content;
 	}
 
+	/**
+	 * Function responsible for displaying widget with CWV side-wide results widget on Tests page
+	 * @param $post
+	 * @param $args
+	 *
+	 * @return void
+	 */
 	public static function speedguard_cwv_sidewide_function( $post = '', $args = '' ) {
 		// Retrieving data to display
 		$speedguard_cwv_origin = SpeedGuard_Admin::get_this_plugin_option( 'speedguard_cwv_origin' );
-		if ( is_array( $speedguard_cwv_origin ) ) {
 			// Preparing data to display
-			$notavailable = 'N/A';
-			$devices      = [ 'mobile', 'desktop' ];
+			$devices = [ 'mobile', 'desktop' ];
 			foreach ( $devices as $device ) {
-				$cwv = [ 'lcp', 'cls', 'fid' ];
-				foreach ( $cwv as $metric ) {
-					$metrics_value = isset( $speedguard_cwv_origin[ $device ][ $metric ]['percentile'] ) ? $speedguard_cwv_origin[ $device ][ $metric ]['percentile'] : $notavailable;
-
-					$current_metric = $device . '_' . $metric;
-
-					if ( $metric === 'lcp' ) {
-						$display_value = round( $metrics_value / 1000, 2 ) . ' s';
-					} elseif ( $metric === 'cls' ) {
-						$display_value = $metrics_value;
-						$display_value = $metrics_value / 100;
-					} elseif ( $metric === 'fid' ) {
-						$display_value = $metrics_value . ' ms';
-					}
-					$$current_metric = '<span data-score-category="' . $speedguard_cwv_origin[ $device ][ $metric ]['category'] . '" class="speedguard-score">' . $display_value . ' </span>';
+			$cwv = [ 'lcp', 'cls', 'fid' ];
+			foreach ( $cwv as $metric ) {
+				$current_metric = $device . '_' . $metric;
+				if ($speedguard_cwv_origin === 'waiting'){ //tests are currently running
+					$metric_display_value = '<div class="loading"></div>';
 				}
+				else if ( (is_array($speedguard_cwv_origin[ $device ]))){//tests are not currently running and there is CWV data available for this device
+					$metrics_value  = $speedguard_cwv_origin[ $device ][ $metric ]['percentile'];
+					//Format metrics output for display
+						if ( $metric === 'lcp' ) {
+							$display_value = round( $metrics_value / 1000, 2 ) . ' s';
+						} elseif ( $metric === 'cls' ) {
+							$display_value = $metrics_value;
+							$display_value = $metrics_value / 100;
+						} elseif ( $metric === 'fid' ) {
+							$display_value = $metrics_value . ' ms';
+						}
+					$metric_display_value = '<span data-score-category="' . $speedguard_cwv_origin[ $device ][ $metric ]['category'] . '" class="speedguard-score">' . $display_value . ' </span>';
+
+				}
+				else {
+					$metric_display_value = '<span>'.__("N/A","speedguard").'</span>';
+				}
+
+				$$current_metric = $metric_display_value;
 			}
-			$content = "
+		}
+
+		$content = "
 	<table class='widefat fixed striped toplevel_page_speedguard_tests_cwv_widget'>
 	<thead>
 	<tr class='bc-platforms'><td></td>
@@ -93,11 +114,9 @@ class SpeedGuardWidgets {
 	</table>
 	<div><br>
 	'
-						// TODO link to the video
-						. sprintf( __( 'N/A means that there is no data from Google available -- most likely your website have not got enough traffic for Google to make evaluation (Not enough usage data in the last 90 days for this device type)', 'speedguard' ), '<a href="#">', '</a>' ) . '</div>';
-		} else {
-			$content = 'Updating';
-		}
+					// TODO link to the video
+					. sprintf( __( 'N/A means that there is no data from Google available -- most likely your website have not got enough traffic for Google to make evaluation (Not enough usage data in the last 90 days for this device type)', 'speedguard' ), '<a href="#">', '</a>' ) . '</div>';
+
 		echo $content;
 	}
 
@@ -105,6 +124,7 @@ class SpeedGuardWidgets {
 	 * Define all metaboxes fro plugin's admin pages (Tests and Settings)
 	 */
 	public static function add_meta_boxes() {
+
 		wp_nonce_field( 'closedpostboxes', 'closedpostboxesnonce', false );
 		add_meta_box(
 			'settings-meta-box',
@@ -119,7 +139,7 @@ class SpeedGuardWidgets {
 		);
 		add_meta_box(
 			'speedguard-cwv-sidewide-meta-box',
-			__( 'Core Web Vitals (real users experience) fro the entire website', 'speedguard' ),
+			__( 'Core Web Vitals (real users experience) for the entire website', 'speedguard' ),
 			[
 				'SpeedGuardWidgets',
 				'speedguard_cwv_sidewide_function',
@@ -391,8 +411,7 @@ class SpeedGuardWidgets {
 			__( 'Site Speed Results [Speedguard]', 'speedguard' ),
 			[
 				$this,
-				'
-        speedguard_dashboard_widget_function',
+				'speedguard_dashboard_widget_function',
 			],
 			'',
 			[ 'echo' => 'true' ]

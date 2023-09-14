@@ -11,6 +11,7 @@ class SpeedGuard_Notifications {
 
 	public static function test_results_email( $type ) {
 		// Check if there are any tests running at the moment, and reschedule if so
+		//TODO replace with transient
 		$args          = [
 			'post_type'      => SpeedGuard_Admin::$cpt_name,
 			'post_status'    => 'publish',

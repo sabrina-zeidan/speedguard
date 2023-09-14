@@ -439,6 +439,9 @@ class SpeedGuard_Tests {
 		}
 	}
 
+	/**
+	 * @return false|int|WP_Post
+	 */
 	public static function is_homepage_guarded() {
 		$args           = [
 			'post_type'      => SpeedGuard_Admin::$cpt_name,
@@ -464,6 +467,10 @@ class SpeedGuard_Tests {
 		}
 	}
 
+	// TODO unify create and update functions
+	/*
+	 * Update the existing test
+	 */
 	public static function update_speedguard_test( $guarded_page_id ) {
 		// TODO: All these if not automatically on activation
 		$updated_ts         = get_post_timestamp( $guarded_page_id, 'modified' ); // no timezone
@@ -471,8 +478,11 @@ class SpeedGuard_Tests {
 		if ( time() > $updated_plus_three ) {
 			// TODO if there are a few newer and a few old - show notice accordingly
 
-			$set_waiting_status = update_post_meta( $guarded_page_id, 'sg_mobile', 'waiting' );
-			$set_waiting_status = update_post_meta( $guarded_page_id, 'sg_desktop', 'waiting' );
+			// Set waiting status for the tests and sidewide
+			update_post_meta( $guarded_page_id, 'sg_mobile', 'waiting' );
+			update_post_meta( $guarded_page_id, 'sg_desktop', 'waiting' );
+			SpeedGuard_Admin::update_this_plugin_option( 'speedguard_cwv_origin', 'waiting' );
+
 			// TODO: Replace with action
 			$response = 'speedguard_test_being_updated'; // TODO: true, false, error
 		} else {
@@ -482,12 +492,13 @@ class SpeedGuard_Tests {
 		return $response;
 	}
 
+	/*
+	* Create a new test
+	*/
 	public static function create_speedguard_test( $url_to_add = '', $guarded_item_type = '', $guarded_item_id = '' ) {
 		if ( empty( $url_to_add ) ) {
 			return;
 		}
-		// $connection      = SpeedGuard_Admin::get_this_plugin_option( 'speedguard_options' )['test_connection_type'];
-		// $code            = $url_to_add . '|' . $connection;
 		$code            = $url_to_add;
 		$new_target_page = [
 			'post_title'  => $code,
@@ -502,9 +513,11 @@ class SpeedGuard_Tests {
 			update_post_meta( $target_page_id, 'speedguard_page_url', $url_to_add );
 			update_post_meta( $target_page_id, 'speedguard_item_type', $guarded_item_type );
 
-			// Set waiting status
+			// Set waiting status for the tests and sidewide
+			SpeedGuard_Admin::update_this_plugin_option( 'speedguard_cwv_origin', 'waiting' );
 			update_post_meta( $target_page_id, 'sg_mobile', 'waiting' );
 			update_post_meta( $target_page_id, 'sg_desktop', 'waiting' );
+
 			// TODO always pass blog id
 			if ( ! empty( $guarded_post_blog_id ) ) {
 				update_post_meta( $target_page_id, 'guarded_post_blog_id', $guarded_post_blog_id );
