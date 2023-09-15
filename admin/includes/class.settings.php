@@ -180,31 +180,33 @@ class SpeedGuard_Settings {
 	}
 
 	function update_results_cron_function() {
-		// if send report on: schedule cron job
-		$speedguard_options = SpeedGuard_Admin::get_this_plugin_option( 'speedguard_options' );
-		$email_me_case      = $speedguard_options['email_me_case'];
-		if ( $email_me_case != 'never' ) {
-			if ( ! wp_next_scheduled( 'speedguard_email_test_results' ) ) {
-				// in 2 minutes
-				wp_schedule_single_event( time() + 2 * 60, 'speedguard_email_test_results' );
+		// If send report is on: schedule cron job
+		$speedguard_options = get_option('speedguard_options');
+		$email_me_case = $speedguard_options['email_me_case'];
+		if ($email_me_case != 'never') {
+			if (!wp_next_scheduled('speedguard_email_test_results')) {
+				// In 2 minutes
+				wp_schedule_single_event(time() + 2 * 60, 'speedguard_email_test_results');
 			}
 		}
-		$args          = array(
+
+		// Get all guarded pages
+		$args = [
 			'post_type'      => SpeedGuard_Admin::$cpt_name,
 			'post_status'    => 'publish',
-			'posts_per_page' => - 1,
+			'posts_per_page' => -1,
 			'fields'         => 'ids',
 			'no_found_rows'  => true,
-		);
-		$the_query     = new WP_Query( $args );
-		$guarded_pages = $the_query->get_posts();
-		if ( ! empty( $guarded_pages ) ) {
-			foreach ( $guarded_pages as $guarded_page_id ) {
-				$result = SpeedGuard_Tests::update_speedguard_test( $guarded_page_id );
-			}
+		];
+		$guarded_pages = get_posts($args);
+
+		// Update the test results for each guarded page
+		foreach ($guarded_pages as $guarded_page_id) {
+			SpeedGuard_Tests::update_speedguard_test($guarded_page_id);
 		}
-		// wp_reset_postdata();
 	}
+
+
 
 	function email_test_results_function() {
 		$speedguard_options = SpeedGuard_Admin::get_this_plugin_option( 'speedguard_options' );

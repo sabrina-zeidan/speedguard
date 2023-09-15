@@ -16,14 +16,14 @@ class SpeedGuard_Admin {
 	private $plugin_name;
 	private $version;
 	const SG_METRICS_ARRAY = array(
-		'mobile' => array(
-			'psi' => array('lcp', 'cls'),
-			'cwv' => array('lcp', 'cls', 'fid')
+		'mobile'  => array(
+			'psi' => array( 'lcp', 'cls' ),
+			'cwv' => array( 'lcp', 'cls', 'fid' ),
 		),
 		'desktop' => array(
-			'psi' => array('lcp', 'cls'),
-			'cwv' => array('lcp', 'cls', 'fid')
-		)
+			'psi' => array( 'lcp', 'cls' ),
+			'cwv' => array( 'lcp', 'cls', 'fid' ),
+		),
 	);
 
 	public function __construct( $plugin_name, $version ) {
@@ -127,34 +127,36 @@ class SpeedGuard_Admin {
 		}
 	}
 
-    // Delete test data when original post got unpublished
+	// Delete test data when original post got unpublished
 	public static function guarded_page_unpublished_hook( $new_status, $old_status, $post ) {
 		// Delete test data when original post got unpublished
 		if ( ( $old_status === 'publish' ) && ( $new_status != 'publish' ) && ( get_post_type( $post->ID ) ) != self::$cpt_name ) {
 			$speedguard_on = get_post_meta( $post->ID, 'speedguard_on', true );
 			if ( $speedguard_on && $speedguard_on[0] === 'true' ) {
-				$connected_guarded_pages = get_posts([
-					'post_type'      => self::$cpt_name,
-					'post_status'    => 'publish',
-					'posts_per_page' => 1,
-					'fields'         => 'ids',
-					'meta_query'     => [
-						[
-							'key'     => 'guarded_post_id',
-							'value'   => $post->ID,
-							'compare' => 'LIKE',
+				$connected_guarded_pages = get_posts(
+					[
+						'post_type'      => self::$cpt_name,
+						'post_status'    => 'publish',
+						'posts_per_page' => 1,
+						'fields'         => 'ids',
+						'meta_query'     => [
+							[
+								'key'     => 'guarded_post_id',
+								'value'   => $post->ID,
+								'compare' => 'LIKE',
+							],
 						],
-					],
-					'no_found_rows'  => true,
-				]);
+						'no_found_rows'  => true,
+					]
+				);
 
-				if ($connected_guarded_pages) {
-					foreach ($connected_guarded_pages as $connected_guarded_page_id) {
-						wp_delete_post($connected_guarded_page_id, true);
+				if ( $connected_guarded_pages ) {
+					foreach ( $connected_guarded_pages as $connected_guarded_page_id ) {
+						wp_delete_post( $connected_guarded_page_id, true );
 					}
 
 					// uncheck speedguard_on
-					update_post_meta($post->ID, 'speedguard_on', 'false');
+					update_post_meta( $post->ID, 'speedguard_on', 'false' );
 				}
 			}
 		}
@@ -329,7 +331,7 @@ class SpeedGuard_Admin {
 			$args = [
 				'post_type'      => self::$cpt_name,
 				'post_status'    => 'publish',
-				'posts_per_page' => - 1,
+				'posts_per_page' => -1,
 				'fields'         => 'ids',
 				'meta_query'     => [
 					[
@@ -338,47 +340,45 @@ class SpeedGuard_Admin {
 						'compare' => 'LIKE',
 					],
 				],
-				'fields'         => 'ids',
 				'no_found_rows'  => true,
 			];
 
-			$the_query     = new WP_Query( $args );
-			$waiting_pages = $the_query->posts;
-			wp_reset_postdata();
-			if ( count( $waiting_pages ) < 1 ) {
+			$waiting_pages = get_posts( $args );
+			if ( empty( $waiting_pages ) ) {
 				delete_transient( 'speedguard-tests-running' );
-
 				return;
 			}
-
 			?>
-			<script type="text/javascript">
-				var waiting_posts = <?php echo json_encode( array_values( $waiting_pages ) ); ?>;
-				const params = new URLSearchParams();
-				params.append('action', 'run_waiting_tests');
-				for (var i = 0; i < waiting_posts.length; i++) {
-					params.append('post_ids[]', waiting_posts[i]);
-				}
-				fetch(ajaxurl, {
-					method: 'POST',
-					credentials: 'same-origin',
-					headers: {
-						'Content-Type': 'application/x-www-form-urlencoded',
-						'Cache-Control': 'no-cache',
-					},
-					body: params,
-				})
-					.then(response => {
-						response.json()
-						setTimeout(function () {
-							window.location.replace(window.location.href + "&speedguard=load_time_updated");
-						}, 10000)
-					})
-					.catch(err => console.log(err));
-			</script>
-			<?php
+					<script type="text/javascript">
+						var waiting_posts = <?php echo json_encode( array_values( $waiting_pages ) ); ?>;
+						const params = new URLSearchParams();
+						params.append('action', 'run_waiting_tests');
+						for (var i = 0; i < waiting_posts.length; i++) {
+							params.append('post_ids[]', waiting_posts[i]);
+						}
+						fetch(ajaxurl, {
+							method: 'POST',
+							credentials: 'same-origin',
+							headers: {
+								'Content-Type': 'application/x-www-form-urlencoded',
+								'Cache-Control': 'no-cache',
+							},
+							body: params,
+						})
+							.then(response => {
+								response.json()
+								setTimeout(function () {
+									window.location.replace(window.location.href + "&speedguard=load_time_updated");
+								}, 10000)
+							})
+							.catch(err => console.log(err));
+					</script>
+					<?php
+
 		}
 	}
+
+
 
 	function run_waiting_tests() {
 		$posts_ids = $_POST['post_ids'];
@@ -412,16 +412,15 @@ class SpeedGuard_Admin {
 		return $query_args;
 	}
 
-	// Plugin Scripts
 
+    //Fix backwards compatibility with old versions of the plugin that used WedPageTest
 	function fix_backwards_compatibility_wpt() {
-		// TODO remove?
 		if ( self::is_screen( 'tests' ) ) {
 			if ( get_transient( 'speedguard-notice-activation' ) ) {
-				$args          = [
+				$args = [
 					'post_type'      => self::$cpt_name,
 					'post_status'    => 'publish',
-					'posts_per_page' => - 1,
+					'posts_per_page' => -1,
 					'fields'         => 'ids',
 					'meta_query'     => [
 						[
@@ -433,16 +432,17 @@ class SpeedGuard_Admin {
 					],
 					'no_found_rows'  => true,
 				];
-				$the_query     = new WP_Query( $args );
-				$guarded_pages = $the_query->posts;
-				if ( $guarded_pages ) {
-					$process_bulk_action = SpeedGuard_Tests::handle_bulk_retest_load_time( 'retest_load_time', $guarded_pages );
-				}
 
-				// delete_transient( 'speedguard-notice-activation' );
+				$guarded_pages = get_posts($args);
+				if ( ! empty($guarded_pages) ) {
+					// Use the `do_action()` function to trigger the `handle_bulk_retest_load_time` action.
+					do_action( 'handle_bulk_retest_load_time', $guarded_pages->ids );
+				}
 			}
 		}
 	}
+
+
 
 	// Plugin Body classes
 
