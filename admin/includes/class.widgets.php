@@ -51,60 +51,6 @@ class SpeedGuardWidgets {
 	}
 
 	/**
-	 * Function responsible for formatting CWV data for display
-	 *
-	 * @param $post
-	 * @param $args
-	 */
-	public static function cwv_metric_display( $results_array, $device, $test_type, $metric ) {
-		//var_dump( $results_array);
-		$display_value = '';
-			$category = '';
-		$class = '';
-		if (  $results_array === 'waiting' ) {  // tests are currently running
-			$class         = 'waiting';
-			$display_value = '';
-		}
-		elseif ( ( is_array(  $results_array) ) ) {// tests are not currently running
-
-			// Check if metric data is available for this device
-			if (isset( $results_array[ $device ][ $test_type ][ $metric ] ) && is_array( $results_array[ $device ][ $test_type ][ $metric ] ) ) {
-			//	var_dump($results_array);
-				if ( $test_type === 'psi' ) {
-					$display_value = $results_array[ $device ][ $test_type ][ $metric ]['displayValue'];
-					$class         =  'score';
-					$category = $results_array[ $device ][ $test_type ][ $metric ]['score'];
-				}
-				elseif ( $test_type === 'cwv' ) {
-					$metrics_value = $results_array[ $device ][ $test_type ][ $metric ]['percentile'];
-					// Format metrics output for display
-
-					if ( $metric === 'lcp' ) {
-						$display_value = round( $metrics_value / 1000, 2 ) . ' s';
-					} elseif ( $metric === 'cls' ) {
-						$display_value = $metrics_value;
-						$display_value = $metrics_value / 100;
-					} elseif ( $metric === 'fid' ) {
-						$display_value = $metrics_value . ' ms';
-					}
-					$class = 'score';
-					$category = isset( $results_array[ $device ][$test_type][ $metric ]['category'] ) ? $results_array[ $device ][$test_type][ $metric ]['category'] : '';
-				}
-			} else { //No data available for the metric
-				$class         = 'na';
-				$display_value = 'N/A';
-			}
-		}
-
-
-		$category             = 'data-score-category="' . $category . '"';
-		$class                = 'class="speedguard-' . $class . '"';
-		$metric_display_value = '<span ' . $category . ' ' . $class . '>' . $display_value . '</span>';
-
-		return $metric_display_value;
-	}
-
-	/**
 	 * Function responsible for displaying widget with CWV side-wide results widget on Tests page
 	 *
 	 * @param $post
@@ -113,13 +59,13 @@ class SpeedGuardWidgets {
 	 * @return void
 	 */
 	public static function speedguard_cwv_sidewide_function( $post = '', $args = '' ) {
-		$test_type = 'cwv'; //PSI widget has different output
+		$test_type = 'cwv'; // PSI widget has different output
 		// Retrieving data to display
 		$speedguard_cwv_origin = SpeedGuard_Admin::get_this_plugin_option( 'sg_origin_result' );
 
-			// Preparing data to display
-		//TODO make this constant
-			$devices = [ 'mobile', 'desktop' ];
+		// Preparing data to display
+		// TODO make this constant
+		$devices = [ 'mobile', 'desktop' ];
 		foreach ( $devices as $device ) {
 			$cwv = [ 'lcp', 'cls', 'fid' ];
 			foreach ( $cwv as $metric ) {
@@ -157,6 +103,54 @@ class SpeedGuardWidgets {
 					. sprintf( __( 'N/A means that there is no data from Google available -- most likely your website have not got enough traffic for Google to make evaluation (Not enough usage data in the last 90 days for this device type)', 'speedguard' ), '<a href="#">', '</a>' ) . '</div>';
 
 		echo $content;
+	}
+
+	/**
+	 * Function responsible for formatting CWV data for display
+	 *
+	 * @param $post
+	 * @param $args
+	 */
+	public static function cwv_metric_display( $results_array, $device, $test_type, $metric ) {
+		// var_dump( $results_array);
+		$display_value = '';
+		$category      = '';
+		$class         = '';
+		if ( $results_array === 'waiting' ) {  // tests are currently running
+			$class         = 'waiting';
+		} elseif ( ( is_array( $results_array ) ) ) {// tests are not currently running
+
+			// Check if metric data is available for this device
+			if ( isset( $results_array[ $device ][ $test_type ][ $metric ] ) && is_array( $results_array[ $device ][ $test_type ][ $metric ] ) ) {
+				if ( $test_type === 'psi' ) {
+					$display_value = $results_array[ $device ][ $test_type ][ $metric ]['displayValue'];
+					$class         = 'score';
+					$category      = $results_array[ $device ][ $test_type ][ $metric ]['score'];
+				} elseif ( $test_type === 'cwv' ) {
+					$metrics_value = $results_array[ $device ][ $test_type ][ $metric ]['percentile'];
+					// Format metrics output for display
+					if ( $metric === 'lcp' ) {
+						$display_value = round( $metrics_value / 1000, 2 ) . ' s';
+					} elseif ( $metric === 'cls' ) {
+						$display_value = $metrics_value;
+						$display_value = $metrics_value / 100;
+					} elseif ( $metric === 'fid' ) {
+						$display_value = $metrics_value . ' ms';
+					}
+					$class    = 'score';
+					$category = $results_array[ $device ][ $test_type ][ $metric ]['category'];
+				}
+			} else { // No data available for the metric
+				$class         = 'na';
+				$display_value = 'N/A';
+			}
+		}
+
+		$category             = 'data-score-category="' . $category . '"';
+		$class                = 'class="speedguard-' . $class . '"';
+		$metric_display_value = '<span ' . $category . ' ' . $class . '>' . $display_value . '</span>';
+
+		return $metric_display_value;
 	}
 
 	/**
@@ -215,17 +209,17 @@ class SpeedGuardWidgets {
 		} elseif ( 'psi' === $sg_options['test_type'] ) {
 			$test_type = ' -- PageSpeed Insights';
 		}
-			add_meta_box(
-				'tests-list-meta-box',
-				sprintf( __( 'Test results for specific URLs %s', 'speedguard' ), $test_type ),
-				[
-					'SpeedGuard_Tests',
-					'tests_list_metabox',
-				],
-				'',
-				'main-content',
-				'core'
-			);
+		add_meta_box(
+			'tests-list-meta-box',
+			sprintf( __( 'Test results for specific URLs %s', 'speedguard' ), $test_type ),
+			[
+				'SpeedGuard_Tests',
+				'tests_list_metabox',
+			],
+			'',
+			'main-content',
+			'core'
+		);
 		add_meta_box(
 			'speedguard-legend-meta-box',
 			__( 'How to understand the information above?', 'speedguard' ),
@@ -356,6 +350,26 @@ class SpeedGuardWidgets {
 		echo $content;
 	}
 
+	function speedguard_dashboard_widget() {
+		wp_add_dashboard_widget(
+			'speedguard_dashboard_widget',
+			__( 'Site Speed Results [Speedguard]', 'speedguard' ),
+			[
+				$this,
+				'speedguard_dashboard_widget_function',
+			],
+			'',
+			[ 'echo' => 'true' ]
+		);
+		// Widget position
+		global $wp_meta_boxes;
+		$normal_dashboard      = $wp_meta_boxes[ 'dashboard' . ( defined( 'SPEEDGUARD_MU_NETWORK' ) ? '-network' : '' ) ]['normal']['core'];
+		$example_widget_backup = [ 'speedguard_dashboard_widget' => $normal_dashboard['speedguard_dashboard_widget'] ];
+		unset( $normal_dashboard['speedguard_dashboard_widget'] );
+		$sorted_dashboard                             = array_merge( $example_widget_backup, $normal_dashboard );
+		$wp_meta_boxes['dashboard']['normal']['core'] = $sorted_dashboard;
+	}
+
 	private function speedguard_admin_bar_widget( $wp_admin_bar ) {
 		if ( ! current_user_can( 'manage_options' ) ) {
 			return;
@@ -442,26 +456,6 @@ class SpeedGuardWidgets {
 		];
 		$wp_admin_bar->add_node( $args );
 		// }
-	}
-
-	function speedguard_dashboard_widget() {
-		wp_add_dashboard_widget(
-			'speedguard_dashboard_widget',
-			__( 'Site Speed Results [Speedguard]', 'speedguard' ),
-			[
-				$this,
-				'speedguard_dashboard_widget_function',
-			],
-			'',
-			[ 'echo' => 'true' ]
-		);
-		// Widget position
-		global $wp_meta_boxes;
-		$normal_dashboard      = $wp_meta_boxes[ 'dashboard' . ( defined( 'SPEEDGUARD_MU_NETWORK' ) ? '-network' : '' ) ]['normal']['core'];
-		$example_widget_backup = [ 'speedguard_dashboard_widget' => $normal_dashboard['speedguard_dashboard_widget'] ];
-		unset( $normal_dashboard['speedguard_dashboard_widget'] );
-		$sorted_dashboard                             = array_merge( $example_widget_backup, $normal_dashboard );
-		$wp_meta_boxes['dashboard']['normal']['core'] = $sorted_dashboard;
 	}
 }
 

@@ -89,7 +89,6 @@ class SpeedGuard_Lighthouse {
 		);
 		wp_update_post( $new_test_cpt  );
 		//And save all data
-		//TODO make this unoversal too -- rename to sg_origin_result [mobile, desktop]
 		SpeedGuard_Admin::update_this_plugin_option( 'sg_origin_result', $origin );
 		//TODO move site average PSI to here?
 		$updated = update_post_meta( $guarded_page_id, 'sg_test_result', $both_devices_values);

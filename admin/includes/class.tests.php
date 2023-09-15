@@ -149,7 +149,8 @@ class SpeedGuard_List_Table extends WP_List_Table {
 
 
 				// Start Prepare PSI data and CWV data with the loop
-				$devices = [ 'mobile', 'desktop' ];
+
+                $devices = [ 'mobile', 'desktop' ];
 				foreach ( $devices as $device ) {
 					$tests_types_array = [
 						'psi' => [ 'lcp', 'cls' ],

@@ -5,6 +5,7 @@ document.addEventListener(
     'DOMContentLoaded',
     function () {
         // Adding SG headers to the default WP list table
+        //test-type-psi
         const table = document.querySelector("table.toplevel_page_speedguard_tests");
         const thead = table.getElementsByTagName("thead")[0];
         const testTypeRow = document.createElement("tr");
