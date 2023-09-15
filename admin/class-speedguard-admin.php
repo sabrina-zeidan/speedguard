@@ -127,16 +127,13 @@ class SpeedGuard_Admin {
 		}
 	}
 
+    // Delete test data when original post got unpublished
 	public static function guarded_page_unpublished_hook( $new_status, $old_status, $post ) {
 		// Delete test data when original post got unpublished
 		if ( ( $old_status === 'publish' ) && ( $new_status != 'publish' ) && ( get_post_type( $post->ID ) ) != self::$cpt_name ) {
 			$speedguard_on = get_post_meta( $post->ID, 'speedguard_on', true );
 			if ( $speedguard_on && $speedguard_on[0] === 'true' ) {
-				// delete test on the main blog
-				if ( defined( 'SPEEDGUARD_MU_NETWORK' ) ) {
-					switch_to_blog( 1 );
-				}
-				$args = [
+				$connected_guarded_pages = get_posts([
 					'post_type'      => self::$cpt_name,
 					'post_status'    => 'publish',
 					'posts_per_page' => 1,
@@ -149,21 +146,16 @@ class SpeedGuard_Admin {
 						],
 					],
 					'no_found_rows'  => true,
+				]);
 
-				];
-				$the_query              = new WP_Query( $args );
-				$connected_guarded_page = $the_query->posts;
-				if ( $connected_guarded_page ) :
-					foreach ( $connected_guarded_page as $connected_guarded_page_id ) {
-						wp_delete_post( $connected_guarded_page_id, true );
+				if ($connected_guarded_pages) {
+					foreach ($connected_guarded_pages as $connected_guarded_page_id) {
+						wp_delete_post($connected_guarded_page_id, true);
 					}
-					if ( defined( 'SPEEDGUARD_MU_NETWORK' ) ) {
-						restore_current_blog();
-					}
+
 					// uncheck speedguard_on
-					update_post_meta( $post->ID, 'speedguard_on', 'false' );
-				endif;
-				wp_reset_postdata();
+					update_post_meta($post->ID, 'speedguard_on', 'false');
+				}
 			}
 		}
 	}

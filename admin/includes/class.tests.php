@@ -40,10 +40,10 @@ class SpeedGuard_List_Table extends WP_List_Table {
 		$this->process_bulk_action();
 	}
 
-	public function get_columns() {
+	//Set up all columns
+    public function get_columns() {
 		// Display Columns set based on Test type choice in Settigns
 		$sg_options = SpeedGuard_Admin::get_this_plugin_option( 'speedguard_options' );
-
 		$columns = [
 			'cb'                 => '<input type="checkbox" />',
 			'guarded_page_title' => __( 'URL', 'speedguard' ),
@@ -69,18 +69,15 @@ class SpeedGuard_List_Table extends WP_List_Table {
 		}
 
 		$columns['report_date'] = __( 'Updated', 'speedguard' );
-
-		// var_dump($columns);
-
-		return $columns;
+        return $columns;
 	}
 
-	// Prepare columns
-
+	// Which columns are hidden
 	public function get_hidden_columns() {
 		return [];
 	}
 
+    //Which columns are sortable
 	public function get_sortable_columns() {
 		return [
 			'guarded_page_title' => [ 'guarded_page_title', false ],
@@ -98,36 +95,18 @@ class SpeedGuard_List_Table extends WP_List_Table {
 		];
 	}
 
-	/** Data for Tests resutls table*/
-
+	// Data for Tests results table
 	private function table_data( $client_id = '' ) {
 		// Data we will return in the end
 		$data = [];
 		// Get all guarded pages
-		$args          = [
+		$guarded_pages = get_posts( [
 			'post_type'      => SpeedGuard_Admin::$cpt_name,
 			'post_status'    => 'publish',
-			// TODO limit the number, ajax chunks
-			'posts_per_page' => - 1,
+			'posts_per_page' => 100, //TODO improve this limit with ajax chunks
 			'fields'         => 'ids',
 			'no_found_rows'  => true,
-		];
-		$the_query     = new WP_Query( $args );
-		$guarded_pages = $the_query->posts;
-
-		// For clients in SpeedGuard PRO
-		if ( ! empty( $client_id ) ) { // TODO SpeedGuard PRO
-			$meta_query   = [];
-			$meta_query[] = [
-				'relation' => 'AND',
-				[
-					'key'     => 'speedguard_page_client_id',
-					'compare' => '=',
-					'value'   => $client_id,
-				],
-			];
-			$the_query->set( 'meta_query', $meta_query );
-		}
+		] );
 		// If there are any guarded pages:
 		if ( $guarded_pages ) :
 			foreach ( $guarded_pages as $guarded_page_id ) {
@@ -154,7 +133,7 @@ class SpeedGuard_List_Table extends WP_List_Table {
 				}
 				$data[] = $thisTestData;
 			} // end foreach $guarded pages
-		endif; // The are $guarded_pages
+		endif; // There are $guarded_pages
 
 		return $data;
 	}
@@ -398,32 +377,27 @@ class SpeedGuard_Tests {
 	}
 
 	/**
-	 * @return false|int|WP_Post
+	 * @return bool
+     * Checks if the homepage is guarded.
 	 */
 	public static function is_homepage_guarded() {
-		$args           = [
-			'post_type'      => SpeedGuard_Admin::$cpt_name,
-			'post_status'    => 'publish',
-			'posts_per_page' => 1,
-			'fields'         => 'ids',
-			'no_found_rows'  => true,
-			'meta_query'     => [
-				[
-					'key'     => 'speedguard_item_type',
-					'compare' => 'LIKE',
-					'value'   => 'homepage',
-				],
-			],
-		];
-		$the_query      = new WP_Query( $args );
-		$homepage_found = $the_query->posts;
-		if ( ! empty( $homepage_found[0] ) ) {
-			// set_transient( 'speedguard-homepage-added-previousely', true, 10); //Is it important?
-			return $homepage_found[0];
-		} else {
-			return false;
-		}
-	}
+    $args = [
+	    'post_type' => SpeedGuard_Admin::$cpt_name,
+	    'post_status' => 'publish',
+	    'posts_per_page' => 1,
+	    'fields'         => 'ids',
+	    'no_found_rows'  => true,
+	    'meta_query' => [
+		    [
+			    'key' => 'speedguard_item_type',
+			    'compare' => 'LIKE',
+			    'value' => 'homepage',
+		    ],
+	    ],
+    ];
+    $posts = get_posts($args);
+    return ! empty($posts);
+}
 
 	// TODO unify create and update functions
 	/*
@@ -575,7 +549,7 @@ class SpeedGuard_Tests {
 	}
 
 	function speedguard_search_function( $search_term ) {
-		$meta_query            = [
+		$meta_query = [
 			'relation' => 'OR',
 			[
 				'key'     => 'speedguard_on',
@@ -588,19 +562,23 @@ class SpeedGuard_Tests {
 				'value'   => 'false',
 			],
 		];
-		$args                  = [
+
+		$args = [
 			'post_type'              => SpeedGuard_Admin::supported_post_types(),
 			'post_status'            => 'publish',
 			'posts_per_page'         => 3,
 			'fields'                 => 'ids',
 			's'                      => $search_term,
 			'no_found_rows'          => true,
+			'meta_query'             => $meta_query,
+			'cache_results'          => false,
 			'update_post_meta_cache' => false,
 			'update_post_term_cache' => false,
-			'meta_query'             => $meta_query,
 		];
-		$the_query             = new WP_Query( $args );
-		$this_blog_found_posts = $the_query->posts;
+
+		$this_blog_found_posts = get_posts($args);
+
+
 		$temp                  = [];
 		foreach ( $this_blog_found_posts as $key => $post_id ) {
 			// $key = 'ID';
