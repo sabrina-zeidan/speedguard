@@ -11,29 +11,7 @@ class SpeedGuard_Notifications {
 
 	public static function test_results_email( $type ) {
 		// Check if there are any tests running at the moment, and reschedule if so
-		//TODO replace with transient
-		$args          = [
-			'post_type'      => SpeedGuard_Admin::$cpt_name,
-			'post_status'    => 'publish',
-			'posts_per_page' => - 1,
-			'fields'         => 'ids',
-			'meta_query'     => [
-				[
-					'key'     => 'sg_test_result',
-					'value'   => 'waiting',
-					'compare' => 'LIKE',
-				],
-			],
-			'fields'         => 'ids',
-			'no_found_rows'  => true,
-		];
-		$the_query     = new WP_Query( $args );
-		$waiting_pages = $the_query->posts;
-		wp_reset_postdata();
-		if ( count( $waiting_pages ) > 0 ) {
-			// In 10 minutes
-			wp_schedule_single_event( time() + 10 * 60, 'speedguard_email_test_results' );
-		} else {
+		if ( ! get_transient( 'speedguard-tests-running' ) ) {
 			$speedguard_options = SpeedGuard_Admin::get_this_plugin_option( 'speedguard_options' );
 			$admin_email        = $speedguard_options['email_me_at'];
 			$site_url           = parse_url( get_home_url() );
@@ -118,8 +96,12 @@ class SpeedGuard_Notifications {
 				$headers = [ 'Content-Type: text/html; charset=UTF-8' ];
 				wp_mail( $admin_email, $subject, $message, $headers );
 			endif;
-			wp_reset_postdata();
-		}//if there are no waiting pages
+		}//if there are no waiting pages]
+	else { //if there are tests running at the moment -- reschedule to send email in 10 minutes
+		wp_schedule_single_event( time() + 10 * 60, 'speedguard_email_test_results' );
+	}
+
+
 	}
 }
 
