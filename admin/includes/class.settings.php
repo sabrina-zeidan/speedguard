@@ -79,7 +79,6 @@ class SpeedGuard_Settings {
 		} elseif ( ! empty( $speedguard_options ) && $option === 'speedguard_options' ) { // if updating options
 			$speedguard_options = SpeedGuard_Admin::get_this_plugin_option( 'speedguard_options' );
 			$admin_email        = $speedguard_options['email_me_at'];
-			$check_recurrence   = $speedguard_options['check_recurrence'];
 			wp_clear_scheduled_hook( 'speedguard_update_results' );
 			if ( ! wp_next_scheduled( 'speedguard_update_results' ) ) {
 				wp_schedule_event( time(), 'speedguard_interval', 'speedguard_update_results' );
@@ -94,9 +93,6 @@ class SpeedGuard_Settings {
 		}
 		if ( empty( $new_value['show_ab_widget'] ) ) {
 			$new_value['show_ab_widget'] = 'on';
-		}
-		if ( empty( $new_value['check_recurrence'] ) ) {
-			$new_value['check_recurrence'] = '1';
 		}
 		if ( empty( $new_value['email_me_at'] ) ) {
 			$new_value['email_me_at'] = $admin_email;
@@ -118,7 +114,6 @@ class SpeedGuard_Settings {
 		if ( $option === 'speedguard_options' ) {
 			$speedguard_options = SpeedGuard_Admin::get_this_plugin_option( 'speedguard_options' );
 			$admin_email        = $speedguard_options['email_me_at'];
-			$check_recurrence   = $speedguard_options['check_recurrence'];
 			wp_clear_scheduled_hook( 'speedguard_update_results' );
 			wp_clear_scheduled_hook( 'speedguard_email_test_results' );
 			if ( ! wp_next_scheduled( 'speedguard_update_results' ) ) {
@@ -223,8 +218,7 @@ class SpeedGuard_Settings {
 	}
 
 	function speedguard_cron_schedules( $schedules ) {
-		$speedguard_options               = SpeedGuard_Admin::get_this_plugin_option( 'speedguard_options' );
-		$check_recurrence                 = $speedguard_options['check_recurrence'];
+		$check_recurrence                 = 1; // Check every day
 		$value                            = constant( 'DAY_IN_SECONDS' );
 		$interval                         = (int) $check_recurrence * $value;
 		$schedules['speedguard_interval'] = array(
@@ -255,15 +249,6 @@ class SpeedGuard_Settings {
 			$checked = '';
 		}
 		echo "<input type='hidden' name='speedguard_options[" . $field_name . "]' value='off' /><input " . $checked . " id='speedguard_options[" . $field_name . "]' name='speedguard_options[" . $field_name . "]' type='checkbox' />";
-	}
-
-	function check_recurrence_fn( $args ) {
-		$options      = SpeedGuard_Admin::get_this_plugin_option( 'speedguard_options' );
-		$field_name   = esc_attr( $args['label_for'] );
-		$days         = _n( ' day', ' days', $options[ $field_name ], 'speedguard' );
-		$string       = "<input id='speedguard_options[" . $field_name . "]' name='speedguard_options[" . $field_name . "]' type='text' class='numbers' size='2' value='" . $options[ $field_name ] . "'/> " . $days;
-		$instructions = '<div class="note">' . __( 'If you don\'t want any automatic tests place "0".', 'speedguard' ) . '</div>';
-		echo $string . $instructions;
 	}
 
 	function email_me_at_fn( $args ) {
@@ -373,17 +358,6 @@ class SpeedGuard_Settings {
 			array( 'label_for' => 'show_ab_widget' )
 		);
 		add_settings_section( 'speedguard_reports_section', '', '', 'speedguard' );
-		add_settings_field(
-			'speedguard_check_recurrence',
-			__( 'Check pageload speed every', 'speedguard' ),
-			array(
-				$this,
-				'check_recurrence_fn',
-			),
-			'speedguard',
-			'speedguard_reports_section',
-			array( 'label_for' => 'check_recurrence' )
-		);
 		add_settings_field(
 			'speedguard_email_me_at',
 			__( 'Send me report at', 'speedguard' ),
