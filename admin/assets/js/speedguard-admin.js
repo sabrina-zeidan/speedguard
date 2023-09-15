@@ -28,11 +28,11 @@ document.addEventListener(
         // Mark scores with colors
         const testscore = document.querySelectorAll(".speedguard-score");
         for (const testScore of testscore) {
-            const dataScore = testScore.getAttribute("data-score");
+            //const dataScore = testScore.getAttribute("data-score");
             const dataCategory = testScore.getAttribute("data-score-category");
-            if (dataScore > 0.7 || dataCategory === "FAST") {
+            if (dataCategory > 0.7 || dataCategory === "FAST") {
                 testScore.classList.add("score-green");
-            } else if (dataScore > 0.4 || dataCategory === "AVERAGE") {
+            } else if (dataCategory > 0.4 || dataCategory === "AVERAGE") {
                 testScore.classList.add("score-yellow");
             } else {
                 testScore.classList.add("score-red");

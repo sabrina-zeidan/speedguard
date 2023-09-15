@@ -143,20 +143,14 @@ class SpeedGuard_List_Table extends WP_List_Table {
 					'guarded_page_title' => '<a href="' . $guarded_page_url . '" target="_blank">' . $guarded_page_url . '</a>',
 					'report_date'        => $updated . '<a href="' . $report_link . '" target="_blank">🔗</a>',
 				];
-                //Get test result data
-                $sg_test_result = get_post_meta( $guarded_page_id, 'sg_test_result', true);
+				// Get test result data
+				$sg_test_result = get_post_meta( $guarded_page_id, 'sg_test_result', true );
 
-		//	if (is_array($sg_test_result)){
 
 
 				// Start Prepare PSI data and CWV data with the loop
 				$devices = [ 'mobile', 'desktop' ];
 				foreach ( $devices as $device ) {
-					// Get needed post_meta for DEVICE
-					$device_test_data  = 'sg_' . $device;
-					//$$device_test_data = get_post_meta( $guarded_page_id, 'sg_' . $device, true );
-				//	$$device_test_data = $sg_test_result[ $device ];
-
 					$tests_types_array = [
 						'psi' => [ 'lcp', 'cls' ],
 						'cwv' => [ 'lcp', 'cls', 'fid' ],
@@ -164,14 +158,7 @@ class SpeedGuard_List_Table extends WP_List_Table {
 					foreach ( $tests_types_array as $test_type => $metrics ) {
 						foreach ( $metrics as $metric ) {
 
-							//	$metrics_value = $$device_test_data[ $test_type ][ $metric ];
-								// Value to Display for this metric $core_value
-								if ( $test_type === 'psi' ) {
-									//$core_value = '<span data-score="' . $metrics_value['score'] . '" class="speedguard-score">' . $metrics_value['displayValue'] . '</span>';
-									$core_value = 'temp';
-								} elseif ( $test_type === 'cwv' ) {
-									$core_value = SpeedGuardWidgets::cwv_metric_display( $sg_test_result, $device, $test_type, $metric);
-								}
+							$core_value = SpeedGuardWidgets::cwv_metric_display( $sg_test_result, $device, $test_type, $metric );
 
 							$thisItem[ $test_type . '_' . $device . '_' . $metric ] = $core_value; // this is a string to display // TODO rename
 						} //end foreach metrics as metric

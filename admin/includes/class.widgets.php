@@ -58,6 +58,9 @@ class SpeedGuardWidgets {
 	 */
 	public static function cwv_metric_display( $results_array, $device, $test_type, $metric ) {
 		//var_dump( $results_array);
+		$display_value = '';
+			$category = '';
+		$class = '';
 		if (  $results_array === 'waiting' ) {  // tests are currently running
 			$class         = 'waiting';
 			$display_value = '';
@@ -67,24 +70,33 @@ class SpeedGuardWidgets {
 			// Check if metric data is available for this device
 			if (isset( $results_array[ $device ][ $test_type ][ $metric ] ) && is_array( $results_array[ $device ][ $test_type ][ $metric ] ) ) {
 			//	var_dump($results_array);
-				$metrics_value = $results_array[ $device ][ $test_type ][ $metric ]['percentile'];
-				// Format metrics output for display
-				$class = 'score';
-				if ( $metric === 'lcp' ) {
-					$display_value = round( $metrics_value / 1000, 2 ) . ' s';
-				} elseif ( $metric === 'cls' ) {
-					$display_value = $metrics_value;
-					$display_value = $metrics_value / 100;
-				} elseif ( $metric === 'fid' ) {
-					$display_value = $metrics_value . ' ms';
+				if ( $test_type === 'psi' ) {
+					$display_value = $results_array[ $device ][ $test_type ][ $metric ]['displayValue'];
+					$class         =  'score';
+					$category = $results_array[ $device ][ $test_type ][ $metric ]['score'];
 				}
-			} else { //No data available for the me
+				elseif ( $test_type === 'cwv' ) {
+					$metrics_value = $results_array[ $device ][ $test_type ][ $metric ]['percentile'];
+					// Format metrics output for display
+
+					if ( $metric === 'lcp' ) {
+						$display_value = round( $metrics_value / 1000, 2 ) . ' s';
+					} elseif ( $metric === 'cls' ) {
+						$display_value = $metrics_value;
+						$display_value = $metrics_value / 100;
+					} elseif ( $metric === 'fid' ) {
+						$display_value = $metrics_value . ' ms';
+					}
+					$class = 'score';
+					$category = isset( $results_array[ $device ][$test_type][ $metric ]['category'] ) ? $results_array[ $device ][$test_type][ $metric ]['category'] : '';
+				}
+			} else { //No data available for the metric
 				$class         = 'na';
 				$display_value = 'N/A';
 			}
 		}
 
-		$category = isset( $results_array[ $device ][$test_type][ $metric ]['category'] ) ? $results_array[ $device ][$test_type][ $metric ]['category'] : '';
+
 		$category             = 'data-score-category="' . $category . '"';
 		$class                = 'class="speedguard-' . $class . '"';
 		$metric_display_value = '<span ' . $category . ' ' . $class . '>' . $display_value . '</span>';
