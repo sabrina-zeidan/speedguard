@@ -18,12 +18,12 @@ class SpeedGuard_Admin {
 	const SG_METRICS_ARRAY = array(
 		'mobile' => array(
 			'psi' => array('lcp', 'cls'),
-            'cwv' => array('lcp', 'cls', 'fid')
+			'cwv' => array('lcp', 'cls', 'fid')
 		),
-        'desktop' => array(
-	        'psi' => array('lcp', 'cls'),
-            'cwv' => array('lcp', 'cls', 'fid')
-        )
+		'desktop' => array(
+			'psi' => array('lcp', 'cls'),
+			'cwv' => array('lcp', 'cls', 'fid')
+		)
 	);
 
 	public function __construct( $plugin_name, $version ) {

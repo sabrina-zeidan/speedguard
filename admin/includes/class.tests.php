@@ -98,12 +98,11 @@ class SpeedGuard_List_Table extends WP_List_Table {
 		];
 	}
 
-	// Columns names
+	/** Data for Tests resutls table*/
 
 	private function table_data( $client_id = '' ) {
 		// Data we will return in the end
 		$data = [];
-
 		// Get all guarded pages
 		$args          = [
 			'post_type'      => SpeedGuard_Admin::$cpt_name,
@@ -116,7 +115,7 @@ class SpeedGuard_List_Table extends WP_List_Table {
 		$the_query     = new WP_Query( $args );
 		$guarded_pages = $the_query->posts;
 
-		// SpeedGuard PRO
+		// For clients in SpeedGuard PRO
 		if ( ! empty( $client_id ) ) { // TODO SpeedGuard PRO
 			$meta_query   = [];
 			$meta_query[] = [
@@ -133,45 +132,29 @@ class SpeedGuard_List_Table extends WP_List_Table {
 		if ( $guarded_pages ) :
 			foreach ( $guarded_pages as $guarded_page_id ) {
 				$guarded_page_url = get_post_meta( $guarded_page_id, 'speedguard_page_url', true );
-				// NEW and good
 				// Prepare basic columns
 				$report_link = add_query_arg( [ 'url' => $guarded_page_url ], 'https://developers.google.com/speed/pagespeed/insights/' );
 				$updated     = get_the_modified_date( 'Y-m-d H:i:s', $guarded_page_id );
 				// Define basic data for the item
-				$thisItem = [
+				$thisTestData = [
 					'guarded_page_id'    => $guarded_page_id,
 					'guarded_page_title' => '<a href="' . $guarded_page_url . '" target="_blank">' . $guarded_page_url . '</a>',
 					'report_date'        => $updated . '<a href="' . $report_link . '" target="_blank">🔗</a>',
 				];
 				// Get test result data
 				$sg_test_result = get_post_meta( $guarded_page_id, 'sg_test_result', true );
-
-
-
-				// Start Prepare PSI data and CWV data with the loop
-
-                $devices = [ 'mobile', 'desktop' ];
-				foreach ( $devices as $device ) {
-					$tests_types_array = [
-						'psi' => [ 'lcp', 'cls' ],
-						'cwv' => [ 'lcp', 'cls', 'fid' ],
-					];
-					foreach ( $tests_types_array as $test_type => $metrics ) {
+				// Start Prepare PSI data and CWV data with the loop (use SG_METRICS_ARRAY make a loop)
+				foreach ( SpeedGuard_Admin::SG_METRICS_ARRAY as $device => $test_types ) {
+					foreach ( $test_types as $test_type => $metrics ) {
 						foreach ( $metrics as $metric ) {
-
-							$core_value = SpeedGuardWidgets::cwv_metric_display( $sg_test_result, $device, $test_type, $metric );
-
-							$thisItem[ $test_type . '_' . $device . '_' . $metric ] = $core_value; // this is a string to display // TODO rename
-						} //end foreach metrics as metric
-					}//end foreach $tests_types_array
-				} //end foreach devices
-
-				$data[] = $thisItem;
-				// END Prepare PSI data with the loop
-
+							$core_value                                                 = SpeedGuardWidgets::cwv_metric_display( $sg_test_result, $device, $test_type, $metric );
+							$thisTestData[ $test_type . '_' . $device . '_' . $metric ] = $core_value; // this is a string to display // TODO rename
+						}
+					}
+				}
+				$data[] = $thisTestData;
 			} // end foreach $guarded pages
 		endif; // The are $guarded_pages
-		// TODO If there are no guarded pages
 
 		return $data;
 	}
