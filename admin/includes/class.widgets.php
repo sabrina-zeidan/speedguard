@@ -66,16 +66,17 @@ class SpeedGuardWidgets {
 
 		// Preparing data to display
 		// TODO make this constant
-
-		foreach ( SpeedGuard_Admin::SG_METRICS_ARRAY as $device => $test_types ) {
+		$sg_test_type = SpeedGuard_Settings::global_test_type();
+			foreach ( SpeedGuard_Admin::SG_METRICS_ARRAY as $device => $test_types ) {
 			foreach ( $test_types as $test_type => $metrics ) {
-				if ($test_type)
-				foreach ( $metrics as $metric ) {
-					$current_metric = $device . '_' . $metric;
-					// unified function to format data for display
-					$$current_metric = SpeedGuardWidgets::single_metric_display(  $speedguard_cwv_origin, $device, $test_type, $metric );
+				if ($test_type === $sg_test_type) { //prepare metrics only for needed test type
+					foreach ( $metrics as $metric ) {
+						$current_metric = $device . '_' . $metric;
+						$$current_metric = SpeedGuardWidgets::single_metric_display(  $speedguard_cwv_origin, $device, $test_type, $metric );
 
+					}
 				}
+
 			}
 		}
 

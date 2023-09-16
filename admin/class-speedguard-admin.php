@@ -494,10 +494,10 @@ class SpeedGuard_Admin {
 			}
 		}
 		if ( self::is_screen( 'tests' ) ) {
-			$sg_options = self::get_this_plugin_option( 'speedguard_options' );
-			if ( $sg_options['test_type'] === 'cwv' ) {
+			$sg_test_type = SpeedGuard_Settings::global_test_type();
+			if ( 'cwv' === $sg_test_type) {
 				$class = 'test-type-cwv';
-			} elseif ( $sg_options['test_type'] === 'psi' ) {
+			} elseif ( 'psi'  === $sg_test_type) {
 				$class = 'test-type-psi';
 			}
 

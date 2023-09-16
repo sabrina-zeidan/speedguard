@@ -139,10 +139,10 @@ class SpeedGuard_List_Table extends WP_List_Table {
 	}
 
 	function get_table_classes() {
-		$sg_options = SpeedGuard_Admin::get_this_plugin_option( 'speedguard_options' );
-		if ( $sg_options['test_type'] === 'cwv' ) {
+        $sg_test_type = SpeedGuard_Settings::global_test_type();
+		if ( 'cwv' === $sg_test_type ) {
 			$test_type = 'cwv-test-type';
-		} elseif ( $sg_options['test_type'] === 'psi' ) {
+		} elseif ( 'psi' === $sg_test_type ) {
 			$test_type = 'psi-test-type';
 		}
 
@@ -183,8 +183,8 @@ class SpeedGuard_List_Table extends WP_List_Table {
 
 	public function get_columnsss() {
 		// Display Columns set based on Test type choice in Settigns
-		$sg_options = SpeedGuard_Admin::get_this_plugin_option( 'speedguard_options' );
-		// First 2 columns
+        $sg_test_type = SpeedGuard_Admin::global_test_type();
+        // First 2 columns
 		$columns   = [];
 		$columns[] = [
 			'cb'                 => '<
@@ -193,26 +193,26 @@ input type="checkbox" />',
 		];
 
 		// Mobile
-		if ( $sg_options['test_type'] === 'cwv' ) {
+		if ( 'cwv' === $sg_test_type ) {
 			$columns[] = [
 				'cwv_mobile_lcp' => __( 'LCP', 'speedguard' ),
 				'cwv_mobile_cls' => __( 'CLS', 'speedguard' ),
 				'cwv_mobile_fid' => __( 'FID', 'speedguard' ),
 			];
-		} elseif ( $sg_options['test_type'] === 'psi' ) {
+		} elseif ( 'psi' === $sg_test_type ) {
 			$columns[] = [
 				'psi_mobile_lcp' => __( 'LCP', 'speedguard' ),
 				'psi_mobile_cls' => __( 'CLS', 'speedguard' ),
 			];
 		}
 		// Desktop
-		if ( $sg_options['test_type'] === 'cwv' ) {
+		if ( 'cwv' === $sg_test_type) {
 			$columns[] = [
 				'cwv_desktop_lcp' => __( 'LCP', 'speedguard' ),
 				'cwv_desktop_cls' => __( 'CLS', 'speedguard' ),
 				'cwv_desktop_fid' => __( 'FID', 'speedguard' ),
 			];
-		} elseif ( $sg_options['test_type'] === 'psi' ) {
+		} elseif ( 'psi' === $sg_test_type) {
 			$columns[] = [
 				'psi_desktop_lcp' => __( 'LCP', 'speedguard' ),
 				'psi_desktop_cls' => __( 'CLS', 'speedguard' ),
