@@ -328,10 +328,10 @@ class SpeedGuard_Admin {
 
 	function run_waiting_tests_ajax() {
 		if ( self::is_screen( 'tests' ) || self::is_screen( 'clients' ) ) {
-			$args = [
+		 	$args = [
 				'post_type'      => self::$cpt_name,
 				'post_status'    => 'publish',
-				'posts_per_page' => -1,
+				'posts_per_page' => 100,
 				'fields'         => 'ids',
 				'meta_query'     => [
 					[
@@ -342,8 +342,9 @@ class SpeedGuard_Admin {
 				],
 				'no_found_rows'  => true,
 			];
-
-			$waiting_pages = get_posts( $args );
+          $waiting_pages = get_posts( $args );
+            //TODO replace with transient (?), might not work on WPEngine
+			//$waiting_pages = array(19);
 			if ( empty( $waiting_pages ) ) {
 				delete_transient( 'speedguard-tests-running' );
 				return;

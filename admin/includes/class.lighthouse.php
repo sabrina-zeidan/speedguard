@@ -19,7 +19,7 @@ class SpeedGuard_Lighthouse {
 
 		$both_devices_values = []; //for post_meta sg_test_result
 		foreach ( $devices as $device ) {
-			sleep( 1 ); // So we can use LightHouse without API
+			//sleep( 5 ); // So we can use LightHouse without API
 			$request  = add_query_arg(
 				array(
 					'url'      => $guarded_page_url,

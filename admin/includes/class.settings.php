@@ -124,23 +124,23 @@ class SpeedGuard_Settings {
 
 	function load_time_updated_function( $meta_id, $post_id, $meta_key, $meta_value ) {
 		if ( 'sg_test_result' === $meta_key ) {
-			$args                       = array(
+
+			$guarded_pages = get_posts([
+
+				'posts_per_page' => 100,
 				'no_found_rows'  => true,
-				'post_type'      => SpeedGuard_Admin::$cpt_name,
+                'post_type'      => SpeedGuard_Admin::$cpt_name,
 				'post_status'    => 'publish',
-				'posts_per_page' => - 1,
 				'fields'         => 'ids',
-				'meta_query'     => array(
-					array(
+				'meta_query' => [
+					[
 						'key'     => 'sg_test_result',
 						'value'   => 'waiting',
 						'compare' => 'NOT LIKE',
-					),
-				),
-			);
-			$the_query                  = new WP_Query( $args );
-			$guarded_pages              = $the_query->get_posts();
-			$guarded_page_load_time_all = array();
+					]
+                ]
+			] );
+            $guarded_page_load_time_all = array();
 			if ( count( $guarded_pages ) > 0 ) {
 				foreach ( $guarded_pages as $guarded_page ) {
 					$guarded_page_load_time = get_post_meta( $guarded_page, 'sg_test_result' );
@@ -219,7 +219,8 @@ class SpeedGuard_Settings {
 
 	function speedguard_cron_schedules( $schedules ) {
 		$check_recurrence                 = 1; // Check every day
-		$value                            = constant( 'DAY_IN_SECONDS' );
+		//$value                            = constant( 'DAY_IN_SECONDS' );
+		$value                            = 1200; //every 10 mins for testing
 		$interval                         = (int) $check_recurrence * $value;
 		$schedules['speedguard_interval'] = array(
 			'interval' => $interval, // user input integer in second
