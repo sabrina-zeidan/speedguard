@@ -126,7 +126,7 @@ class SpeedGuard_List_Table extends WP_List_Table {
 				foreach ( SpeedGuard_Admin::SG_METRICS_ARRAY as $device => $test_types ) {
 					foreach ( $test_types as $test_type => $metrics ) {
 						foreach ( $metrics as $metric ) {
-							$core_value                                                 = SpeedGuardWidgets::cwv_metric_display( $sg_test_result, $device, $test_type, $metric );
+							$core_value                                                 = SpeedGuardWidgets::single_metric_display( $sg_test_result, $device, $test_type, $metric );
 							$thisTestData[ $test_type . '_' . $device . '_' . $metric ] = $core_value; // this is a string to display // TODO rename
 						}
 					}

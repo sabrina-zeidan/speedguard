@@ -62,18 +62,23 @@ class SpeedGuardWidgets {
 		$test_type = 'cwv'; // PSI widget has different output
 		// Retrieving data to display
 		$speedguard_cwv_origin = SpeedGuard_Admin::get_this_plugin_option( 'sg_origin_result' );
+		pr($speedguard_cwv_origin);
 
 		// Preparing data to display
 		// TODO make this constant
-		$devices = [ 'mobile', 'desktop' ];
-		foreach ( $devices as $device ) {
-			$cwv = [ 'lcp', 'cls', 'fid' ];
-			foreach ( $cwv as $metric ) {
-				$current_metric = $device . '_' . $metric;
-				// unified function to format data for display
-				$$current_metric = self::cwv_metric_display( $speedguard_cwv_origin, $device, $test_type, $metric );
+
+		foreach ( SpeedGuard_Admin::SG_METRICS_ARRAY as $device => $test_types ) {
+			foreach ( $test_types as $test_type => $metrics ) {
+				if ($test_type)
+				foreach ( $metrics as $metric ) {
+					$current_metric = $device . '_' . $metric;
+					// unified function to format data for display
+					$$current_metric = SpeedGuardWidgets::single_metric_display(  $speedguard_cwv_origin, $device, $test_type, $metric );
+
+				}
 			}
 		}
+
 
 		$content = "
 	<table class='widefat fixed striped toplevel_page_speedguard_tests_cwv_widget'>
@@ -111,7 +116,7 @@ class SpeedGuardWidgets {
 	 * @param $post
 	 * @param $args
 	 */
-	public static function cwv_metric_display( $results_array, $device, $test_type, $metric ) {
+	public static function single_metric_display( $results_array, $device, $test_type, $metric ) {
 		// var_dump( $results_array);
 		$display_value = '';
 		$category      = '';
@@ -203,10 +208,11 @@ class SpeedGuardWidgets {
 			'main-content',
 			'core'
 		);
-		$sg_options = SpeedGuard_Admin::get_this_plugin_option( 'speedguard_options' );
-		if ( 'cwv' === $sg_options['test_type'] ) {
+
+		$sg_test_type = SpeedGuard_Settings::global_test_type();
+		if ( 'cwv' === $sg_test_type ) {
 			$test_type = ' -- Core Web Vitals';
-		} elseif ( 'psi' === $sg_options['test_type'] ) {
+		} elseif ( 'psi' === $sg_test_type ) {
 			$test_type = ' -- PageSpeed Insights';
 		}
 		add_meta_box(

@@ -36,6 +36,15 @@ class SpeedGuard_Settings {
 		add_action( 'speedguard_email_test_results', array( $this, 'email_test_results_function' ) );
 	}
 
+	public static function global_test_type() {
+		$speedguard_options = SpeedGuard_Admin::get_this_plugin_option( 'speedguard_options' );
+        if ( ! empty( $speedguard_options['test_type'] ) ) {
+            return $speedguard_options['test_type'];
+        } else {
+            return 'cwv';
+        }
+	}
+
 	public static function my_settings_page_function() {
 		if ( SpeedGuard_Admin::is_screen( 'settings' ) ) {
 			SpeedGuardWidgets::add_meta_boxes();

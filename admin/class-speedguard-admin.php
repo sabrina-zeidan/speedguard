@@ -8,6 +8,12 @@
  * @subpackage Speedguard/admin
  * @author     Sabrina Zeidan <sabrinazeidan@gmail.com>
  */
+//temp for development
+function pr( $data ) {
+	echo "<pre>";
+	print_r( $data ); // or var_dump($data);
+	echo "</pre>";
+}
 
 class SpeedGuard_Admin {
 
