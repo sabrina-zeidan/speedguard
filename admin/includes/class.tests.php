@@ -43,13 +43,13 @@ class SpeedGuard_List_Table extends WP_List_Table {
 	//Set up all columns
     public function get_columns() {
 		// Display Columns set based on Test type choice in Settigns
-		$sg_options = SpeedGuard_Admin::get_this_plugin_option( 'speedguard_options' );
-		$columns = [
+	    $sg_test_type = SpeedGuard_Settings::global_test_type();
+        $columns = [
 			'cb'                 => '<input type="checkbox" />',
 			'guarded_page_title' => __( 'URL', 'speedguard' ),
 		];
 		// CWV
-		if ( $sg_options['test_type'] === 'cwv' ) {
+		if ( 'cwv' === $sg_test_type ) {
 			// Mobile
 			$columns['cwv_mobile_lcp'] = __( 'LCP', 'speedguard' );
 			$columns['cwv_mobile_cls'] = __( 'CLS', 'speedguard' );
@@ -59,7 +59,7 @@ class SpeedGuard_List_Table extends WP_List_Table {
 			$columns['cwv_desktop_cls'] = __( 'CLS', 'speedguard' );
 			$columns['cwv_desktop_fid'] = __( 'FID', 'speedguard' );
 		} // PSI
-		elseif ( $sg_options['test_type'] === 'psi' ) {
+		elseif ( 'psi' === $sg_test_type) {
 			// Mobile
 			$columns['psi_mobile_lcp'] = __( 'LCP', 'speedguard' );
 			$columns['psi_mobile_cls'] = __( 'CLS', 'speedguard' );
@@ -176,58 +176,9 @@ class SpeedGuard_List_Table extends WP_List_Table {
 			exit;
 		}
 	}
-	// END
 
 
-	// Table data
 
-	public function get_columnsss() {
-		// Display Columns set based on Test type choice in Settigns
-        $sg_test_type = SpeedGuard_Admin::global_test_type();
-        // First 2 columns
-		$columns   = [];
-		$columns[] = [
-			'cb'                 => '<
-input type="checkbox" />',
-			'guarded_page_title' => __( 'URL', 'speedguard' ),
-		];
-
-		// Mobile
-		if ( 'cwv' === $sg_test_type ) {
-			$columns[] = [
-				'cwv_mobile_lcp' => __( 'LCP', 'speedguard' ),
-				'cwv_mobile_cls' => __( 'CLS', 'speedguard' ),
-				'cwv_mobile_fid' => __( 'FID', 'speedguard' ),
-			];
-		} elseif ( 'psi' === $sg_test_type ) {
-			$columns[] = [
-				'psi_mobile_lcp' => __( 'LCP', 'speedguard' ),
-				'psi_mobile_cls' => __( 'CLS', 'speedguard' ),
-			];
-		}
-		// Desktop
-		if ( 'cwv' === $sg_test_type) {
-			$columns[] = [
-				'cwv_desktop_lcp' => __( 'LCP', 'speedguard' ),
-				'cwv_desktop_cls' => __( 'CLS', 'speedguard' ),
-				'cwv_desktop_fid' => __( 'FID', 'speedguard' ),
-			];
-		} elseif ( 'psi' === $sg_test_type) {
-			$columns[] = [
-				'psi_desktop_lcp' => __( 'LCP', 'speedguard' ),
-				'psi_desktop_cls' => __( 'CLS', 'speedguard' ),
-			];
-		}
-
-		// Date column
-		$columns[] = [
-			'report_date' => __( 'Updated', 'speedguard' ),
-		];
-
-		return $columns;
-	}
-
-	// Columns names
 
 	function column_cb( $item ) {
 		return sprintf( '<input type="checkbox" name="guarded-pages[]" value="%s" />', $item['guarded_page_id'] );
