@@ -29,7 +29,7 @@ class SpeedGuardWidgets {
 	 * @param $post
 	 * @param $args
 	*/
-	
+
 	/**
 	 * Define all metaboxes fro plugin's admin pages (Tests and Settings)
 	 */
@@ -253,12 +253,17 @@ class SpeedGuardWidgets {
 	'.$fid_tr.'
 	</thbody>
 	</table>
-	<div><br>
-	'
-		           // TODO link to the video
-		           . sprintf( __( 'N/A means that there is no data from Google available -- most likely your website have not got enough traffic for Google to make evaluation (Not enough usage data in the last 90 days for this device type)', 'speedguard' ), '<a href="#">', '</a>' ) . '</div>';
 
-		echo $content;
+	';
+
+		if (( 'cwv' === $sg_test_type) && ("N/A" === $mobile_lcp)) {
+			$info_text = sprintf( __( 'N/A means that there is no data from Google available -- most likely your website have not got enough traffic for Google to make evaluation (Not enough usage data in the last 90 days for this device type)', 'speedguard' ), '<a href="#">', '</a>' ) . '<div><br></div>';
+		}
+		elseif ( 'psi' === $sg_test_type){
+			$info_text = sprintf( __( 'This is not real user data. These are averages calculated based on the tests below. Core Web Vitals -- is where the the real data is. You can switch in Settings', 'speedguard' ), '<a href="#">', '</a>' ) . '</div>';
+		}
+
+		echo $content.$info_text;
 	}
 
 	public static function speedguard_legend_meta_box() {
@@ -353,7 +358,7 @@ class SpeedGuardWidgets {
 	function speedguard_dashboard_widget() {
 		wp_add_dashboard_widget(
 			'speedguard_dashboard_widget',
-			__( 'Site Speed Results [Speedguard]', 'speedguard' ),
+			__( 'Current Performance', 'speedguard' ),
 			[
 				$this,
 				'speedguard_origin_results_meta_box',
