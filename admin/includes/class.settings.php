@@ -26,10 +26,7 @@ class SpeedGuard_Settings {
 		// Update options action function for Multisite
 		add_action( 'network_admin_edit_speedguard_update_settings', [ $this, 'speedguard_update_settings' ] );
 
-		// update Averages when any load_time is updated
-		add_action( 'added_post_meta', [ $this, 'load_time_updated_function' ], 10, 4 );
-		add_action( 'updated_post_meta', [ $this, 'load_time_updated_function' ], 10, 4 );
-		add_action( 'deleted_post_meta', [ $this, 'load_time_updated_function' ], 10, 4 );
+
 		add_filter( 'cron_schedules', [ $this, 'speedguard_cron_schedules' ] );
 		// send report when load_time is updated by cron automatically
 		add_action( 'speedguard_update_results', [ $this, 'update_results_cron_function' ] );
@@ -127,93 +124,7 @@ class SpeedGuard_Settings {
 			}
 		}
 	}
-	//TODO: first save to sq_origin_test_results
-	// TODO: remove all average option and frfom everywhere in the plugin
-	//TODO:  then adjust to run only on the last one, not every time
-	//TODO move to new_test_lighthouse document
-	//TODO trigger when test is deleted
-	function load_time_updated_function( $meta_id, $post_id, $meta_key, $meta_value ) {
-		if ( 'sg_test_result' === $meta_key ) {
-			if ( ! get_transient( 'speedguard-tests-running' ) ) { //if there are no more tests running
-				$new_sg_origin_result = [];
-				//Get all tests with valid results
-				$guarded_pages = get_posts( [
-					'posts_per_page' => 100,
-					'no_found_rows'  => true,
-					'post_type'      => SpeedGuard_Admin::$cpt_name,
-					'post_status'    => 'publish',
-					'fields'         => 'ids',
-					'meta_query'     => [
-						[
-							'key'     => 'sg_test_result',
-							'value'   => 'waiting',
-							'compare' => 'NOT LIKE',
-						]
-					]
-				] );
 
-				if ( count( $guarded_pages ) > 0 ) {
-					$average = [];
-					foreach ( $guarded_pages as $guarded_page ) {
-						$guarded_page_load_time = get_post_meta( $guarded_page, 'sg_test_result', true );
-						foreach ( SpeedGuard_Admin::SG_METRICS_ARRAY as $device => $test_types ) {
-							foreach ( $test_types as $test_type => $metrics ) {
-								if ( $test_type === 'psi' ) { //prepare metrics from PSI
-									foreach ( $metrics as $metric ) {
-										$average[ $device ][ $test_type ][ $metric ]['guarded_pages'][ $guarded_page ] = $guarded_page_load_time[ $device ][ $test_type ][ $metric ]['numericValue'];
-									}
-								}
-							}
-						}
-					}
-
-					//Prepare new values for PSI Averages
-					$new_average_array = [];
-					foreach ( $average as $device => $test_types ) {
-						foreach ( $test_types as $test_type => $metrics ) {
-							foreach ( $metrics as $metric => $values ) {
-								foreach ( $values as $key => $value ) {
-									$new_metric_array = [];
-									if ( $key === 'guarded_pages' ) {
-										$average                     = array_sum( $value ) / count( $value );
-										$new_metric_array['average'] = $average;
-										if ( 'lcp' === $metric ) {
-											$average                          = round( $average / 1000, 2 );
-											$new_metric_array['displayValue'] = $average . ' s';
-											if ( $average < 2.5 ) {
-												$new_metric_array['score'] = 'FAST';
-											} elseif ( $average < 4.0 ) {
-												$new_metric_array['score'] = 'AVERAGE';
-											} else {
-												$new_metric_array['score'] = 'SLOW';
-											}
-										} elseif ( 'cls' === $metric ) {
-											$new_metric_array['displayValue'] = round( $average, 3 );
-											if ( $average < 0.1 ) {
-												$new_metric_array['score'] = 'FAST';
-											} elseif ( $average < 0.25 ) {
-												$new_metric_array['score'] = 'AVERAGE';
-											} else {
-												$new_metric_array['score'] = 'SLOW';
-											}
-										}
-										$new_metric_array['min']                               = min( $value );
-										$new_metric_array['max']                               = max( $value );
-										$new_metric_array['guarded_pages']                     = $value;
-										$new_average_array[ $device ][ $test_type ][ $metric ] = $new_metric_array;
-									}
-								}
-							}
-						}
-					}
-
-					$new_sg_origin_result = array_merge_recursive( SpeedGuard_Admin::get_this_plugin_option( 'sg_origin_result' ), $new_average_array );
-				}
-
-				SpeedGuard_Admin::update_this_plugin_option( 'sg_origin_results', $new_sg_origin_result );
-			}
-		}
-	}
 
 	function update_results_cron_function() {
 		// If send report is on: schedule cron job

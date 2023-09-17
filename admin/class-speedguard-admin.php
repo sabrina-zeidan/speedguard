@@ -202,7 +202,7 @@ class SpeedGuard_Admin {
 			return;
 		}
 		$sg_origin_results   = self::get_this_plugin_option( 'sg_origin_results' );
-		$guarded_pages_count = count( $sg_origin_results['mobile']['psi']['lcp']['guarded_pages'] );
+		$guarded_pages_count = isset($sg_origin_results['mobile']['psi']['lcp']['guarded_pages']) ? count( $sg_origin_results['mobile']['psi']['lcp']['guarded_pages'] ) : '';
 		// All screens
 		// Dashboard and SpeedGuard Settigns screens
 		if ( self::is_screen( 'settings,dashboard' ) ) {
@@ -487,7 +487,7 @@ class SpeedGuard_Admin {
 	function body_classes_filter( $classes ) {
 		if ( self::is_screen( 'settings,tests,dashboard' ) ) {
 			$sg_origin_results   = self::get_this_plugin_option( 'sg_origin_results' );
-			$guarded_pages_count = count( $sg_origin_results['mobile']['psi']['lcp']['guarded_pages'] );
+			$guarded_pages_count = isset($sg_origin_results['mobile']['psi']['lcp']['guarded_pages']) ? count( $sg_origin_results['mobile']['psi']['lcp']['guarded_pages'] ) : '';
 
 			if ( $guarded_pages_count < 1 ) {
 				$classes = $classes . ' no-guarded-pages';
