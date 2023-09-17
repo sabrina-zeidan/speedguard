@@ -206,7 +206,7 @@ class SpeedGuard_Admin {
 		// All screens
 		// Dashboard and SpeedGuard Settigns screens
 		if ( self::is_screen( 'settings,dashboard' ) ) {
-			if ( $guarded_pages_count < 2 ) { // TODO: set transient/user meta on dissmissal action
+			if ( !empty($guarded_pages_count) && $guarded_pages_count < 2 ) { // TODO: set transient/user meta on dissmissal action
 				$message = sprintf( __( 'You only have the speed of 1 page monitored currently. Would you like to %1$sadd other pages%2$s to see the whole picture of the site speed?', 'speedguard' ), '<a href="' . self::speedguard_page_url( 'tests' ) . '">', '</a>' );
 				$notices = self::set_notice( $message, 'warning' );
 			}
