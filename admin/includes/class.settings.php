@@ -109,9 +109,6 @@ class SpeedGuard_Settings {
 		if ( empty( $new_value['email_me_case'] ) ) {
 			$new_value['email_me_case'] = 'current state';
 		}
-		if ( empty( $new_value['critical_load_time'] ) ) {
-			$new_value['critical_load_time'] = '3';
-		}
 		if ( empty( $new_value['test_type'] ) ) {
 			$new_value['test_type'] = 'cwv';
 		}
@@ -245,18 +242,11 @@ class SpeedGuard_Settings {
 		}
 	}
 
-
 	function email_test_results_function() {
 		$speedguard_options = SpeedGuard_Admin::get_this_plugin_option( 'speedguard_options' );
 		$email_me_case      = $speedguard_options['email_me_case'];
-		if ( $email_me_case === 'every time after tests are executed' ) {
+		if ( $email_me_case !== 'never' ) {
 			SpeedGuard_Notifications::test_results_email( 'regular' );
-		} elseif ( $email_me_case === 'just in case average speed worse than' ) {
-			$critical_load_time = $speedguard_options['critical_load_time'];
-			$average_load_time  = SpeedGuard_Admin::get_this_plugin_option( 'speedguard_average' )['average_load_time'];
-			if ( $average_load_time > $critical_load_time ) {
-				SpeedGuard_Notifications::test_results_email( 'critical_load_time' );
-			}
 		}
 	}
 
@@ -318,27 +308,11 @@ class SpeedGuard_Settings {
 		foreach ( $items as $item => $item_label ) {
 			$checked = ( $options[ $field_name ] === $item ) ? ' checked="checked" ' : '';
 
-			echo '<input ' . $checked . " type='radio' name='speedguard_options[" . $field_name . "]' id='" . $item . "' value='" . $item . "' /><label for='" . $item . "'>" . $item_label . '</label>';
-			$critical_load_time = $options['critical_load_time'];
-			if ( $item === 'just in case average speed worse than' ) {
-				$this->critical_load_time_fn(
-					[
-						'label_for' => 'critical_load_time',
-						'show'      => true,
-					]
-				);
-			}
-			echo '</label><br />';
+			echo '<input ' . $checked . " type='radio' name='speedguard_options[" . $field_name . "]' id='" . $item . "' value='" . $item . "' /><label for='" . $item . "'>" . $item_label . '</label></br>';
 		}
 	}
 
-	function critical_load_time_fn( $args ) {
-		if ( isset( $args['show'] ) && $args['show'] === true ) {
-			$options    = SpeedGuard_Admin::get_this_plugin_option( 'speedguard_options' );
-			$field_name = esc_attr( $args['label_for'] );
-			echo " <input type='text' id='speedguard_options[critical_load_time]' name='speedguard_options[critical_load_time]'  class='numbers'  size='2' value='" . $options[ $field_name ] . "'> " . __( 's', 'speedguard' );
-		}
-	}
+
 
 	function test_type_fn( $args ) {
 		$options    = SpeedGuard_Admin::get_this_plugin_option( 'speedguard_options' );
@@ -438,17 +412,7 @@ class SpeedGuard_Settings {
 			[ 'label_for' => 'test_type' ]
 		);
 
-		add_settings_field(
-			'speedguard_critical_load_time',
-			'',
-			[
-				$this,
-				'critical_load_time_fn',
-			],
-			'speedguard',
-			'speedguard_hidden_section',
-			[ 'label_for' => 'critical_load_time' ]
-		);
+
 	}
 
 	function speedguard_settings_general() {

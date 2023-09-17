@@ -18,12 +18,9 @@ class SpeedGuard_Notifications {
 			$site_url           = parse_url( get_home_url() );
 			$site_url           = $site_url['host'];
 
-			if ( $type === 'critical_load_time' ) {
-				$subject = sprintf( __( '%1$s is slow [SpeedGuard]', 'speedguard' ), $site_url );
-				$note    = sprintf( __( '%1$s takes more than %2$s seconds to load', 'speedguard' ), $site_url, $critical_load_time );
-			} else {
+
 				$subject = sprintf( __( '%1$s speed report [SpeedGuard]', 'speedguard' ), $site_url );
-			}
+
 			$args          = [
 				'post_type'      => SpeedGuard_Admin::$cpt_name,
 				'post_status'    => 'publish',
@@ -46,7 +43,7 @@ class SpeedGuard_Notifications {
 										<body style="padding-top: 50px; padding-bottom: 50px;  background:#fff; color:#000;" >
 											<table align="center">  
 												<tr>
-													<td style="padding: 10px;" bgcolor="#f7f7f7"><p style="text-align:center; font-size: 1.2em; font-weight: bold;" >' . __( 'Average site speed is', 'speedguard' ) . ' ' . $average_site_speed . 's</p>
+													<td style="padding: 10px;" bgcolor="#f7f7f7"><p style="text-align:center; font-size: 1.2em; font-weight: bold;" >' . __( 'Average site speed is', 'speedguard' ) . 's</p>
 													<p>												
 													' . sprintf( __( 'See the entire %1$sreport%2$s in the WordPress admin.', 'speedguard' ), '<a href="' . SpeedGuard_Admin::speedguard_page_url( 'tests' ) . '" target="_blank">', '</a>' ) . '</p>												
 													</td> 
