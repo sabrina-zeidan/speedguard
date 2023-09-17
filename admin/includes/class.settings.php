@@ -107,7 +107,7 @@ class SpeedGuard_Settings {
 			$new_value['email_me_at'] = $admin_email;
 		}
 		if ( empty( $new_value['email_me_case'] ) ) {
-			$new_value['email_me_case'] = 'just in case average speed worse than';
+			$new_value['email_me_case'] = 'current state';
 		}
 		if ( empty( $new_value['critical_load_time'] ) ) {
 			$new_value['critical_load_time'] = '3';
@@ -308,11 +308,13 @@ class SpeedGuard_Settings {
 	function email_me_case_fn( $args ) {
 		$options    = SpeedGuard_Admin::get_this_plugin_option( 'speedguard_options' );
 		$field_name = esc_attr( $args['label_for'] );
-		$items      = [
-			'every time after tests are executed'   => __( 'every time after tests are executed', 'speedguard' ),
-			'just in case average speed worse than' => __( 'just in case average speed worse than', 'speedguard' ),
-			'never'                                 => __( 'never', 'speedguard' ),
+		$items = [
+			'current state' => __( 'Every day with the current state', 'speedguard' ),
+			'if any URL is not GOOD'  => __( 'if any URL is not passing CWV (after daily check)', 'speedguard' ),
+			'if CWV origing not GOOD' => __( 'only if CWV for the whole site (origin) is not passing CWV (after daily check)', 'speedguard' ),
+			'never' => __( 'never', 'speedguard' ),
 		];
+
 		foreach ( $items as $item => $item_label ) {
 			$checked = ( $options[ $field_name ] === $item ) ? ' checked="checked" ' : '';
 
