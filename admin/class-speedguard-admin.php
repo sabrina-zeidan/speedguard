@@ -201,12 +201,12 @@ class SpeedGuard_Admin {
 		if ( ! current_user_can( 'manage_options' ) ) {
 			return;
 		}
-		$speedguard_average = self::get_this_plugin_option( 'speedguard_average' );
-		$speedguard_options = self::get_this_plugin_option( 'speedguard_options' );
-		// All screens
+		$sg_origin_results = self::get_this_plugin_option( 'sg_origin_results' );
+		$guarded_pages_count = count($sg_origin_results['mobile']['psi']['lcp']['guarded_pages']);
+        // All screens
 		// Dashboard and SpeedGuard Settigns screens
 		if ( self::is_screen( 'settings,dashboard' ) ) {
-			if ( $speedguard_average['guarded_pages_count'] < 2 ) { // TODO: set transient/user meta on dissmissal action
+			if ( $guarded_pages_count  < 2 ) { // TODO: set transient/user meta on dissmissal action
 				$message = sprintf( __( 'You only have the speed of 1 page monitored currently. Would you like to %1$sadd other pages%2$s to see the whole picture of the site speed?', 'speedguard' ), '<a href="' . self::speedguard_page_url( 'tests' ) . '">', '</a>' );
 				$notices = self::set_notice( $message, 'warning' );
 			}
@@ -488,8 +488,12 @@ class SpeedGuard_Admin {
 
 	function body_classes_filter( $classes ) {
 		if ( self::is_screen( 'settings,tests,dashboard' ) ) {
-			$speedguard_average = self::get_this_plugin_option( 'speedguard_average' );
-			if ( isset( $speedguard_average['guarded_pages_count'] ) && ( $speedguard_average['guarded_pages_count'] < 1 ) ) {
+			//$speedguard_average = self::get_this_plugin_option( 'speedguard_average' );
+
+            $sg_origin_results = self::get_this_plugin_option( 'sg_origin_results' );
+			$guarded_pages_count = count($sg_origin_results['mobile']['psi']['lcp']['guarded_pages']);
+
+			if ( $guarded_pages_count < 1 )  {
 				$classes = $classes . ' no-guarded-pages';
 			}
 		}
