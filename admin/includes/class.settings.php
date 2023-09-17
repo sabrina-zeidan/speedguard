@@ -5,7 +5,7 @@
  *   Class responsible for the SpeedGuard settings
  */
 class SpeedGuard_Settings {
-	static $settings_page_hook        = 'speedguard_page_speedguard_settings';
+	static $settings_page_hook = 'speedguard_page_speedguard_settings';
 	public static $speedguard_options = 'speedguard_options';
 
 	function __construct() {
@@ -38,36 +38,36 @@ class SpeedGuard_Settings {
 
 	public static function global_test_type() {
 		$speedguard_options = SpeedGuard_Admin::get_this_plugin_option( 'speedguard_options' );
-        if ( ! empty( $speedguard_options['test_type'] ) ) {
-            return $speedguard_options['test_type'];
-        } else {
-            return 'cwv';
-        }
+		if ( ! empty( $speedguard_options['test_type'] ) ) {
+			return $speedguard_options['test_type'];
+		} else {
+			return 'cwv';
+		}
 	}
 
 	public static function my_settings_page_function() {
 		if ( SpeedGuard_Admin::is_screen( 'settings' ) ) {
 			SpeedGuardWidgets::add_meta_boxes();
 			?>
-			<div class="wrap">
-				<h2><?php _e( 'SpeedGuard :: Settings', 'speedguard' ); ?></h2>
-				<div id="poststuff" class="metabox-holder has-right-sidebar">
-					<div id="side-info-column" class="inner-sidebar">
+            <div class="wrap">
+                <h2><?php _e( 'SpeedGuard :: Settings', 'speedguard' ); ?></h2>
+                <div id="poststuff" class="metabox-holder has-right-sidebar">
+                    <div id="side-info-column" class="inner-sidebar">
 						<?php do_meta_boxes( '', 'side', 0 ); ?>
-					</div>
-					<div id="post-body" class="has-sidebar">
-						<div id="post-body-content" class="has-sidebar-content">
-							<form method="post"
-									action="<?php print_r( defined( 'SPEEDGUARD_MU_NETWORK' ) ? 'edit.php?action=speedguard_update_settings' : 'options.php' ); ?>">
+                    </div>
+                    <div id="post-body" class="has-sidebar">
+                        <div id="post-body-content" class="has-sidebar-content">
+                            <form method="post"
+                                  action="<?php print_r( defined( 'SPEEDGUARD_MU_NETWORK' ) ? 'edit.php?action=speedguard_update_settings' : 'options.php' ); ?>">
 								<?php do_meta_boxes( '', 'normal', 0 ); ?>
-							</form>
+                            </form>
 
 
-						</div>
-					</div>
-				</div>
-				</form>
-			</div>
+                        </div>
+                    </div>
+                </div>
+                </form>
+            </div>
 			<?php
 		}
 	}
@@ -130,86 +130,120 @@ class SpeedGuard_Settings {
 			}
 		}
 	}
-
+	//TODO: first save to sq_origin_test_results
+	// TODO: remove all average option and frfom everywhere in the plugin
+	//TODO:  then adjust to run only on the last one, not every time
+	//TODO move to new_test_lighthouse document
+    //TODO trigger when test is deleted
 	function load_time_updated_function( $meta_id, $post_id, $meta_key, $meta_value ) {
 		if ( 'sg_test_result' === $meta_key ) {
-
-			$guarded_pages = get_posts([
-
-				'posts_per_page' => 100,
-				'no_found_rows'  => true,
-                'post_type'      => SpeedGuard_Admin::$cpt_name,
-				'post_status'    => 'publish',
-				'fields'         => 'ids',
-				'meta_query' => [
-					[
-						'key'     => 'sg_test_result',
-						'value'   => 'waiting',
-						'compare' => 'NOT LIKE',
+			if ( ! get_transient( 'speedguard-tests-running' ) ) { //if there are no more tests running
+				$new_sg_origin_result = [];
+				//Get all tests with valid results
+				$guarded_pages = get_posts( [
+					'posts_per_page' => 100,
+					'no_found_rows'  => true,
+					'post_type'      => SpeedGuard_Admin::$cpt_name,
+					'post_status'    => 'publish',
+					'fields'         => 'ids',
+					'meta_query'     => [
+						[
+							'key'     => 'sg_test_result',
+							'value'   => 'waiting',
+							'compare' => 'NOT LIKE',
+						]
 					]
-                ]
-			] );
-            $guarded_page_load_time_all = array();
-			if ( count( $guarded_pages ) > 0 ) {
-				foreach ( $guarded_pages as $guarded_page ) {
-					$guarded_page_load_time = get_post_meta( $guarded_page, 'sg_test_result' );
-					if ( ! empty( $guarded_page_load_time[0]['numericValue'] ) && $guarded_page_load_time[0]['numericValue'] > 0 ) {
-						$guarded_page_load_time       = round( ( $guarded_page_load_time[0]['numericValue'] / 1000 ), 1 );
-						$guarded_page_load_time_all[] = $guarded_page_load_time;
+				] );
+
+				if ( count( $guarded_pages ) > 0 ) {
+					$average = [];
+					foreach ( $guarded_pages as $guarded_page ) {
+						$guarded_page_load_time = get_post_meta( $guarded_page, 'sg_test_result', true );
+						foreach ( SpeedGuard_Admin::SG_METRICS_ARRAY as $device => $test_types ) {
+							foreach ( $test_types as $test_type => $metrics ) {
+								if ( $test_type === 'psi' ) { //prepare metrics from PSI
+									foreach ( $metrics as $metric ) {
+										$average[ $device ][ $test_type ][ $metric ]['guarded_pages'][ $guarded_page ] = $guarded_page_load_time[ $device ][ $test_type ][ $metric ]['numericValue'];
+									}
+								}
+							}
+						}
 					}
+
+					//Prepare new values for PSI Averages
+					$new_average_array = [];
+					foreach ( $average as $device => $test_types ) {
+						foreach ( $test_types as $test_type => $metrics ) {
+							foreach ( $metrics as $metric => $values ) {
+								foreach ( $values as $key => $value ) {
+									$new_metric_array = [];
+									if ( $key === 'guarded_pages' ) {
+										$average                     = array_sum( $value ) / count( $value );
+										$new_metric_array['average'] = $average;
+										if ( 'lcp' === $metric ) {
+											$average =  round( $average / 1000, 2 );
+											$new_metric_array['displayValue'] = $average . ' s';
+											if ( $average < 2.5 ) {
+												$new_metric_array['score'] = 'FAST';
+											} elseif ( $average < 4.0 ) {
+												$new_metric_array['score'] = 'AVERAGE';
+											} else {
+												$new_metric_array['score'] = 'SLOW';
+											}
+										} elseif ( 'cls' === $metric ) {
+											$new_metric_array['displayValue'] = round( $average, 3 );
+                                            if ( $average < 0.1 ) {
+                                                $new_metric_array['score'] = 'FAST';
+                                            } elseif ( $average < 0.25 ) {
+                                                $new_metric_array['score'] = 'AVERAGE';
+                                            } else {
+	                                            $new_metric_array['score'] = 'SLOW';
+                                            }
+										}
+										$new_metric_array['min']                               = min( $value );
+										$new_metric_array['max']                               = max( $value );
+										$new_metric_array['guarded_pages']                     = $value;
+										$new_average_array[ $device ][ $test_type ][ $metric ] = $new_metric_array;
+									}
+								}
+							}
+						}
+					}
+
+					$new_sg_origin_result = array_merge_recursive( SpeedGuard_Admin::get_this_plugin_option( 'sg_origin_result' ), $new_average_array );
 				}
-				if ( ! empty( $guarded_page_load_time_all ) ) {
-					$average_load_time = round( array_sum( $guarded_page_load_time_all ) / count( $guarded_page_load_time_all ), 1 );
-					$min_load_time     = min( $guarded_page_load_time_all );
-					$max_load_time     = max( $guarded_page_load_time_all );
-					$new_averages      = array(
-						'average_load_time'   => $average_load_time,
-						'min_load_time'       => $min_load_time,
-						'max_load_time'       => $max_load_time,
-						'guarded_pages_count' => count( $guarded_page_load_time_all ),
-					);
-				}
-			} else {
-				$new_averages = array(
-					'average_load_time'   => 0,
-					'min_load_time'       => 0,
-					'max_load_time'       => 0,
-					'guarded_pages_count' => 0,
-				);
-			}
-			if ( $new_averages ) {
-				SpeedGuard_Admin::update_this_plugin_option( 'speedguard_average', $new_averages );
+
+				SpeedGuard_Admin::update_this_plugin_option( 'sg_origin_results', $new_sg_origin_result );
 			}
 		}
 	}
 
 	function update_results_cron_function() {
 		// If send report is on: schedule cron job
-		$speedguard_options = get_option('speedguard_options');
-		$email_me_case = $speedguard_options['email_me_case'];
-		if ($email_me_case != 'never') {
-			if (!wp_next_scheduled('speedguard_email_test_results')) {
+		$speedguard_options = get_option( 'speedguard_options' );
+		$email_me_case      = $speedguard_options['email_me_case'];
+		if ( $email_me_case != 'never' ) {
+			if ( ! wp_next_scheduled( 'speedguard_email_test_results' ) ) {
 				// In 2 minutes
-				wp_schedule_single_event(time() + 2 * 60, 'speedguard_email_test_results');
+				wp_schedule_single_event( time() + 2 * 60, 'speedguard_email_test_results' );
 			}
 		}
 
 		// Get all guarded pages
-		$args = [
+		$args          = [
 			'post_type'      => SpeedGuard_Admin::$cpt_name,
 			'post_status'    => 'publish',
-			'posts_per_page' => -1,
+			'posts_per_page' => - 1,
 			'fields'         => 'ids',
 			'no_found_rows'  => true,
 		];
-		$guarded_pages = get_posts($args);
+		$guarded_pages = get_posts( $args );
 
 		// Update the test results for each guarded page
-		foreach ($guarded_pages as $guarded_page_id) {
-			SpeedGuard_Tests::update_speedguard_test($guarded_page_id);
+		foreach ( $guarded_pages as $guarded_page_id ) {
+			SpeedGuard_Tests::update_speedguard_test( $guarded_page_id );
 		}
 	}
-
 
 
 	function email_test_results_function() {
@@ -227,9 +261,9 @@ class SpeedGuard_Settings {
 	}
 
 	function speedguard_cron_schedules( $schedules ) {
-		$check_recurrence                 = 1; // Check every day
-		//$value                            = constant( 'DAY_IN_SECONDS' );
-		$value                            = 1200; //every 10 mins for testing
+		$check_recurrence = 1; // Check every day
+		$value            = constant( 'DAY_IN_SECONDS' );
+		//$value                            = 1200; //every 10 mins for testing
 		$interval                         = (int) $check_recurrence * $value;
 		$schedules['speedguard_interval'] = array(
 			'interval' => $interval, // user input integer in second
@@ -308,7 +342,7 @@ class SpeedGuard_Settings {
 		$options    = SpeedGuard_Admin::get_this_plugin_option( 'speedguard_options' );
 		$field_name = esc_attr( $args['label_for'] );
 		$items      = array(
-			'cwv'  => __( 'Core Web Vitals', 'speedguard' ),
+			'cwv' => __( 'Core Web Vitals', 'speedguard' ),
 			'psi' => __( 'PageSpeed Insights', 'speedguard' ),
 		);
 		echo "<select id='speedguard_options[" . $field_name . "]' name='speedguard_options[" . $field_name . "]' >";

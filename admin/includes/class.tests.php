@@ -363,7 +363,7 @@ class SpeedGuard_Tests {
 
 			// Set waiting status for the tests and sidewide
 			update_post_meta( $guarded_page_id, 'sg_test_result', 'waiting' );
-			SpeedGuard_Admin::update_this_plugin_option( 'sg_origin_result', 'waiting' );
+			SpeedGuard_Admin::update_this_plugin_option( 'sg_origin_results', 'waiting' );
 
 			// TODO: Replace with action
 			$response = 'speedguard_test_being_updated'; // TODO: true, false, error
@@ -396,7 +396,7 @@ class SpeedGuard_Tests {
 			update_post_meta( $target_page_id, 'speedguard_item_type', $guarded_item_type );
 
 			// Set waiting status for the tests and sidewide
-			SpeedGuard_Admin::update_this_plugin_option( 'sg_origin_result', 'waiting' );
+			SpeedGuard_Admin::update_this_plugin_option( 'sg_origin_results', 'waiting' );
 			update_post_meta( $target_page_id, 'sg_test_result', 'waiting' );
 
 			// TODO always pass blog id

@@ -83,7 +83,7 @@ function speedguard_delete_data()
 		'speedguard_options',
 		'speedguard_api',
 		'speedguard_average',
-		'sg_origin_result',
+		'sg_origin_results',
 	];
 
 	foreach ($speedguard_options as $option_name) {
