@@ -18,19 +18,19 @@ function pr( $data ) {
 class SpeedGuard_Admin {
 
 
+	const SG_METRICS_ARRAY = [
+		'mobile'  => [
+			'psi' => [ 'lcp', 'cls' ],
+			'cwv' => [ 'lcp', 'cls', 'fid' ],
+		],
+		'desktop' => [
+			'psi' => [ 'lcp', 'cls' ],
+			'cwv' => [ 'lcp', 'cls', 'fid' ],
+		],
+	];
 	public static $cpt_name = 'guarded-page';
 	private $plugin_name;
 	private $version;
-	const SG_METRICS_ARRAY = array(
-		'mobile'  => array(
-			'psi' => array( 'lcp', 'cls' ),
-			'cwv' => array( 'lcp', 'cls', 'fid' ),
-		),
-		'desktop' => array(
-			'psi' => array( 'lcp', 'cls' ),
-			'cwv' => array( 'lcp', 'cls', 'fid' ),
-		),
-	);
 
 	public function __construct( $plugin_name, $version ) {
 		$this->plugin_name = $plugin_name;
@@ -201,12 +201,12 @@ class SpeedGuard_Admin {
 		if ( ! current_user_can( 'manage_options' ) ) {
 			return;
 		}
-		$sg_origin_results = self::get_this_plugin_option( 'sg_origin_results' );
-		$guarded_pages_count = count($sg_origin_results['mobile']['psi']['lcp']['guarded_pages']);
-        // All screens
+		$sg_origin_results   = self::get_this_plugin_option( 'sg_origin_results' );
+		$guarded_pages_count = count( $sg_origin_results['mobile']['psi']['lcp']['guarded_pages'] );
+		// All screens
 		// Dashboard and SpeedGuard Settigns screens
 		if ( self::is_screen( 'settings,dashboard' ) ) {
-			if ( $guarded_pages_count  < 2 ) { // TODO: set transient/user meta on dissmissal action
+			if ( $guarded_pages_count < 2 ) { // TODO: set transient/user meta on dissmissal action
 				$message = sprintf( __( 'You only have the speed of 1 page monitored currently. Would you like to %1$sadd other pages%2$s to see the whole picture of the site speed?', 'speedguard' ), '<a href="' . self::speedguard_page_url( 'tests' ) . '">', '</a>' );
 				$notices = self::set_notice( $message, 'warning' );
 			}
@@ -334,7 +334,7 @@ class SpeedGuard_Admin {
 
 	function run_waiting_tests_ajax() {
 		if ( self::is_screen( 'tests' ) || self::is_screen( 'clients' ) ) {
-		 	$args = [
+			$args          = [
 				'post_type'      => self::$cpt_name,
 				'post_status'    => 'publish',
 				'posts_per_page' => 100,
@@ -348,43 +348,42 @@ class SpeedGuard_Admin {
 				],
 				'no_found_rows'  => true,
 			];
-          $waiting_pages = get_posts( $args );
-            //TODO replace with transient (?), might not work on WPEngine
+			$waiting_pages = get_posts( $args );
+			//TODO replace with transient (?), might not work on WPEngine
 			//$waiting_pages = array(19);
 			if ( empty( $waiting_pages ) ) {
 				delete_transient( 'speedguard-tests-running' );
+
 				return;
 			}
 			?>
-					<script type="text/javascript">
-						var waiting_posts = <?php echo json_encode( array_values( $waiting_pages ) ); ?>;
-						const params = new URLSearchParams();
-						params.append('action', 'run_waiting_tests');
-						for (var i = 0; i < waiting_posts.length; i++) {
-							params.append('post_ids[]', waiting_posts[i]);
-						}
-						fetch(ajaxurl, {
-							method: 'POST',
-							credentials: 'same-origin',
-							headers: {
-								'Content-Type': 'application/x-www-form-urlencoded',
-								'Cache-Control': 'no-cache',
-							},
-							body: params,
-						})
-							.then(response => {
-								response.json()
-								setTimeout(function () {
-									window.location.replace(window.location.href + "&speedguard=load_time_updated");
-								}, 10000)
-							})
-							.catch(err => console.log(err));
-					</script>
-					<?php
-
+            <script type="text/javascript">
+                var waiting_posts = <?php echo json_encode( array_values( $waiting_pages ) ); ?>;
+                const params = new URLSearchParams();
+                params.append('action', 'run_waiting_tests');
+                for (var i = 0; i < waiting_posts.length; i++) {
+                    params.append('post_ids[]', waiting_posts[i]);
+                }
+                fetch(ajaxurl, {
+                    method: 'POST',
+                    credentials: 'same-origin',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'Cache-Control': 'no-cache',
+                    },
+                    body: params,
+                })
+                    .then(response => {
+                        response.json()
+                        setTimeout(function () {
+                            window.location.replace(window.location.href + "&speedguard=load_time_updated");
+                        }, 10000)
+                    })
+                    .catch(err => console.log(err));
+            </script>
+			<?php
 		}
 	}
-
 
 
 	function run_waiting_tests() {
@@ -420,14 +419,14 @@ class SpeedGuard_Admin {
 	}
 
 
-    //Fix backwards compatibility with old versions of the plugin that used WedPageTest
+	//Fix backwards compatibility with old versions of the plugin that used WedPageTest
 	function fix_backwards_compatibility_wpt() {
 		if ( self::is_screen( 'tests' ) ) {
 			if ( get_transient( 'speedguard-notice-activation' ) ) {
 				$args = [
 					'post_type'      => self::$cpt_name,
 					'post_status'    => 'publish',
-					'posts_per_page' => -1,
+					'posts_per_page' => - 1,
 					'fields'         => 'ids',
 					'meta_query'     => [
 						[
@@ -440,15 +439,14 @@ class SpeedGuard_Admin {
 					'no_found_rows'  => true,
 				];
 
-				$guarded_pages = get_posts($args);
-				if ( ! empty($guarded_pages) ) {
+				$guarded_pages = get_posts( $args );
+				if ( ! empty( $guarded_pages ) ) {
 					// Use the `do_action()` function to trigger the `handle_bulk_retest_load_time` action.
 					do_action( 'handle_bulk_retest_load_time', $guarded_pages->ids );
 				}
 			}
 		}
 	}
-
 
 
 	// Plugin Body classes
@@ -488,23 +486,22 @@ class SpeedGuard_Admin {
 
 	function body_classes_filter( $classes ) {
 		if ( self::is_screen( 'settings,tests,dashboard' ) ) {
-            $sg_origin_results = self::get_this_plugin_option( 'sg_origin_results' );
-			$guarded_pages_count = count($sg_origin_results['mobile']['psi']['lcp']['guarded_pages']);
+			$sg_origin_results   = self::get_this_plugin_option( 'sg_origin_results' );
+			$guarded_pages_count = count( $sg_origin_results['mobile']['psi']['lcp']['guarded_pages'] );
 
-			if ( $guarded_pages_count < 1 )  {
+			if ( $guarded_pages_count < 1 ) {
 				$classes = $classes . ' no-guarded-pages';
 			}
 		}
 		if ( self::is_screen( 'tests' ) ) {
 			$sg_test_type = SpeedGuard_Settings::global_test_type();
-			if ( 'cwv' === $sg_test_type) {
+			if ( 'cwv' === $sg_test_type ) {
 				$class = 'test-type-cwv';
-			} elseif ( 'psi'  === $sg_test_type) {
+			} elseif ( 'psi' === $sg_test_type ) {
 				$class = 'test-type-psi';
 			}
 
 			$classes = $classes . ' ' . $class;
-
 		}
 		if ( self::is_screen( 'plugins' ) ) {
 			if ( get_transient( 'speedguard-notice-activation' ) ) {

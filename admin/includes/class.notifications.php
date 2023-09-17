@@ -18,7 +18,6 @@ class SpeedGuard_Notifications {
 			$site_url           = parse_url( get_home_url() );
 			$site_url           = $site_url['host'];
 
-
 			if ( $type === 'critical_load_time' ) {
 				$subject = sprintf( __( '%1$s is slow [SpeedGuard]', 'speedguard' ), $site_url );
 				$note    = sprintf( __( '%1$s takes more than %2$s seconds to load', 'speedguard' ), $site_url, $critical_load_time );
@@ -96,11 +95,9 @@ class SpeedGuard_Notifications {
 				wp_mail( $admin_email, $subject, $message, $headers );
 			endif;
 		}//if there are no waiting pages]
-	else { //if there are tests running at the moment -- reschedule to send email in 10 minutes
-		wp_schedule_single_event( time() + 10 * 60, 'speedguard_email_test_results' );
-	}
-
-
+		else { //if there are tests running at the moment -- reschedule to send email in 10 minutes
+			wp_schedule_single_event( time() + 10 * 60, 'speedguard_email_test_results' );
+		}
 	}
 }
 

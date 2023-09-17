@@ -72,7 +72,6 @@ class SpeedGuardWidgets {
 			'core'
 		);
 
-
 		if ( 'cwv' === $sg_test_type ) {
 			$test_type = ' -- Core Web Vitals';
 		} elseif ( 'psi' === $sg_test_type ) {
@@ -123,6 +122,71 @@ class SpeedGuardWidgets {
 			'core'
 		);
 	}
+
+	/**
+	 * Function responsible for displaying widget with CWV side-wide results widget on Tests page
+	 *
+	 * @param $post
+	 * @param $args
+	 *
+	 * @return void
+	 */
+	public static function speedguard_origin_results_meta_box() {
+		// Retrieving data to display
+		$speedguard_cwv_origin = SpeedGuard_Admin::get_this_plugin_option( 'sg_origin_results' );
+
+		// Preparing data to display
+		// TODO make this constant
+		$sg_test_type = SpeedGuard_Settings::global_test_type();
+		foreach ( SpeedGuard_Admin::SG_METRICS_ARRAY as $device => $test_types ) {
+			foreach ( $test_types as $test_type => $metrics ) {
+				if ( $test_type === $sg_test_type ) { //prepare metrics only for needed test type
+					foreach ( $metrics as $metric ) {
+						$current_metric  = $device . '_' . $metric;
+						$$current_metric = SpeedGuardWidgets::single_metric_display( $speedguard_cwv_origin, $device, $test_type, $metric );
+					}
+				}
+			}
+		}
+		if ( 'cwv' === $sg_test_type ) {
+			$fid_tr = '<tr><th>' . __( 'First Input Delay (FID)', 'speedguard' ) . '</th>
+	<td>' . $mobile_fid . '</td>
+	<td>' . $desktop_fid . '</td></tr>';
+		} else {
+			$fid_tr = '';
+		}
+
+		$content = "
+	<table class='widefat fixed striped toplevel_page_speedguard_tests_cwv_widget'>
+	<thead>
+	<tr class='bc-platforms'><td></td>
+	<th><i class='sg-device-column mobile' aria-hidden='true' title='Mobile'></i></th>
+	<th><i class='sg-device-column desktop' aria-hidden='true' title='Desktop''></i></th>
+	</tr>
+	</thead>
+	<thbody>
+	<tr><th>" . __( 'Largest Contentful Paint (LCP)', 'speedguard' ) . '</th>
+	<td>' . $mobile_lcp . '</td>
+	<td>' . $desktop_lcp . '</td>
+	</tr>                                                                   
+	<tr><th>' . __( 'Cumulative Layout Shift (CLS)', 'speedguard' ) . '</th>
+	<td>' . $mobile_cls . '</td>
+	<td>' . $desktop_cls . '</td>
+	</tr>
+	' . $fid_tr . '</thbody>
+	</table>
+	<div><br>
+	'
+		           // TODO link to the video
+		           . sprintf( __( 'N/A means that there is no data from Google available -- most likely your website have not got enough traffic for Google to make evaluation (Not enough usage data in the last 90 days for this device type)', 'speedguard' ), '<a href="#">', '</a>' ) . '</div>';
+
+		echo $content;
+	}
+
+	/**
+	 * Tests Page -> Info Metabox output
+	 */
+
 	/**
 	 * Function responsible for formatting CWV data for display
 	 *
@@ -134,7 +198,7 @@ class SpeedGuardWidgets {
 		$category      = '';
 		$class         = '';
 		if ( $results_array === 'waiting' ) {  // tests are currently running
-			$class         = 'waiting';
+			$class = 'waiting';
 		} elseif ( ( is_array( $results_array ) ) ) {// tests are not currently running
 
 			// Check if metric data is available for this device
@@ -170,70 +234,6 @@ class SpeedGuardWidgets {
 		return $metric_display_value;
 	}
 
-	/**
-	 * Tests Page -> Info Metabox output
-	 */
-	/**
-	 * Function responsible for displaying widget with CWV side-wide results widget on Tests page
-	 *
-	 * @param $post
-	 * @param $args
-	 *
-	 * @return void
-	 */
-	public static function speedguard_origin_results_meta_box() {
-		// Retrieving data to display
-		$speedguard_cwv_origin = SpeedGuard_Admin::get_this_plugin_option( 'sg_origin_results' );
-
-		// Preparing data to display
-		// TODO make this constant
-		$sg_test_type = SpeedGuard_Settings::global_test_type();
-		foreach ( SpeedGuard_Admin::SG_METRICS_ARRAY as $device => $test_types ) {
-			foreach ( $test_types as $test_type => $metrics ) {
-				if ($test_type === $sg_test_type) { //prepare metrics only for needed test type
-					foreach ( $metrics as $metric ) {
-						$current_metric = $device . '_' . $metric;
-						$$current_metric = SpeedGuardWidgets::single_metric_display(  $speedguard_cwv_origin, $device, $test_type, $metric );
-
-					}
-				}
-
-			}
-		}
-if ('cwv' === $sg_test_type){
-	$fid_tr = '<tr><th>' . __( 'First Input Delay (FID)', 'speedguard' ) . '</th>
-	<td>' . $mobile_fid . '</td>
-	<td>' . $desktop_fid . '</td></tr>';
-}
-else {$fid_tr = '';}
-
-		$content = "
-	<table class='widefat fixed striped toplevel_page_speedguard_tests_cwv_widget'>
-	<thead>
-	<tr class='bc-platforms'><td></td>
-	<th><i class='sg-device-column mobile' aria-hidden='true' title='Mobile'></i></th>
-	<th><i class='sg-device-column desktop' aria-hidden='true' title='Desktop''></i></th>
-	</tr>
-	</thead>
-	<thbody>
-	<tr><th>" . __( 'Largest Contentful Paint (LCP)', 'speedguard' ) . '</th>
-	<td>' . $mobile_lcp . '</td>
-	<td>' . $desktop_lcp . '</td>
-	</tr>                                                                   
-	<tr><th>' . __( 'Cumulative Layout Shift (CLS)', 'speedguard' ) . '</th>
-	<td>' . $mobile_cls . '</td>
-	<td>' . $desktop_cls . '</td>
-	</tr>
-	'.$fid_tr.'</thbody>
-	</table>
-	<div><br>
-	'
-		           // TODO link to the video
-		           . sprintf( __( 'N/A means that there is no data from Google available -- most likely your website have not got enough traffic for Google to make evaluation (Not enough usage data in the last 90 days for this device type)', 'speedguard' ), '<a href="#">', '</a>' ) . '</div>';
-
-		echo $content;
-	}
-
 	public static function speedguard_legend_meta_box() {
 		// Set the variable for the Core Web Vitals link.
 		$cwv_link = 'https://web.dev/lcp/';
@@ -243,15 +243,15 @@ else {$fid_tr = '';}
   <tr>
     <td>
       <p>' . sprintf(
-			__( 'We all know that site\'s loading speed was impacting Google ranking for quite a while now. But recently (late May 2020) company has revealed more details about %1$sCore Web Vitals%2$s — metrics that Google will be using to rank websites.', 'speedguard' ),
-			'<a href="' . $cwv_link . '" target="_blank">',
-			'</a>'
-		) . '</p>
+				__( 'We all know that site\'s loading speed was impacting Google ranking for quite a while now. But recently (late May 2020) company has revealed more details about %1$sCore Web Vitals%2$s — metrics that Google will be using to rank websites.', 'speedguard' ),
+				'<a href="' . $cwv_link . '" target="_blank">',
+				'</a>'
+			) . '</p>
       <p>' . sprintf(
-			__( '%1$sLargest Contentful Paint%2$s is one of them. It measures how quickly the page\'s "main content" loads — the bulk of the text or image (within the viewport, so before the user scrolls). ', 'speedguard' ),
-			'<strong>',
-			'</strong>'
-		) . '</p>
+			           __( '%1$sLargest Contentful Paint%2$s is one of them. It measures how quickly the page\'s "main content" loads — the bulk of the text or image (within the viewport, so before the user scrolls). ', 'speedguard' ),
+			           '<strong>',
+			           '</strong>'
+		           ) . '</p>
       <p>
         ' . __( 'The intention of these changes is to improve how users perceive the experience of interacting with a web page.', 'speedguard' ) . '
       </p>

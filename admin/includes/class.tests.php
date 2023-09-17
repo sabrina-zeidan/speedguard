@@ -41,10 +41,10 @@ class SpeedGuard_List_Table extends WP_List_Table {
 	}
 
 	//Set up all columns
-    public function get_columns() {
+	public function get_columns() {
 		// Display Columns set based on Test type choice in Settigns
-	    $sg_test_type = SpeedGuard_Settings::global_test_type();
-        $columns = [
+		$sg_test_type = SpeedGuard_Settings::global_test_type();
+		$columns      = [
 			'cb'                 => '<input type="checkbox" />',
 			'guarded_page_title' => __( 'URL', 'speedguard' ),
 		];
@@ -59,7 +59,7 @@ class SpeedGuard_List_Table extends WP_List_Table {
 			$columns['cwv_desktop_cls'] = __( 'CLS', 'speedguard' );
 			$columns['cwv_desktop_fid'] = __( 'FID', 'speedguard' );
 		} // PSI
-		elseif ( 'psi' === $sg_test_type) {
+        elseif ( 'psi' === $sg_test_type ) {
 			// Mobile
 			$columns['psi_mobile_lcp'] = __( 'LCP', 'speedguard' );
 			$columns['psi_mobile_cls'] = __( 'CLS', 'speedguard' );
@@ -69,7 +69,8 @@ class SpeedGuard_List_Table extends WP_List_Table {
 		}
 
 		$columns['report_date'] = __( 'Updated', 'speedguard' );
-        return $columns;
+
+		return $columns;
 	}
 
 	// Which columns are hidden
@@ -77,7 +78,7 @@ class SpeedGuard_List_Table extends WP_List_Table {
 		return [];
 	}
 
-    //Which columns are sortable
+	//Which columns are sortable
 	public function get_sortable_columns() {
 		return [
 			'guarded_page_title' => [ 'guarded_page_title', false ],
@@ -139,7 +140,7 @@ class SpeedGuard_List_Table extends WP_List_Table {
 	}
 
 	function get_table_classes() {
-        $sg_test_type = SpeedGuard_Settings::global_test_type();
+		$sg_test_type = SpeedGuard_Settings::global_test_type();
 		if ( 'cwv' === $sg_test_type ) {
 			$test_type = 'cwv-test-type';
 		} elseif ( 'psi' === $sg_test_type ) {
@@ -176,8 +177,6 @@ class SpeedGuard_List_Table extends WP_List_Table {
 			exit;
 		}
 	}
-
-
 
 
 	function column_cb( $item ) {
@@ -329,26 +328,27 @@ class SpeedGuard_Tests {
 
 	/**
 	 * @return bool
-     * Checks if the homepage is guarded.
+	 * Checks if the homepage is guarded.
 	 */
 	public static function is_homepage_guarded() {
-    $args = [
-	    'post_type' => SpeedGuard_Admin::$cpt_name,
-	    'post_status' => 'publish',
-	    'posts_per_page' => 1,
-	    'fields'         => 'ids',
-	    'no_found_rows'  => true,
-	    'meta_query' => [
-		    [
-			    'key' => 'speedguard_item_type',
-			    'compare' => 'LIKE',
-			    'value' => 'homepage',
-		    ],
-	    ],
-    ];
-    $posts = get_posts($args);
-    return ! empty($posts);
-}
+		$args  = [
+			'post_type'      => SpeedGuard_Admin::$cpt_name,
+			'post_status'    => 'publish',
+			'posts_per_page' => 1,
+			'fields'         => 'ids',
+			'no_found_rows'  => true,
+			'meta_query'     => [
+				[
+					'key'     => 'speedguard_item_type',
+					'compare' => 'LIKE',
+					'value'   => 'homepage',
+				],
+			],
+		];
+		$posts = get_posts( $args );
+
+		return ! empty( $posts );
+	}
 
 	// TODO unify create and update functions
 	/*
@@ -438,23 +438,23 @@ class SpeedGuard_Tests {
 		if ( SpeedGuard_Admin::is_screen( 'tests' ) ) {
 			SpeedGuardWidgets::add_meta_boxes();
 			?>
-			<div class="wrap">
-				<h2><?php _e( 'Speedguard :: Guarded pages', 'speedguard' ); ?></h2>
-				<div id="poststuff" class="metabox-holder has-right-sidebar">
-					<div id="side-info-column" class="inner-sidebar">
+            <div class="wrap">
+                <h2><?php _e( 'Speedguard :: Guarded pages', 'speedguard' ); ?></h2>
+                <div id="poststuff" class="metabox-holder has-right-sidebar">
+                    <div id="side-info-column" class="inner-sidebar">
 						<?php
 
 						do_meta_boxes( '', 'side', 0 );
 						?>
-					</div>
-					<div id="post-body" class="has-sidebar">
-						<div id="post-body-content" class="has-sidebar-content">
+                    </div>
+                    <div id="post-body" class="has-sidebar">
+                        <div id="post-body-content" class="has-sidebar-content">
 							<?php do_meta_boxes( '', 'main-content', '' ); ?>
-						</div>
-					</div>
-				</div>
-				</form>
-			</div>
+                        </div>
+                    </div>
+                </div>
+                </form>
+            </div>
 			<?php
 		}
 	}
@@ -527,10 +527,9 @@ class SpeedGuard_Tests {
 			'update_post_term_cache' => false,
 		];
 
-		$this_blog_found_posts = get_posts($args);
+		$this_blog_found_posts = get_posts( $args );
 
-
-		$temp                  = [];
+		$temp = [];
 		foreach ( $this_blog_found_posts as $key => $post_id ) {
 			// $key = 'ID';
 			$temp    = [

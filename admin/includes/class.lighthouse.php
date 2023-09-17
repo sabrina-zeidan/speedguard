@@ -20,14 +20,14 @@ class SpeedGuard_Lighthouse {
 		foreach ( $devices as $device ) {
 			//sleep( 5 ); // So we can use LightHouse without API
 			$request  = add_query_arg(
-				array(
+				[
 					'url'      => $guarded_page_url,
 					'category' => 'performance',
 					'strategy' => $device,
-				),
+				],
 				'https://www.googleapis.com/pagespeedonline/v5/runPagespeed'
 			);
-			$args     = array( 'timeout' => 30 );
+			$args     = [ 'timeout' => 30 ];
 			$response = wp_safe_remote_get( $request, $args );
 			if ( is_wp_error( $response ) ) { // if no response
 				return false;
@@ -58,8 +58,7 @@ class SpeedGuard_Lighthouse {
 					$LCP          = isset( $json_response['originLoadingExperience']['metrics']['LARGEST_CONTENTFUL_PAINT_MS'] ) ? $json_response['originLoadingExperience']['metrics']['LARGEST_CONTENTFUL_PAINT_MS'] : $notavailable; // percentile,distributions, category
 					$CLS          = isset( $json_response['originLoadingExperience']['metrics']['CUMULATIVE_LAYOUT_SHIFT_SCORE'] ) ? $json_response['originLoadingExperience']['metrics']['CUMULATIVE_LAYOUT_SHIFT_SCORE'] : $notavailable; // percentile,distributions, category
 					$FID          = isset( $json_response['originLoadingExperience']['metrics']['FIRST_INPUT_DELAY_MS'] ) ? $json_response['originLoadingExperience']['metrics']['FIRST_INPUT_DELAY_MS'] : $notavailable; // percentile,distributions, category
-				}
-				else {
+				} else {
 					$origin_cwv[ $device ] = "N/A"; // No sidewide CWV available
 				}
 				$origin[ $device ] ['cwv'] = [
@@ -67,8 +66,7 @@ class SpeedGuard_Lighthouse {
 					'cls' => $CLS,
 					'fid' => $FID,
 				];
-			// TODO -- check if it's the last test in the queue. If so -- calculate PSI Average
-
+				// TODO -- check if it's the last test in the queue. If so -- calculate PSI Average
 
 			} else {
 				// TODOIf no PSI data -- meaning test failed to execute -- add error message
@@ -76,10 +74,10 @@ class SpeedGuard_Lighthouse {
 		}
 
 		// Create a new test CPT
-		$new_test_cpt = array(
+		$new_test_cpt = [
 			'ID'         => $guarded_page_id,
 			'post_title' => $guarded_page_url,
-		);
+		];
 		wp_update_post( $new_test_cpt );
 		//And save all data
 		SpeedGuard_Admin::update_this_plugin_option( 'sg_origin_results', $origin );

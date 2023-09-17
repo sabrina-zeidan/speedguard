@@ -10,30 +10,30 @@ class SpeedGuard_Settings {
 
 	function __construct() {
 		// Register Settings sections
-		add_action( 'admin_init', array( $this, 'speedguard_settings' ) );
+		add_action( 'admin_init', [ $this, 'speedguard_settings' ] );
 
 		// This is Single Install or Multisite PER SITE
-		add_action( 'added_option', array( $this, 'default_options_added' ), 10, 2 );
-		add_action( 'updated_option', array( $this, 'speedguard_options_updated' ), 10, 3 );
-		add_action( 'pre_update_option_speedguard_options', array( $this, 'default_options_set' ), 10, 2 );
+		add_action( 'added_option', [ $this, 'default_options_added' ], 10, 2 );
+		add_action( 'updated_option', [ $this, 'speedguard_options_updated' ], 10, 3 );
+		add_action( 'pre_update_option_speedguard_options', [ $this, 'default_options_set' ], 10, 2 );
 
 		// For NETWORK ACTIVATED only
 
-		add_action( 'add_site_option', array( $this, 'default_options_added' ), 10, 2 );
-		add_action( 'update_site_option', array( $this, 'default_options_added' ), 10, 2 );
+		add_action( 'add_site_option', [ $this, 'default_options_added' ], 10, 2 );
+		add_action( 'update_site_option', [ $this, 'default_options_added' ], 10, 2 );
 		// Set default plugin settings
-		add_action( 'pre_update_site_option_speedguard_options', array( $this, 'default_options_set' ), 10, 2 );
+		add_action( 'pre_update_site_option_speedguard_options', [ $this, 'default_options_set' ], 10, 2 );
 		// Update options action function for Multisite
-		add_action( 'network_admin_edit_speedguard_update_settings', array( $this, 'speedguard_update_settings' ) );
+		add_action( 'network_admin_edit_speedguard_update_settings', [ $this, 'speedguard_update_settings' ] );
 
 		// update Averages when any load_time is updated
-		add_action( 'added_post_meta', array( $this, 'load_time_updated_function' ), 10, 4 );
-		add_action( 'updated_post_meta', array( $this, 'load_time_updated_function' ), 10, 4 );
-		add_action( 'deleted_post_meta', array( $this, 'load_time_updated_function' ), 10, 4 );
-		add_filter( 'cron_schedules', array( $this, 'speedguard_cron_schedules' ) );
+		add_action( 'added_post_meta', [ $this, 'load_time_updated_function' ], 10, 4 );
+		add_action( 'updated_post_meta', [ $this, 'load_time_updated_function' ], 10, 4 );
+		add_action( 'deleted_post_meta', [ $this, 'load_time_updated_function' ], 10, 4 );
+		add_filter( 'cron_schedules', [ $this, 'speedguard_cron_schedules' ] );
 		// send report when load_time is updated by cron automatically
-		add_action( 'speedguard_update_results', array( $this, 'update_results_cron_function' ) );
-		add_action( 'speedguard_email_test_results', array( $this, 'email_test_results_function' ) );
+		add_action( 'speedguard_update_results', [ $this, 'update_results_cron_function' ] );
+		add_action( 'speedguard_email_test_results', [ $this, 'email_test_results_function' ] );
 	}
 
 	public static function global_test_type() {
@@ -83,7 +83,7 @@ class SpeedGuard_Settings {
 		if ( empty( $speedguard_options ) ) {
 			// TODO set options on activation
 			// if just activated + if options are not set yet
-			$new_value = $this->default_options_set( array() );
+			$new_value = $this->default_options_set( [] );
 			SpeedGuard_Admin::update_this_plugin_option( 'speedguard_options', $new_value );
 		} elseif ( ! empty( $speedguard_options ) && $option === 'speedguard_options' ) { // if updating options
 			$speedguard_options = SpeedGuard_Admin::get_this_plugin_option( 'speedguard_options' );
@@ -134,7 +134,7 @@ class SpeedGuard_Settings {
 	// TODO: remove all average option and frfom everywhere in the plugin
 	//TODO:  then adjust to run only on the last one, not every time
 	//TODO move to new_test_lighthouse document
-    //TODO trigger when test is deleted
+	//TODO trigger when test is deleted
 	function load_time_updated_function( $meta_id, $post_id, $meta_key, $meta_value ) {
 		if ( 'sg_test_result' === $meta_key ) {
 			if ( ! get_transient( 'speedguard-tests-running' ) ) { //if there are no more tests running
@@ -181,7 +181,7 @@ class SpeedGuard_Settings {
 										$average                     = array_sum( $value ) / count( $value );
 										$new_metric_array['average'] = $average;
 										if ( 'lcp' === $metric ) {
-											$average =  round( $average / 1000, 2 );
+											$average                          = round( $average / 1000, 2 );
 											$new_metric_array['displayValue'] = $average . ' s';
 											if ( $average < 2.5 ) {
 												$new_metric_array['score'] = 'FAST';
@@ -192,13 +192,13 @@ class SpeedGuard_Settings {
 											}
 										} elseif ( 'cls' === $metric ) {
 											$new_metric_array['displayValue'] = round( $average, 3 );
-                                            if ( $average < 0.1 ) {
-                                                $new_metric_array['score'] = 'FAST';
-                                            } elseif ( $average < 0.25 ) {
-                                                $new_metric_array['score'] = 'AVERAGE';
-                                            } else {
-	                                            $new_metric_array['score'] = 'SLOW';
-                                            }
+											if ( $average < 0.1 ) {
+												$new_metric_array['score'] = 'FAST';
+											} elseif ( $average < 0.25 ) {
+												$new_metric_array['score'] = 'AVERAGE';
+											} else {
+												$new_metric_array['score'] = 'SLOW';
+											}
 										}
 										$new_metric_array['min']                               = min( $value );
 										$new_metric_array['max']                               = max( $value );
@@ -265,10 +265,10 @@ class SpeedGuard_Settings {
 		$value            = constant( 'DAY_IN_SECONDS' );
 		//$value                            = 1200; //every 10 mins for testing
 		$interval                         = (int) $check_recurrence * $value;
-		$schedules['speedguard_interval'] = array(
+		$schedules['speedguard_interval'] = [
 			'interval' => $interval, // user input integer in second
 			'display'  => __( 'SpeedGuard check interval', 'speedguard' ),
-		);
+		];
 
 		return $schedules;
 	}
@@ -308,11 +308,11 @@ class SpeedGuard_Settings {
 	function email_me_case_fn( $args ) {
 		$options    = SpeedGuard_Admin::get_this_plugin_option( 'speedguard_options' );
 		$field_name = esc_attr( $args['label_for'] );
-		$items      = array(
+		$items      = [
 			'every time after tests are executed'   => __( 'every time after tests are executed', 'speedguard' ),
 			'just in case average speed worse than' => __( 'just in case average speed worse than', 'speedguard' ),
 			'never'                                 => __( 'never', 'speedguard' ),
-		);
+		];
 		foreach ( $items as $item => $item_label ) {
 			$checked = ( $options[ $field_name ] === $item ) ? ' checked="checked" ' : '';
 
@@ -320,10 +320,10 @@ class SpeedGuard_Settings {
 			$critical_load_time = $options['critical_load_time'];
 			if ( $item === 'just in case average speed worse than' ) {
 				$this->critical_load_time_fn(
-					array(
+					[
 						'label_for' => 'critical_load_time',
 						'show'      => true,
-					)
+					]
 				);
 			}
 			echo '</label><br />';
@@ -341,10 +341,10 @@ class SpeedGuard_Settings {
 	function test_type_fn( $args ) {
 		$options    = SpeedGuard_Admin::get_this_plugin_option( 'speedguard_options' );
 		$field_name = esc_attr( $args['label_for'] );
-		$items      = array(
+		$items      = [
 			'cwv' => __( 'Core Web Vitals', 'speedguard' ),
 			'psi' => __( 'PageSpeed Insights', 'speedguard' ),
-		);
+		];
 		echo "<select id='speedguard_options[" . $field_name . "]' name='speedguard_options[" . $field_name . "]' >";
 		foreach ( $items as $item => $item_label ) {
 			$selected = ( $options[ $field_name ] === $item ) ? ' selected="selected" ' : '';
@@ -364,10 +364,10 @@ class SpeedGuard_Settings {
 		}
 		wp_redirect(
 			add_query_arg(
-				array(
+				[
 					'page'             => 'speedguard_settings',
 					'settings-updated' => 'true',
-				),
+				],
 				network_admin_url( 'admin.php' )
 			)
 		);
@@ -381,71 +381,71 @@ class SpeedGuard_Settings {
 		add_settings_field(
 			'speedguard_options',
 			__( 'Show site average load time on Dashboard', 'speedguard' ),
-			array(
+			[
 				$this,
 				'show_dashboard_widget_fn',
-			),
+			],
 			'speedguard',
 			'speedguard_widget_settings_section',
-			array( 'label_for' => 'show_dashboard_widget' )
+			[ 'label_for' => 'show_dashboard_widget' ]
 		);
 
 		add_settings_field(
 			'speedguard_ab_widget',
 			__( 'Show current page load time in Admin Bar', 'speedguard' ),
-			array(
+			[
 				$this,
 				'show_ab_widget_fn',
-			),
+			],
 			'speedguard',
 			'speedguard_widget_settings_section',
-			array( 'label_for' => 'show_ab_widget' )
+			[ 'label_for' => 'show_ab_widget' ]
 		);
 		add_settings_section( 'speedguard_reports_section', '', '', 'speedguard' );
 		add_settings_field(
 			'speedguard_email_me_at',
 			__( 'Send me report at', 'speedguard' ),
-			array(
+			[
 				$this,
 				'email_me_at_fn',
-			),
+			],
 			'speedguard',
 			'speedguard_reports_section',
-			array( 'label_for' => 'email_me_at' )
+			[ 'label_for' => 'email_me_at' ]
 		);
 		add_settings_field(
 			'speedguard_email_me_case',
 			'',
-			array(
+			[
 				$this,
 				'email_me_case_fn',
-			),
+			],
 			'speedguard',
 			'speedguard_reports_section',
-			array( 'label_for' => 'email_me_case' )
+			[ 'label_for' => 'email_me_case' ]
 		);
 		add_settings_field(
 			'speedguard_test_type',
 			__( 'Test type', 'speedguard' ),
-			array(
+			[
 				$this,
 				'test_type_fn',
-			),
+			],
 			'speedguard',
 			'speedguard_reports_section',
-			array( 'label_for' => 'test_type' )
+			[ 'label_for' => 'test_type' ]
 		);
 
 		add_settings_field(
 			'speedguard_critical_load_time',
 			'',
-			array(
+			[
 				$this,
 				'critical_load_time_fn',
-			),
+			],
 			'speedguard',
 			'speedguard_hidden_section',
-			array( 'label_for' => 'critical_load_time' )
+			[ 'label_for' => 'critical_load_time' ]
 		);
 	}
 
