@@ -29,30 +29,7 @@ class SpeedGuardWidgets {
 	 * @param $post
 	 * @param $args
 	*/
-	public static function speedguard_dashboard_widget_function( $post = '', $args = '' ) {
-		$speedguard_average = SpeedGuard_Admin::get_this_plugin_option( 'speedguard_average' );
-		if ( is_array( $speedguard_average ) ) {
-			$average_load_time = $speedguard_average['average_load_time'];
-		}
-		if ( ! empty( $average_load_time ) ) {
-			$min_load_time = $speedguard_average['min_load_time'];
-			$max_load_time = $speedguard_average['max_load_time'];
-			$content       = "<div class='speedguard-results'>
-						<div class='result-column'><p class='result-numbers'>$max_load_time</p>" . __( 'Worst', 'speedguard' ) . "</div>
-						<div class='result-column'><p class='result-numbers average'>$average_load_time</p>" . __( 'Average Load Time', 'speedguard' ) . "</div>
-						<div class='result-column'><p class='result-numbers'>$min_load_time</p>" . __( 'Best', 'speedguard' ) . "</div>	
-						<a href='" . SpeedGuard_Admin::speedguard_page_url( 'tests' ) . "#speedguard-important-questions-meta-box' class='button button-primary' target='_blank'>" . __( 'Improve', 'speedguard' ) . '</a> 
-						</div>
-						';
-		} else {
-			$content = sprintf( __( 'First %1$sadd URLs%2$s that should be guarded.', 'speedguard' ), '<a href="' . SpeedGuard_Admin::speedguard_page_url( 'tests' ) . '#speedguard-add-new-url-meta-box">', '</a>' );
-		}
-		echo $content;
-	}
-
-
-
-
+	
 	/**
 	 * Define all metaboxes fro plugin's admin pages (Tests and Settings)
 	 */
@@ -379,7 +356,7 @@ class SpeedGuardWidgets {
 			__( 'Site Speed Results [Speedguard]', 'speedguard' ),
 			[
 				$this,
-				'speedguard_dashboard_widget_function',
+				'speedguard_origin_results_meta_box',
 			],
 			'',
 			[ 'echo' => 'true' ]
