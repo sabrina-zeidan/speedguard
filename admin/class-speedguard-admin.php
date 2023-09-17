@@ -488,8 +488,6 @@ class SpeedGuard_Admin {
 
 	function body_classes_filter( $classes ) {
 		if ( self::is_screen( 'settings,tests,dashboard' ) ) {
-			//$speedguard_average = self::get_this_plugin_option( 'speedguard_average' );
-
             $sg_origin_results = self::get_this_plugin_option( 'sg_origin_results' );
 			$guarded_pages_count = count($sg_origin_results['mobile']['psi']['lcp']['guarded_pages']);
 

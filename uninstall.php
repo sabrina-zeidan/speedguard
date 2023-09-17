@@ -81,8 +81,7 @@ function speedguard_delete_data()
 	// Delete options
 	$speedguard_options = [
 		'speedguard_options',
-		'speedguard_api',
-		'speedguard_average',
+		//'speedguard_api',
 		'sg_origin_results',
 	];
 

@@ -9,6 +9,7 @@ class SpeedGuard_Notifications {
 	function __construct() {
 	}
 
+	//TOTAL TODO
 	public static function test_results_email( $type ) {
 		// Check if there are any tests running at the moment, and reschedule if so
 		if ( ! get_transient( 'speedguard-tests-running' ) ) {
@@ -16,10 +17,8 @@ class SpeedGuard_Notifications {
 			$admin_email        = $speedguard_options['email_me_at'];
 			$site_url           = parse_url( get_home_url() );
 			$site_url           = $site_url['host'];
-			// $site_date = get_date_from_gmt(date('Y-m-d H:i:s',time()),'Y-m-d H:i:s');
-			$average_site_speed = SpeedGuard_Admin::get_this_plugin_option( 'speedguard_average' );
-			$average_site_speed = $average_site_speed['average_load_time'];
-			$critical_load_time = $speedguard_options['critical_load_time'];
+
+
 			if ( $type === 'critical_load_time' ) {
 				$subject = sprintf( __( '%1$s is slow [SpeedGuard]', 'speedguard' ), $site_url );
 				$note    = sprintf( __( '%1$s takes more than %2$s seconds to load', 'speedguard' ), $site_url, $critical_load_time );
