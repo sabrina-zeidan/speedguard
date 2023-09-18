@@ -26,7 +26,6 @@ class SpeedGuard_Settings {
 		// Update options action function for Multisite
 		add_action( 'network_admin_edit_speedguard_update_settings', [ $this, 'speedguard_update_settings' ] );
 
-
 		add_filter( 'cron_schedules', [ $this, 'speedguard_cron_schedules' ] );
 		// send report when load_time is updated by cron automatically
 		add_action( 'speedguard_update_results', [ $this, 'update_results_cron_function' ] );
@@ -209,11 +208,11 @@ class SpeedGuard_Settings {
 	function email_me_case_fn( $args ) {
 		$options    = SpeedGuard_Admin::get_this_plugin_option( 'speedguard_options' );
 		$field_name = esc_attr( $args['label_for'] );
-		$items = [
-			'current state' => __( 'Every day with the current state', 'speedguard' ),
+		$items      = [
+			'current state'           => __( 'Every day with the current state', 'speedguard' ),
 			'if any URL is not GOOD'  => __( 'if any URL is not passing CWV (after daily check)', 'speedguard' ),
 			'if CWV origing not GOOD' => __( 'only if CWV for the whole site (origin) is not passing CWV (after daily check)', 'speedguard' ),
-			'never' => __( 'never', 'speedguard' ),
+			'never'                   => __( 'never', 'speedguard' ),
 		];
 
 		foreach ( $items as $item => $item_label ) {
@@ -222,7 +221,6 @@ class SpeedGuard_Settings {
 			echo '<input ' . $checked . " type='radio' name='speedguard_options[" . $field_name . "]' id='" . $item . "' value='" . $item . "' /><label for='" . $item . "'>" . $item_label . '</label></br>';
 		}
 	}
-
 
 
 	function test_type_fn( $args ) {
@@ -322,8 +320,6 @@ class SpeedGuard_Settings {
 			'speedguard_reports_section',
 			[ 'label_for' => 'test_type' ]
 		);
-
-
 	}
 
 	function speedguard_settings_general() {

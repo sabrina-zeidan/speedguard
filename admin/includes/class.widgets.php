@@ -34,7 +34,6 @@ class SpeedGuard_Widgets {
 	 * Define all metaboxes fro plugin's admin pages (Tests and Settings)
 	 */
 
-
 	public static function add_meta_boxes() {
 		$sg_test_type = SpeedGuard_Settings::global_test_type();
 		wp_nonce_field( 'closedpostboxes', 'closedpostboxesnonce', false );
@@ -130,51 +129,6 @@ class SpeedGuard_Widgets {
 			'core'
 		);
 	}
-	/**
-	 * Function responsible for formatting CWV data for display
-	 */
-	public static function single_metric_display( $results_array, $device, $test_type, $metric ) {
-		$display_value = '';
-		$category      = '';
-		$class         = '';
-		if ( $results_array === 'waiting' ) {  // tests are currently running
-			$class         = 'waiting';
-		} elseif ( ( is_array( $results_array ) ) ) {// tests are not currently running
-			// Check if metric data is available for this device
-			if ( isset( $results_array[ $device ][ $test_type ][ $metric ] ) ) {
-
-				if ( $test_type === 'psi' ) {
-					$display_value = $results_array[ $device ][ $test_type ][ $metric ]['displayValue'];
-
-					$class         = 'score';
-					$category      = $results_array[ $device ][ $test_type ][ $metric ]['score'];
-				} elseif ( $test_type === 'cwv' ) {
-
-					$metrics_value = $results_array[ $device ][ $test_type ][ $metric ]['percentile'];
-					// Format metrics output for display
-					if ( $metric === 'lcp' ) {
-						$display_value = round( $metrics_value / 1000, 2 ) . ' s';
-					} elseif ( $metric === 'cls' ) {
-						$display_value = $metrics_value;
-						$display_value = $metrics_value / 100;
-					} elseif ( $metric === 'fid' ) {
-						$display_value = $metrics_value . ' ms';
-					}
-					$class    = 'score';
-					$category = $results_array[ $device ][ $test_type ][ $metric ]['category'];
-				}
-			} else { // No data available for the metric
-				$class         = 'na';
-				$display_value = 'N/A';
-			}
-		}
-
-		$category             = 'data-score-category="' . $category . '"';
-		$class                = 'class="speedguard-' . $class . '"';
-		$metric_display_value = '<span ' . $category . ' ' . $class . '>' . $display_value . '</span>';
-
-		return $metric_display_value;
-	}
 
 	/**
 	 * Function responsible for displaying the Origin widget, both n Tests page and Dashboard
@@ -182,23 +136,20 @@ class SpeedGuard_Widgets {
 	public static function origin_results_widget_function( $post = '', $args = '' ) {
 		// Retrieving data to display
 		$speedguard_cwv_origin = SpeedGuard_Admin::get_this_plugin_option( 'sg_origin_results' );
-pr($speedguard_cwv_origin);
+
+		//pr($speedguard_cwv_origin);
 		// Preparing data to display
 		// TODO make this constant
 		$sg_test_type = SpeedGuard_Settings::global_test_type();
 		foreach ( SpeedGuard_Admin::SG_METRICS_ARRAY as $device => $test_types ) {
 			foreach ( $test_types as $test_type => $metrics ) {
-
-				if ($test_type === $sg_test_type) { //prepare metrics only for needed test type
+				if ( $test_type === $sg_test_type ) { //prepare metrics only for needed test type
 
 					foreach ( $metrics as $metric ) {
-
-						$current_metric = $device . '_' . $metric;
-						$$current_metric = SpeedGuard_Widgets::single_metric_display(  $speedguard_cwv_origin, $device, $test_type, $metric );
-
+						$current_metric  = $device . '_' . $metric;
+						$$current_metric = SpeedGuard_Widgets::single_metric_display( $speedguard_cwv_origin, $device, $test_type, $metric );
 					}
 				}
-
 			}
 		}
 
@@ -209,7 +160,6 @@ pr($speedguard_cwv_origin);
 		} else {
 			$fid_tr = '';
 		}
-
 
 		$content = "
 	<table class='widefat fixed striped toplevel_page_speedguard_tests_cwv_widget'>
@@ -228,22 +178,68 @@ pr($speedguard_cwv_origin);
 	<td>' . $mobile_cls . '</td>
 	<td>' . $desktop_cls . '</td>
 	</tr>
-	'.$fid_tr.'
+	' . $fid_tr . '
 	</thbody>
 	</table>
 
 	';
 
-		if (( 'cwv' === $sg_test_type) && ("N/A" === $mobile_lcp)) {
+		if ( ( 'cwv' === $sg_test_type ) && ( "N/A" === $mobile_lcp ) ) {
 			$info_text = sprintf( __( 'N/A means that there is no data from Google available -- most likely your website have not got enough traffic for Google to make evaluation (Not enough usage data in the last 90 days for this device type)', 'speedguard' ), '<a href="#">', '</a>' ) . '<div><br></div>';
-		}
-		elseif ( 'psi' === $sg_test_type){
+		} elseif ( 'psi' === $sg_test_type ) {
 			$info_text = sprintf( __( 'This is not real user data. These are averages calculated based on the tests below. Core Web Vitals -- is where the the real data is. You can switch in Settings', 'speedguard' ), '<a href="#">', '</a>' ) . '<div><br></div>';
 		}
 
-		echo $content.$info_text;
+		echo $content . $info_text;
 	}
-	
+
+	/**
+	 * Function responsible for formatting CWV data for display
+	 */
+	public static function single_metric_display( $results_array, $device, $test_type, $metric ) {
+		$display_value = '';
+		$category      = '';
+		$class         = '';
+		if ( ( $results_array === 'waiting' ) ) {  // tests are currently running, //PSI Origin results will be calculated after all tests are finished
+			$class = 'waiting';
+		} elseif ( ( is_array( $results_array ) ) ) {// tests are not currently running
+			// Check if metric data is available for this device
+			if ( isset( $results_array[ $device ][ $test_type ][ $metric ] ) ) {
+				if ( $test_type === 'psi' ) {
+					$display_value = $results_array[ $device ][ $test_type ][ $metric ]['displayValue'];
+
+					$class    = 'score';
+					$category = $results_array[ $device ][ $test_type ][ $metric ]['score'];
+				} elseif ( $test_type === 'cwv' ) {
+					$metrics_value = $results_array[ $device ][ $test_type ][ $metric ]['percentile'];
+					// Format metrics output for display
+					if ( $metric === 'lcp' ) {
+						$display_value = round( $metrics_value / 1000, 2 ) . ' s';
+					} elseif ( $metric === 'cls' ) {
+						$display_value = $metrics_value;
+						$display_value = $metrics_value / 100;
+					} elseif ( $metric === 'fid' ) {
+						$display_value = $metrics_value . ' ms';
+					}
+					$class    = 'score';
+					$category = $results_array[ $device ][ $test_type ][ $metric ]['category'];
+				}
+			} elseif ( $test_type === 'psi' && get_transient( 'speedguard-tests-running' ) ) {
+				$class = 'waiting';
+			} else {
+				// No data aailable for the metric
+				$class         = 'na';
+				$display_value = 'N/A';
+			}
+		}
+
+		$category             = 'data-score-category="' . $category . '"';
+		$class                = 'class="speedguard-' . $class . '"';
+		$metric_display_value = '<span ' . $category . ' ' . $class . '>' . $display_value . '</span>';
+
+		return $metric_display_value;
+	}
+
 	public static function explanation_widget_function() {
 		$cwv_link = 'https://web.dev/lcp/';
 		// Create the table.
@@ -251,15 +247,15 @@ pr($speedguard_cwv_origin);
   <tr>
     <td>
       <p>' . sprintf(
-			__( 'We all know that site\'s loading speed was impacting Google ranking for quite a while now. But recently (late May 2020) company has revealed more details about %1$sCore Web Vitals%2$s — metrics that Google will be using to rank websites.', 'speedguard' ),
-			'<a href="' . $cwv_link . '" target="_blank">',
-			'</a>'
-		) . '</p>
+				__( 'We all know that site\'s loading speed was impacting Google ranking for quite a while now. But recently (late May 2020) company has revealed more details about %1$sCore Web Vitals%2$s — metrics that Google will be using to rank websites.', 'speedguard' ),
+				'<a href="' . $cwv_link . '" target="_blank">',
+				'</a>'
+			) . '</p>
       <p>' . sprintf(
-			__( '%1$sLargest Contentful Paint%2$s is one of them. It measures how quickly the page\'s "main content" loads — the bulk of the text or image (within the viewport, so before the user scrolls). ', 'speedguard' ),
-			'<strong>',
-			'</strong>'
-		) . '</p>
+			           __( '%1$sLargest Contentful Paint%2$s is one of them. It measures how quickly the page\'s "main content" loads — the bulk of the text or image (within the viewport, so before the user scrolls). ', 'speedguard' ),
+			           '<strong>',
+			           '</strong>'
+		           ) . '</p>
       <p>
         ' . __( 'The intention of these changes is to improve how users perceive the experience of interacting with a web page.', 'speedguard' ) . '
       </p>
@@ -305,8 +301,8 @@ pr($speedguard_cwv_origin);
 
 	public static function about_widget_function() {
 		$speedguard_cwv_origin = SpeedGuard_Admin::get_this_plugin_option( 'sg_origin_results' );
-		$picture = '<a href="https://sabrinazeidan.com/?utm_source=speedguard&utm_medium=sidebar&utm_campaign=avatar" target="_blank"><div id="szpic"></div></a>';
-		$hey     = sprintf(
+		$picture               = '<a href="https://sabrinazeidan.com/?utm_source=speedguard&utm_medium=sidebar&utm_campaign=avatar" target="_blank"><div id="szpic"></div></a>';
+		$hey                   = sprintf(
 			__(
 				'Hey!%1$s My name is %3$sSabrina%4$s. 
 		%1$sI speed up websites everyday, and I built this plugin because I needed a simple tool to monitor site speed and notify me if something is not right.%2$s

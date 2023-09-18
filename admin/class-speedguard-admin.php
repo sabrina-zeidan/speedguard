@@ -202,11 +202,11 @@ class SpeedGuard_Admin {
 			return;
 		}
 		$sg_origin_results   = self::get_this_plugin_option( 'sg_origin_results' );
-		$guarded_pages_count = isset($sg_origin_results['mobile']['psi']['lcp']['guarded_pages']) ? count( $sg_origin_results['mobile']['psi']['lcp']['guarded_pages'] ) : '';
+		$guarded_pages_count = isset( $sg_origin_results['mobile']['psi']['lcp']['guarded_pages'] ) ? count( $sg_origin_results['mobile']['psi']['lcp']['guarded_pages'] ) : '';
 		// All screens
 		// Dashboard and SpeedGuard Settigns screens
 		if ( self::is_screen( 'settings,dashboard' ) ) {
-			if ( !empty($guarded_pages_count) && $guarded_pages_count < 2 ) { // TODO: set transient/user meta on dissmissal action
+			if ( ! empty( $guarded_pages_count ) && $guarded_pages_count < 2 ) { // TODO: set transient/user meta on dissmissal action
 				$message = sprintf( __( 'You only have the speed of 1 page monitored currently. Would you like to %1$sadd other pages%2$s to see the whole picture of the site speed?', 'speedguard' ), '<a href="' . self::speedguard_page_url( 'tests' ) . '">', '</a>' );
 				$notices = self::set_notice( $message, 'warning' );
 			}
@@ -349,9 +349,27 @@ class SpeedGuard_Admin {
 				'no_found_rows'  => true,
 			];
 			$waiting_pages = get_posts( $args );
-			//TODO replace with transient (?), might not work on WPEngine
-			//$waiting_pages = array(19);
+
+			/**
+			 * if ( ! in_array( $guarded_page_id, $array_of_current_tests ) ) {
+			 * $array_of_current_tests[] = $guarded_page_id;
+			 * }
+			 * $value = json_encode( $array_of_current_tests );
+			 * set_transient( 'speedguard_waiting_tests', $value );
+			 * //run tests
+			 *    $array_of_current_tests = json_decode( get_transient( 'speedguard_waiting_tests' ) );
+			 * //remove this test from waiting tests
+			 * if ( ( $key = array_search( $guarded_page_id, $array_of_current_tests ) ) !== false ) {
+			 * unset( $array_of_current_tests[ $key ] );
+			 * }
+			 * $updated_value = json_encode( $array_of_current_tests );
+			 * set_transient( 'speedguard_waiting_tests', $updated_value);
+			 *
+			 *
+			 **/
+
 			if ( empty( $waiting_pages ) ) {
+				SpeedGuard_Lighthouse::update_average_psi();
 				delete_transient( 'speedguard-tests-running' );
 
 				return;
@@ -392,7 +410,8 @@ class SpeedGuard_Admin {
 			if ( ! get_transient( 'speedguard-tests-running' ) ) {
 				set_transient( 'speedguard-tests-running', true );
 			}
-			$test_created = SpeedGuard_Lighthouse::lighthouse_new_test( $post_id );
+			SpeedGuard_Lighthouse::lighthouse_new_test( $post_id );
+
 			wp_die();
 		}
 	}
@@ -487,7 +506,7 @@ class SpeedGuard_Admin {
 	function body_classes_filter( $classes ) {
 		if ( self::is_screen( 'settings,tests,dashboard' ) ) {
 			$sg_origin_results   = self::get_this_plugin_option( 'sg_origin_results' );
-			$guarded_pages_count = isset($sg_origin_results['mobile']['psi']['lcp']['guarded_pages']) ? count( $sg_origin_results['mobile']['psi']['lcp']['guarded_pages'] ) : '';
+			$guarded_pages_count = isset( $sg_origin_results['mobile']['psi']['lcp']['guarded_pages'] ) ? count( $sg_origin_results['mobile']['psi']['lcp']['guarded_pages'] ) : '';
 
 			if ( $guarded_pages_count < 1 ) {
 				$classes = $classes . ' no-guarded-pages';
