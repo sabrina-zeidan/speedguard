@@ -4,7 +4,7 @@
  *
  *   Class responsible for adding metaboxes
  */
-class SpeedGuardWidgets {
+class SpeedGuard_Widgets {
 	public function __construct() {
 		$options = SpeedGuard_Admin::get_this_plugin_option( 'speedguard_options' );
 		if ( ! empty( $options ) ) {
@@ -13,7 +13,7 @@ class SpeedGuardWidgets {
 					'wp_' . ( defined( 'SPEEDGUARD_MU_NETWORK' ) ? 'network_' : '' ) . 'dashboard_setup',
 					[
 						$this,
-						'speedguard_dashboard_widget',
+						'speedguard_dashboard_widget_function',
 					]
 				);
 			}
@@ -59,7 +59,7 @@ class SpeedGuardWidgets {
 			'speedguard-dashboard-widget',
 			__( $origin_widget_title, 'speedguard' ),
 			[
-				'SpeedGuardWidgets',
+				'SpeedGuard_Widgets',
 				'origin_results_widget_function',
 			],
 			'',
@@ -71,7 +71,7 @@ class SpeedGuardWidgets {
 			'speedguard-add-new-url-meta-box',
 			__( 'Add new URL to monitoring', 'speedguard' ),
 			[
-				'SpeedGuardWidgets',
+				'SpeedGuard_Widgets',
 				'add_new_widget_function',
 			],
 			'',
@@ -100,7 +100,7 @@ class SpeedGuardWidgets {
 			'speedguard-legend-meta-box',
 			__( 'How to understand the information above?', 'speedguard' ),
 			[
-				'SpeedGuardWidgets',
+				'SpeedGuard_Widgets',
 				'explanation_widget_function',
 			],
 			'',
@@ -111,7 +111,7 @@ class SpeedGuardWidgets {
 			'speedguard-important-questions-meta-box',
 			__( 'Important questions:', 'speedguard' ),
 			[
-				'SpeedGuardWidgets',
+				'SpeedGuard_Widgets',
 				'important_questions_widget_function',
 			],
 			'',
@@ -122,7 +122,7 @@ class SpeedGuardWidgets {
 			'speedguard-about-meta-box',
 			__( 'Do you like this plugin?', 'speedguard' ),
 			[
-				'SpeedGuardWidgets',
+				'SpeedGuard_Widgets',
 				'about_widget_function',
 			],
 			'',
@@ -197,7 +197,7 @@ class SpeedGuardWidgets {
 					foreach ( $metrics as $metric ) {
 
 						$current_metric = $device . '_' . $metric;
-						$$current_metric = SpeedGuardWidgets::single_metric_display(  $speedguard_cwv_origin, $device, $test_type, $metric );
+						$$current_metric = SpeedGuard_Widgets::single_metric_display(  $speedguard_cwv_origin, $device, $test_type, $metric );
 
 					}
 				}
@@ -334,7 +334,7 @@ class SpeedGuardWidgets {
 		echo $content;
 	}
 
-	function speedguard_dashboard_widget() {
+	function speedguard_dashboard_widget_function() {
 		wp_add_dashboard_widget(
 			'speedguard_dashboard_widget',
 			__( 'Current Performance', 'speedguard' ),
@@ -354,7 +354,7 @@ class SpeedGuardWidgets {
 		$wp_meta_boxes['dashboard']['normal']['core'] = $sorted_dashboard;
 	}
 
-	private function speedguard_admin_bar_widget( $wp_admin_bar ) {
+	public function speedguard_admin_bar_widget( $wp_admin_bar ) {
 		if ( ! current_user_can( 'manage_options' ) ) {
 			return;
 		}
@@ -443,4 +443,4 @@ class SpeedGuardWidgets {
 	}
 }
 
-new SpeedGuardWidgets();
+new SpeedGuard_Widgets();

@@ -44,7 +44,7 @@ class SpeedGuard_Settings {
 
 	public static function my_settings_page_function() {
 		if ( SpeedGuard_Admin::is_screen( 'settings' ) ) {
-			SpeedGuardWidgets::add_meta_boxes();
+			SpeedGuard_Widgets::add_meta_boxes();
 			?>
             <div class="wrap">
                 <h2><?php _e( 'SpeedGuard :: Settings', 'speedguard' ); ?></h2>

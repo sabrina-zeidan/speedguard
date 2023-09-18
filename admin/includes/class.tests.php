@@ -127,7 +127,7 @@ class SpeedGuard_List_Table extends WP_List_Table {
 				foreach ( SpeedGuard_Admin::SG_METRICS_ARRAY as $device => $test_types ) {
 					foreach ( $test_types as $test_type => $metrics ) {
 						foreach ( $metrics as $metric ) {
-							$core_value                                                 = SpeedGuardWidgets::single_metric_display( $sg_test_result, $device, $test_type, $metric );
+							$core_value                                                 = SpeedGuard_Widgets::single_metric_display( $sg_test_result, $device, $test_type, $metric );
 							$thisTestData[ $test_type . '_' . $device . '_' . $metric ] = $core_value; // this is a string to display // TODO rename
 						}
 					}
@@ -436,7 +436,7 @@ class SpeedGuard_Tests {
 
 	public static function tests_page() {
 		if ( SpeedGuard_Admin::is_screen( 'tests' ) ) {
-			SpeedGuardWidgets::add_meta_boxes();
+			SpeedGuard_Widgets::add_meta_boxes();
 			?>
             <div class="wrap">
                 <h2><?php _e( 'Speedguard :: Guarded pages', 'speedguard' ); ?></h2>
