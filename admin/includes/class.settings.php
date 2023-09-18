@@ -41,7 +41,7 @@ class SpeedGuard_Settings {
 		}
 	}
 
-	public static function my_settings_page_function() {
+	public static function settings_page_function() {
 		if ( SpeedGuard_Admin::is_screen( 'settings' ) ) {
 			SpeedGuard_Widgets::add_meta_boxes();
 			?>

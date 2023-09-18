@@ -553,7 +553,7 @@ class SpeedGuard_Admin {
 			'speedguard_settings',
 			[
 				'SpeedGuard_Settings',
-				'my_settings_page_function',
+				'settings_page_function',
 			]
 		);
 	}
