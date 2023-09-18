@@ -33,6 +33,8 @@ class SpeedGuardWidgets {
 	/**
 	 * Define all metaboxes fro plugin's admin pages (Tests and Settings)
 	 */
+
+
 	public static function add_meta_boxes() {
 		$sg_test_type = SpeedGuard_Settings::global_test_type();
 		wp_nonce_field( 'closedpostboxes', 'closedpostboxesnonce', false );
@@ -54,19 +56,8 @@ class SpeedGuardWidgets {
 		}
 
 		add_meta_box(
-			'speedguard-cwv-sidewide-meta-box',
+			'speedguard-dashboard-widget',
 			__( $origin_widget_title, 'speedguard' ),
-			[
-				'SpeedGuardWidgets',
-				'speedguard_origin_results_meta_box',
-			],
-			'',
-			'main-content',
-			'core'
-		);
-		add_meta_box(
-			'speedguard-speedresults-meta-box',
-			__( 'PageSpeed Insights (lab tests)', 'speedguard' ),
 			[
 				'SpeedGuardWidgets',
 				'speedguard_dashboard_widget_function',
@@ -75,6 +66,7 @@ class SpeedGuardWidgets {
 			'main-content',
 			'core'
 		);
+
 		add_meta_box(
 			'speedguard-add-new-url-meta-box',
 			__( 'Add new URL to monitoring', 'speedguard' ),
@@ -201,7 +193,13 @@ class SpeedGuardWidgets {
 	 *
 	 * @return void
 	 */
-	public static function speedguard_origin_results_meta_box() {
+	public static function sz_speedguard_origin_results_meta_box() {
+
+	}
+
+
+
+	public static function speedguard_dashboard_widget_function( $post = '', $args = '' ) {
 		// Retrieving data to display
 		$speedguard_cwv_origin = SpeedGuard_Admin::get_this_plugin_option( 'sg_origin_results' );
 
@@ -260,11 +258,12 @@ class SpeedGuardWidgets {
 			$info_text = sprintf( __( 'N/A means that there is no data from Google available -- most likely your website have not got enough traffic for Google to make evaluation (Not enough usage data in the last 90 days for this device type)', 'speedguard' ), '<a href="#">', '</a>' ) . '<div><br></div>';
 		}
 		elseif ( 'psi' === $sg_test_type){
-			$info_text = sprintf( __( 'This is not real user data. These are averages calculated based on the tests below. Core Web Vitals -- is where the the real data is. You can switch in Settings', 'speedguard' ), '<a href="#">', '</a>' ) . '</div>';
+			$info_text = sprintf( __( 'This is not real user data. These are averages calculated based on the tests below. Core Web Vitals -- is where the the real data is. You can switch in Settings', 'speedguard' ), '<a href="#">', '</a>' ) . '<div><br></div>';
 		}
 
 		echo $content.$info_text;
 	}
+
 
 	public static function speedguard_legend_meta_box() {
 		// Set the variable for the Core Web Vitals link.
@@ -361,7 +360,7 @@ class SpeedGuardWidgets {
 			__( 'Current Performance', 'speedguard' ),
 			[
 				$this,
-				'speedguard_origin_results_meta_box',
+				'speedguard_dashboard_widget_function',
 			],
 			'',
 			[ 'echo' => 'true' ]
