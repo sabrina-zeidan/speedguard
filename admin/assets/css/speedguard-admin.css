@@ -7,7 +7,7 @@
 	background-size: 18px auto;
 }
 
-#tests-list-meta-box .speedguard-waiting, #speedguard-cwv-sidewide-meta-box .speedguard-waiting {
+#tests-list-meta-box .speedguard-waiting, #speedguard-dashboard-widget .speedguard-waiting {
 	background-image: url(../images/loading.gif);
 	height: 18px;
 	width: 18px;

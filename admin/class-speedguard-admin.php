@@ -215,7 +215,7 @@ class SpeedGuard_Admin {
 		if ( self::is_screen( 'plugins' ) ) {
 			// homepage was added/updated on activation
 			if ( get_transient( 'speedguard-notice-activation' ) ) {
-				$message = sprintf( __( 'Homepage speed test has just started. Would you like to %1$stest some other pages%2$s as well?', 'speedguard' ), '<a href="' . self::speedguard_page_url( 'tests' ) . '">', '</a>' );
+				$message = sprintf( __( 'Homepage performance test has just started. Would you like to %1$stest some other pages%2$s as well?', 'speedguard' ), '<a href="' . self::speedguard_page_url( 'tests' ) . '">', '</a>' );
 				$notices = self::set_notice( $message, 'success' );
 			}
 			// TODO: On plugin deactivation

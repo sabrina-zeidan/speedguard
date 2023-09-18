@@ -144,9 +144,6 @@ class SpeedGuard_Widgets {
 			if ( isset( $results_array[ $device ][ $test_type ][ $metric ] ) ) {
 
 				if ( $test_type === 'psi' ) {
-
-
-
 					$display_value = $results_array[ $device ][ $test_type ][ $metric ]['displayValue'];
 
 					$class         = 'score';
@@ -185,7 +182,7 @@ class SpeedGuard_Widgets {
 	public static function origin_results_widget_function( $post = '', $args = '' ) {
 		// Retrieving data to display
 		$speedguard_cwv_origin = SpeedGuard_Admin::get_this_plugin_option( 'sg_origin_results' );
-
+pr($speedguard_cwv_origin);
 		// Preparing data to display
 		// TODO make this constant
 		$sg_test_type = SpeedGuard_Settings::global_test_type();
