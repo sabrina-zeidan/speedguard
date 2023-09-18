@@ -426,7 +426,7 @@ class SpeedGuard_Tests {
 		return $response;
 	}
 
-	public static function tests_list_metabox() {
+	public static function tests_results_widget_function() {
 		$exampleListTable = new SpeedGuard_List_Table();
 		echo '<form id="wpse-list-table-form" method="post">';
 		$exampleListTable->prepare_items();

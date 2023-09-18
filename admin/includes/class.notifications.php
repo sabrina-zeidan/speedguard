@@ -75,7 +75,7 @@ class SpeedGuard_Notifications {
 														</table>													
 														<div style="padding: 1em; color:#000;"> 
 														<p style="font-size: 1.2em; font-weight: bold;" >' . __( 'Important questions:', 'speedguard' ) . '</p>';
-				str_replace( 'utm_medium=sidebar', 'utm_medium=email_report', SpeedGuardWidgets::important_questions_meta_box() ); // TODO: is not replaced
+				str_replace( 'utm_medium=sidebar', 'utm_medium=email_report', SpeedGuardWidgets::important_questions_widget_function() ); // TODO: is not replaced
 				echo '
 														</div>
 													</td> 

@@ -60,7 +60,7 @@ class SpeedGuardWidgets {
 			__( $origin_widget_title, 'speedguard' ),
 			[
 				'SpeedGuardWidgets',
-				'speedguard_dashboard_widget_function',
+				'origin_results_widget_function',
 			],
 			'',
 			'main-content',
@@ -72,7 +72,7 @@ class SpeedGuardWidgets {
 			__( 'Add new URL to monitoring', 'speedguard' ),
 			[
 				'SpeedGuardWidgets',
-				'add_new_url_meta_box',
+				'add_new_widget_function',
 			],
 			'',
 			'main-content',
@@ -90,7 +90,7 @@ class SpeedGuardWidgets {
 			sprintf( __( 'Test results for specific URLs %s', 'speedguard' ), $test_type ),
 			[
 				'SpeedGuard_Tests',
-				'tests_list_metabox',
+				'tests_results_widget_function',
 			],
 			'',
 			'main-content',
@@ -101,7 +101,7 @@ class SpeedGuardWidgets {
 			__( 'How to understand the information above?', 'speedguard' ),
 			[
 				'SpeedGuardWidgets',
-				'speedguard_legend_meta_box',
+				'explanation_widget_function',
 			],
 			'',
 			'main-content',
@@ -112,7 +112,7 @@ class SpeedGuardWidgets {
 			__( 'Important questions:', 'speedguard' ),
 			[
 				'SpeedGuardWidgets',
-				'important_questions_meta_box',
+				'important_questions_widget_function',
 			],
 			'',
 			'side',
@@ -123,7 +123,7 @@ class SpeedGuardWidgets {
 			__( 'Do you like this plugin?', 'speedguard' ),
 			[
 				'SpeedGuardWidgets',
-				'about_meta_box',
+				'about_widget_function',
 			],
 			'',
 			'side',
@@ -132,9 +132,6 @@ class SpeedGuardWidgets {
 	}
 	/**
 	 * Function responsible for formatting CWV data for display
-	 *
-	 * @param $post
-	 * @param $args
 	 */
 	public static function single_metric_display( $results_array, $device, $test_type, $metric ) {
 		$display_value = '';
@@ -183,23 +180,9 @@ class SpeedGuardWidgets {
 	}
 
 	/**
-	 * Tests Page -> Info Metabox output
+	 * Function responsible for displaying the Origin widget, both n Tests page and Dashboard
 	 */
-	/**
-	 * Function responsible for displaying widget with CWV side-wide results widget on Tests page
-	 *
-	 * @param $post
-	 * @param $args
-	 *
-	 * @return void
-	 */
-	public static function sz_speedguard_origin_results_meta_box() {
-
-	}
-
-
-
-	public static function speedguard_dashboard_widget_function( $post = '', $args = '' ) {
+	public static function origin_results_widget_function( $post = '', $args = '' ) {
 		// Retrieving data to display
 		$speedguard_cwv_origin = SpeedGuard_Admin::get_this_plugin_option( 'sg_origin_results' );
 
@@ -263,12 +246,9 @@ class SpeedGuardWidgets {
 
 		echo $content.$info_text;
 	}
-
-
-	public static function speedguard_legend_meta_box() {
-		// Set the variable for the Core Web Vitals link.
+	
+	public static function explanation_widget_function() {
 		$cwv_link = 'https://web.dev/lcp/';
-
 		// Create the table.
 		$content = '<table>
   <tr>
@@ -299,7 +279,7 @@ class SpeedGuardWidgets {
 		echo $content;
 	}
 
-	public static function add_new_url_meta_box() {
+	public static function add_new_widget_function() {
 		$content = '<form name="speedguard_add_url" id="speedguard_add_url"  method="post" action="">   
 		<input class="form-control"  type="text" id="speedguard_new_url" name="speedguard_new_url" value="" placeholder="' . __( 'Start typing the title of the post, page or custom post type...', 'speedguard' ) . '" autofocus="autofocus"/>
 		<input type="hidden" id="blog_id" name="blog_id" value="" />
@@ -312,7 +292,7 @@ class SpeedGuardWidgets {
 		echo $content;
 	}
 
-	public static function important_questions_meta_box() {
+	public static function important_questions_widget_function() {
 		$links = [
 			sprintf( __( '%1$sHow fast should a website load?%2$s', 'speedguard' ), '<a href="https://sabrinazeidan.com/how-fast-should-my-website-load/?utm_source=speedguard&utm_medium=sidebar&utm_campaign=important_questions" target="_blank">', '</a>' ),
 			sprintf( __( '%1$sHow to serve scaled images to speed up your site?%2$s', 'speedguard' ), '<a href="https://sabrinazeidan.com/serve-scaled-images-wordpress/?utm_source=speedguard&utm_medium=sidebar&utm_campaign=important_questions" target="_blank">', '</a>' ),
@@ -326,7 +306,7 @@ class SpeedGuardWidgets {
 		echo '</ul>';
 	}
 
-	public static function about_meta_box() {
+	public static function about_widget_function() {
 		$speedguard_cwv_origin = SpeedGuard_Admin::get_this_plugin_option( 'sg_origin_results' );
 		$picture = '<a href="https://sabrinazeidan.com/?utm_source=speedguard&utm_medium=sidebar&utm_campaign=avatar" target="_blank"><div id="szpic"></div></a>';
 		$hey     = sprintf(
@@ -360,7 +340,7 @@ class SpeedGuardWidgets {
 			__( 'Current Performance', 'speedguard' ),
 			[
 				$this,
-				'speedguard_dashboard_widget_function',
+				'origin_results_widget_function',
 			],
 			'',
 			[ 'echo' => 'true' ]
