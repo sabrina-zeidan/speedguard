@@ -78,7 +78,7 @@ class SpeedGuard_Lighthouse {
 		//And save all data
 		//Save CWV for origin
 		SpeedGuard_Admin::update_this_plugin_option( 'sg_origin_results', $origin );
-		
+
 		$waiting_tests = get_transient( 'speedguard_waiting_tests' );
 		if ( $waiting_tests ) {
 			if ( 1 === count( json_decode( $waiting_tests ) ) ) {  //if this is the last test

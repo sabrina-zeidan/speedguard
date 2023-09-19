@@ -404,34 +404,6 @@ class SpeedGuard_Admin {
 	}
 
 
-	//Fix backwards compatibility with old versions of the plugin that used WedPageTest
-	function fix_backwards_compatibility_wpt() {
-		if ( self::is_screen( 'tests' ) ) {
-			if ( get_transient( 'speedguard-notice-activation' ) ) {
-				$args = [
-					'post_type'      => self::$cpt_name,
-					'post_status'    => 'publish',
-					'posts_per_page' => - 1,
-					'fields'         => 'ids',
-					'meta_query'     => [
-						[
-							'key'     => 'load_time',
-							'value'   => 0,
-							'compare' => '>',
-							'type'    => 'DECIMAL',
-						],
-					],
-					'no_found_rows'  => true,
-				];
-				$guarded_pages = get_posts( $args );
-				if ( ! empty( $guarded_pages ) ) {
-					// Use the `do_action()` function to trigger the `handle_bulk_retest_load_time` action.
-					do_action( 'handle_bulk_retest_load_time', $guarded_pages->ids );
-				}
-			}
-		}
-	}
-
 
 	// Plugin Body classes
 	public function enqueue_styles() {
