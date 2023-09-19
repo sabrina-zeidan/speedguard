@@ -35,7 +35,6 @@ class SpeedGuard_Admin {
 	public function __construct( $plugin_name, $version ) {
 		$this->plugin_name = $plugin_name;
 		$this->version     = $version;
-
 		// PRO
 		define( 'SPEEDGUARD_PRO', true );
 		// Multisite
@@ -48,7 +47,6 @@ class SpeedGuard_Admin {
 		if ( is_multisite() && ! ( is_plugin_active_for_network( 'speedguard/speedguard.php' ) ) ) {
 			define( 'SPEEDGUARD_MU_PER_SITE', true );
 		}
-
 		// Menu items and Admin notices
 		add_action(
 			( defined( 'SPEEDGUARD_MU_NETWORK' ) ? 'network_' : '' ) . 'admin_menu',
@@ -64,7 +62,6 @@ class SpeedGuard_Admin {
 				'show_admin_notices',
 			]
 		);
-
 		// If Network activated don't load stuff on subsites. Load on the main site of the Multisite network or for regular WP install
 		global $blog_id;
 		if ( ! ( is_plugin_active_for_network( 'speedguard/speedguard.php' ) ) || ( is_plugin_active_for_network( 'speedguard/speedguard.php' ) ) && ( is_main_site( $blog_id ) ) ) {
@@ -73,14 +70,12 @@ class SpeedGuard_Admin {
 			require_once plugin_dir_path( __FILE__ ) . '/includes/class.tests.php';
 			require_once plugin_dir_path( __FILE__ ) . '/includes/class.lighthouse.php';
 			require_once plugin_dir_path( __FILE__ ) . '/includes/class.notifications.php';
-
 			add_action( 'admin_init', [ $this, 'speedguard_cpt' ] );
 			add_filter( 'admin_body_class', [ $this, 'body_classes_filter' ] );
 			add_action( 'transition_post_status', [ $this, 'guarded_page_unpublished_hook' ], 10, 3 );
 			add_action( 'before_delete_post', [ $this, 'before_delete_test_hook' ], 10, 1 );
 			// MU Headers alredy sent fix
 			add_action( 'init', [ $this, 'app_output_buffer' ] );
-
 			// Add removable query args
 			add_filter( 'removable_query_args', [ $this, 'removable_query_args' ] );
 			add_filter(
@@ -91,7 +86,6 @@ class SpeedGuard_Admin {
 				]
 			);
 		}
-
 		add_action( 'admin_footer', [ $this, 'run_waiting_tests_ajax' ] );
 		add_action( 'wp_ajax_run_waiting_tests', [ $this, 'run_waiting_tests' ] );
 	}
@@ -126,7 +120,6 @@ class SpeedGuard_Admin {
 			} elseif ( $guarded_item_type === 'archive' ) {
 				update_term_meta( $guarded_item_id, 'speedguard_on', 'false' );
 			}
-
 			if ( defined( 'SPEEDGUARD_MU_NETWORK' ) ) {
 				switch_to_blog( get_network()->site_id );
 			}
@@ -155,12 +148,10 @@ class SpeedGuard_Admin {
 						'no_found_rows'  => true,
 					]
 				);
-
 				if ( $connected_guarded_pages ) {
 					foreach ( $connected_guarded_pages as $connected_guarded_page_id ) {
 						wp_delete_post( $connected_guarded_page_id, true );
 					}
-
 					// uncheck speedguard_on
 					update_post_meta( $post->ID, 'speedguard_on', 'false' );
 				}
@@ -196,7 +187,6 @@ class SpeedGuard_Admin {
 	}
 
 	// Remove meta when test is deleted
-
 	public static function show_admin_notices() {
 		if ( ! current_user_can( 'manage_options' ) ) {
 			return;
@@ -224,7 +214,6 @@ class SpeedGuard_Admin {
 				// delete_transient( 'speedguard-notice-deactivation' );
 			}
 		}
-
 		// Tests screen
 		if ( self::is_screen( 'tests' ) ) {
 			// Errors
@@ -241,7 +230,6 @@ class SpeedGuard_Admin {
 				$notices = self::set_notice( __( 'This URL is already guarded!', 'speedguard' ), 'warning' );
 				// TODO: offer to retest/ retest automatically
 			}
-
 			// Success
 			if ( ! empty( $_REQUEST['speedguard'] ) && $_REQUEST['speedguard'] === 'new_url_added' ) {
 				$notices = self::set_notice( __( 'New URL is successfully added!', 'speedguard' ), 'success' );
@@ -260,7 +248,6 @@ class SpeedGuard_Admin {
 				$notices = self::set_notice( __( 'Selected pages are not guarded anymore!', 'speedguard' ), 'success' );
 			}
 		}
-
 		if ( self::is_screen( 'settings' ) ) {
 			if ( ! empty( $_REQUEST['settings-updated'] ) && $_REQUEST['settings-updated'] === 'true' ) {
 				$notices = self::set_notice( __( 'Settings have been updated!' ), 'success' );
@@ -313,7 +300,6 @@ class SpeedGuard_Admin {
 
 
 	// WordPress functions 'get_site_option' and 'get_option'
-
 	public static function speedguard_page_url( $page ) {
 		if ( $page === 'tests' ) {
 			$admin_page_url = defined( 'SPEEDGUARD_MU_NETWORK' ) ? network_admin_url( 'admin.php?page=speedguard_tests' ) : admin_url( 'admin.php?page=speedguard_tests' );
@@ -325,13 +311,11 @@ class SpeedGuard_Admin {
 	}
 
 	// WordPress functions 'update_site_option' and 'update_option'
-
 	public static function set_notice( $message, $class ) {
 		return "<div class='notice notice-$class is-dismissible'><p>$message</p></div>";
 	}
 
 	// WordPress functions 'delete_site_option' and 'delete_option'
-
 	function run_waiting_tests_ajax() {
 		if ( self::is_screen( 'tests' ) || self::is_screen( 'clients' ) ) {
 			$args          = [
@@ -349,31 +333,15 @@ class SpeedGuard_Admin {
 				'no_found_rows'  => true,
 			];
 			$waiting_pages = get_posts( $args );
-
-			/**
-			 * if ( ! in_array( $guarded_page_id, $array_of_current_tests ) ) {
-			 * $array_of_current_tests[] = $guarded_page_id;
-			 * }
-			 * $value = json_encode( $array_of_current_tests );
-			 * set_transient( 'speedguard_waiting_tests', $value );
-			 * //run tests
-			 *    $array_of_current_tests = json_decode( get_transient( 'speedguard_waiting_tests' ) );
-			 * //remove this test from waiting tests
-			 * if ( ( $key = array_search( $guarded_page_id, $array_of_current_tests ) ) !== false ) {
-			 * unset( $array_of_current_tests[ $key ] );
-			 * }
-			 * $updated_value = json_encode( $array_of_current_tests );
-			 * set_transient( 'speedguard_waiting_tests', $updated_value);
-			 *
-			 *
-			 **/
-
 			if ( empty( $waiting_pages ) ) {
-				SpeedGuard_Lighthouse::update_average_psi();
 				delete_transient( 'speedguard-tests-running' );
+				delete_transient( 'speedguard_waiting_tests' );
 
 				return;
 			}
+			//if there are waiting pages, save them in a transient
+			$value = json_encode( $waiting_pages );
+			set_transient( 'speedguard_waiting_tests', $value, MINUTE_IN_SECONDS * 10 );
 			?>
             <script type="text/javascript">
                 var waiting_posts = <?php echo json_encode( array_values( $waiting_pages ) ); ?>;
@@ -411,7 +379,6 @@ class SpeedGuard_Admin {
 				set_transient( 'speedguard-tests-running', true );
 			}
 			SpeedGuard_Lighthouse::lighthouse_new_test( $post_id );
-
 			wp_die();
 		}
 	}
@@ -427,7 +394,6 @@ class SpeedGuard_Admin {
 	}
 
 	// Plugin Styles
-
 	public function removable_query_args( $query_args ) {
 		if ( self::is_screen( 'settings,tests,clients' ) ) {
 			$new_query_args = [ 'speedguard', 'new_url_id' ];
@@ -457,7 +423,6 @@ class SpeedGuard_Admin {
 					],
 					'no_found_rows'  => true,
 				];
-
 				$guarded_pages = get_posts( $args );
 				if ( ! empty( $guarded_pages ) ) {
 					// Use the `do_action()` function to trigger the `handle_bulk_retest_load_time` action.
@@ -469,7 +434,6 @@ class SpeedGuard_Admin {
 
 
 	// Plugin Body classes
-
 	public function enqueue_styles() {
 		if ( ( is_admin_bar_showing() ) && ( self::is_screen( 'dashboard,settings,tests' ) || ! is_admin() ) ) {
 			wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'assets/css/speedguard-admin.css', [], $this->version );
@@ -480,7 +444,6 @@ class SpeedGuard_Admin {
 	}
 
 	// Plugin Item in Admin Menu
-
 	public function enqueue_scripts() {
 		if ( is_admin_bar_showing() && ( self::is_screen( 'dashboard,settings,tests,plugins,clients' ) || ! is_admin() ) ) {
 			wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'assets/js/speedguard-admin.js', [], $this->version, false );
@@ -502,12 +465,10 @@ class SpeedGuard_Admin {
 
 
 	// Plugin Admin Notices
-
 	function body_classes_filter( $classes ) {
 		if ( self::is_screen( 'settings,tests,dashboard' ) ) {
 			$sg_origin_results   = self::get_this_plugin_option( 'sg_origin_results' );
 			$guarded_pages_count = isset( $sg_origin_results['mobile']['psi']['lcp']['guarded_pages'] ) ? count( $sg_origin_results['mobile']['psi']['lcp']['guarded_pages'] ) : '';
-
 			if ( $guarded_pages_count < 1 ) {
 				$classes = $classes . ' no-guarded-pages';
 			}
@@ -519,7 +480,6 @@ class SpeedGuard_Admin {
 			} elseif ( 'psi' === $sg_test_type ) {
 				$class = 'test-type-psi';
 			}
-
 			$classes = $classes . ' ' . $class;
 		}
 		if ( self::is_screen( 'plugins' ) ) {

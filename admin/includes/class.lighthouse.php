@@ -16,9 +16,7 @@ class SpeedGuard_Lighthouse {
 	public static function lighthouse_new_test( $guarded_page_id ) {
 		$guarded_page_url = get_post_meta( $guarded_page_id, 'speedguard_page_url', true );
 		$devices          = [ 'desktop', 'mobile' ];
-
 		$origin = [];
-
 		$both_devices_values = []; //for post_meta sg_test_result
 		foreach ( $devices as $device ) {
 			//sleep( 5 ); // So we can use LightHouse without API
@@ -37,7 +35,6 @@ class SpeedGuard_Lighthouse {
 			}
 			$response      = wp_remote_retrieve_body( $response );
 			$json_response = json_decode( $response, true, 1512 );
-
 			// If test has PSI results (request was successful)
 			if ( ! empty( $json_response['lighthouseResult'] ) ) {
 				// Save PSI and CWV together to meta sg_test_result as device array
@@ -53,14 +50,12 @@ class SpeedGuard_Lighthouse {
 					'fid' => $json_response['loadingExperience']['metrics']['FIRST_INPUT_DELAY_MS'],
 				];
 				$both_devices_values[ $device ] = $device_values;
-
 				// Save CWV for origin for this Device
 				if ( ! empty( $json_response['originLoadingExperience'] ) ) {
 					$notavailable = "N/A";
 					$LCP          = isset( $json_response['originLoadingExperience']['metrics']['LARGEST_CONTENTFUL_PAINT_MS'] ) ? $json_response['originLoadingExperience']['metrics']['LARGEST_CONTENTFUL_PAINT_MS'] : $notavailable; // percentile,distributions, category
 					$CLS          = isset( $json_response['originLoadingExperience']['metrics']['CUMULATIVE_LAYOUT_SHIFT_SCORE'] ) ? $json_response['originLoadingExperience']['metrics']['CUMULATIVE_LAYOUT_SHIFT_SCORE'] : $notavailable; // percentile,distributions, category
 					$FID          = isset( $json_response['originLoadingExperience']['metrics']['FIRST_INPUT_DELAY_MS'] ) ? $json_response['originLoadingExperience']['metrics']['FIRST_INPUT_DELAY_MS'] : $notavailable; // percentile,distributions, category
-
 					$origin[ $device ] ['cwv'] = [
 						'lcp' => $LCP,
 						'cls' => $CLS,
@@ -73,27 +68,31 @@ class SpeedGuard_Lighthouse {
 				// TODOIf no PSI data -- meaning test failed to execute -- add error message
 			}
 		}
-
 		// Create a new test CPT
 		$new_test_cpt = [
 			'ID'         => $guarded_page_id,
 			'post_title' => $guarded_page_url,
 		];
 		wp_update_post( $new_test_cpt );
-
 		$updated = update_post_meta( $guarded_page_id, 'sg_test_result', $both_devices_values );
-
 		//And save all data
 		//Save CWV for origin
 		SpeedGuard_Admin::update_this_plugin_option( 'sg_origin_results', $origin );
+		
+		$waiting_tests = get_transient( 'speedguard_waiting_tests' );
+		if ( $waiting_tests ) {
+			if ( 1 === count( json_decode( $waiting_tests ) ) ) {  //if this is the last test
+				SpeedGuard_Lighthouse::update_average_psi();
+			}
+		}
 
 		return $updated;
 	}
 
 	public static function update_average_psi() {
-		$new_average_array    = SpeedGuard_Lighthouse::count_average_psi();
-		$origin               = SpeedGuard_Admin::get_this_plugin_option( 'sg_origin_results' );
-		if (is_array($origin)) {
+		$new_average_array = SpeedGuard_Lighthouse::count_average_psi();
+		$origin            = SpeedGuard_Admin::get_this_plugin_option( 'sg_origin_results' );
+		if ( is_array( $origin ) ) {
 			$new_sg_origin_result = array_merge_recursive( $origin, $new_average_array );
 			SpeedGuard_Admin::update_this_plugin_option( 'sg_origin_results', $new_sg_origin_result );
 		}
@@ -118,20 +117,16 @@ class SpeedGuard_Lighthouse {
 				]
 			]
 		] );
-
 		// If there are no tests with valid results, return an empty array
 		if ( empty( $guarded_pages ) ) {
 			return [];
 		}
-
 		// Initialize the average array
 		$average = [];
-
 		// Loop through the guarded pages
 		foreach ( $guarded_pages as $guarded_page ) {
 			// Get the guarded page load time
 			$guarded_page_load_time = get_post_meta( $guarded_page, 'sg_test_result', true );
-
 			// Loop through the device types
 			foreach ( SpeedGuard_Admin::SG_METRICS_ARRAY as $device => $test_types ) {
 				// Loop through the test types
@@ -146,7 +141,6 @@ class SpeedGuard_Lighthouse {
 				}
 			}
 		}
-
 		// Loop through the average array
 		foreach ( $average as $device => $test_types ) {
 			// Loop through the test types
@@ -155,16 +149,13 @@ class SpeedGuard_Lighthouse {
 				foreach ( $metrics as $metric => $values ) {
 					// Calculate the average
 					$average = array_sum( $values['guarded_pages'] ) / count( $values['guarded_pages'] );
-
 					// Create a new metric array
 					$new_metric_array = [
 						'average' => $average,
 					];
-
 					// If the metric is LCP, calculate the display value and score
 					if ( $metric === 'lcp' ) {
 						$new_metric_array['displayValue'] = round( $average / 1000, 2 ) . ' s';
-
 						if ( $average < 2.5 ) {
 							$new_metric_array['score'] = 'FAST';
 						} elseif ( $average < 4.0 ) {
@@ -173,11 +164,9 @@ class SpeedGuard_Lighthouse {
 							$new_metric_array['score'] = 'SLOW';
 						}
 					}
-
 					// If the metric is CLS, calculate the display value and score
 					if ( $metric === 'cls' ) {
 						$new_metric_array['displayValue'] = round( $average, 3 );
-
 						if ( $average < 0.1 ) {
 							$new_metric_array['score'] = 'FAST';
 						} elseif ( $average < 0.25 ) {
@@ -186,7 +175,6 @@ class SpeedGuard_Lighthouse {
 							$new_metric_array['score'] = 'SLOW';
 						}
 					}
-
 					// Add the new metric array to the new average array
 					$new_average_array[ $device ][ $test_type ][ $metric ] = $new_metric_array;
 				}
