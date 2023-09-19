@@ -278,9 +278,12 @@ class SpeedGuard_Widgets {
 			</p>
 			<p>
 				<?php _e('<strong>Cumulative Layout Shift (CLS):</strong> The total amount of layout shift on a page while it is loading. This is a measure of how much the content on a page moves around while it is loading.'); ?>
+                <img src="<?php echo plugin_dir_url( __DIR__ ) . 'assets/images/cls.svg' ?>" alt="Cumulative Layout Shift chart">
 			</p>
 			<p>
 				<?php _e('<strong>First Input Delay (FID):</strong> The time it takes for a browser to respond to a user interaction, such as clicking a button or tapping on a link. This is a measure of how responsive a web page feels to users.'); ?>
+                  <img src="<?php echo plugin_dir_url( __DIR__ ) . 'assets/images/fid.svg' ?>" alt="First Input Delay chart">
+
 			</p>
 			<p>
 				<?php _e('All three of these metrics are important for providing a good user experience. A fast LCP means that users will not have to wait long for the main content of a page to load. A low CLS means that users will not have to deal with content that moves around while they are trying to read it. And a low FID means that users will be able to interact with a web page quickly and easily.'); ?>
