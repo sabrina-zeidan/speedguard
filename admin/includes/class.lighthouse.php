@@ -93,8 +93,10 @@ class SpeedGuard_Lighthouse {
 	public static function update_average_psi() {
 		$new_average_array    = SpeedGuard_Lighthouse::count_average_psi();
 		$origin               = SpeedGuard_Admin::get_this_plugin_option( 'sg_origin_results' );
-		$new_sg_origin_result = array_merge_recursive( $origin, $new_average_array );
-		SpeedGuard_Admin::update_this_plugin_option( 'sg_origin_results', $new_sg_origin_result );
+		if (is_array($origin)) {
+			$new_sg_origin_result = array_merge_recursive( $origin, $new_average_array );
+			SpeedGuard_Admin::update_this_plugin_option( 'sg_origin_results', $new_sg_origin_result );
+		}
 	}
 
 	public static function count_average_psi() {
