@@ -137,7 +137,7 @@ class SpeedGuard_Widgets {
 		// Retrieving data to display
 		$speedguard_cwv_origin = SpeedGuard_Admin::get_this_plugin_option( 'sg_origin_results' );
 
-		//pr($speedguard_cwv_origin);
+		pr($speedguard_cwv_origin);
 		// Preparing data to display
 		// TODO make this constant
 		$sg_test_type = SpeedGuard_Settings::global_test_type();
@@ -243,33 +243,53 @@ class SpeedGuard_Widgets {
 	public static function explanation_widget_function() {
 		$cwv_link = 'https://web.dev/lcp/';
 		// Create the table.
-		$content = '<table>
-  <tr>
-    <td>
-      <p>' . sprintf(
-				__( 'We all know that site\'s loading speed was impacting Google ranking for quite a while now. But recently (late May 2020) company has revealed more details about %1$sCore Web Vitals%2$s — metrics that Google will be using to rank websites.', 'speedguard' ),
-				'<a href="' . $cwv_link . '" target="_blank">',
-				'</a>'
-			) . '</p>
-      <p>' . sprintf(
-			           __( '%1$sLargest Contentful Paint%2$s is one of them. It measures how quickly the page\'s "main content" loads — the bulk of the text or image (within the viewport, so before the user scrolls). ', 'speedguard' ),
-			           '<strong>',
-			           '</strong>'
-		           ) . '</p>
-      <p>
-        ' . __( 'The intention of these changes is to improve how users perceive the experience of interacting with a web page.', 'speedguard' ) . '
-      </p>
-    </td>
-  </tr>
-  <tr>
-    <td>
-      <img src="' . plugin_dir_url( __DIR__ ) . 'assets/images/lcp.svg" alt="Largest Contentful Paint chart">
-    </td>
-  </tr>
-</table>';
+		?>
 
-		// Echo the content.
-		echo $content;
+
+		<ul>
+			<li>
+		<h3><?php _e('What does N/A mean?'); ?></h3>
+		<span>
+			<?php
+			echo sprintf(
+				__( 'If you see "N/A" for a metric in Core Web Vitals tests, it means that there is not enough real-user data to provide a score. This can happen if your website is new or has very low traffic. The same will be displayed in your Google Search Console (GSC), which uses the same data source (<a href="%s">CrUX report</a>) as CWV.', 'my-text-domain' ),
+				esc_url( 'https://developer.chrome.com/docs/crux/' )
+			);
+			?>
+
+		</span>
+	</li>
+	<li>
+		<h3><?php _e('What is the difference between Core Web Vitals and PageSpeed Insights?'); ?></h3>
+		<span>
+			<?php _e('The main difference between CWV and PSI is that CWV is based on real-user data, while PSI uses lab data collected in a controlled environment. Lab data can be useful for debugging performance issues, but it is not as representative of the real-world user experience as real-user data.'); ?>
+			<p><strong> 
+					<?php _e('If you have CWV data available, you should always refer to that data first, as it represents the real experience real users of your website are having.'); ?></strong></p>
+			<?php _e('If there is no CWV data avalable -- you CAN use PSI as a reference, but you need to remember these are LAB tests: on the devices, connection and location that are most certainlely don\'t match the actual state of things.'); ?>
+		</span>
+	</li>
+	<li>
+		<h3><?php _e('Understanding metrics:'); ?></h3>
+		<span>
+			<p>
+
+				<?php _e('<strong>Largest Contentful Paint (LCP):</strong> The time it takes for the largest content element on a page to load. This is typically an image or video.'); ?>
+				<img src="<?php echo plugin_dir_url( __DIR__ ) . 'assets/images/lcp.svg' ?>" alt="Largest Contentful Paint chart">
+			</p>
+			<p>
+				<?php _e('<strong>Cumulative Layout Shift (CLS):</strong> The total amount of layout shift on a page while it is loading. This is a measure of how much the content on a page moves around while it is loading.'); ?>
+			</p>
+			<p>
+				<?php _e('<strong>First Input Delay (FID):</strong> The time it takes for a browser to respond to a user interaction, such as clicking a button or tapping on a link. This is a measure of how responsive a web page feels to users.'); ?>
+			</p>
+			<p>
+				<?php _e('All three of these metrics are important for providing a good user experience. A fast LCP means that users will not have to wait long for the main content of a page to load. A low CLS means that users will not have to deal with content that moves around while they are trying to read it. And a low FID means that users will be able to interact with a web page quickly and easily.'); ?>
+			</p>
+		</span>
+	</li>
+</ul>
+		
+<?php
 	}
 
 	public static function add_new_widget_function() {
@@ -287,10 +307,9 @@ class SpeedGuard_Widgets {
 
 	public static function important_questions_widget_function() {
 		$links = [
-			sprintf( __( '%1$sHow fast should a website load?%2$s', 'speedguard' ), '<a href="https://sabrinazeidan.com/how-fast-should-my-website-load/?utm_source=speedguard&utm_medium=sidebar&utm_campaign=important_questions" target="_blank">', '</a>' ),
-			sprintf( __( '%1$sHow to serve scaled images to speed up your site?%2$s', 'speedguard' ), '<a href="https://sabrinazeidan.com/serve-scaled-images-wordpress/?utm_source=speedguard&utm_medium=sidebar&utm_campaign=important_questions" target="_blank">', '</a>' ),
-			sprintf( __( '%1$sHow to speed up YouTube videos on your site?%2$s', 'speedguard' ), '<a href="https://sabrinazeidan.com/embed-youtube-video-wordpress-without-slowing/?utm_source=speedguard&utm_medium=sidebar&utm_campaign=important_questions" target="_blank">', '</a>' ),
-			sprintf( __( '%1$s5 popular recommendations that don’t work%2$s', 'speedguard' ), '<a href="https://sabrinazeidan.com/how-to-speed-up-wordpress-this-dont-work/?utm_source=speedguard&utm_medium=sidebar&utm_campaign=important_questions" target="_blank">', '</a>' ),
+			sprintf( __( '%1$sWhy CWV fail after they were passing before? [video]%2$s', 'speedguard' ), '<a href="https://www.youtube.com/watch?v=Q40B5cscObc" target="_blank">', '</a>' ),
+			sprintf( __( '%1$sOne single reason why your CWV are not passing [video]%2$s', 'speedguard' ), '<a href="https://youtu.be/-d7CPbjLXwg?si=VmZ_q-9myI4SBYSD" target="_blank">', '</a>' ),
+			sprintf( __( '%1$s5 popular recommendations that don’t work [video]%2$s', 'speedguard' ), '<a href="https://youtu.be/5j3OUaBDXKI?si=LSow4BWgtF9cSQKq" target="_blank">', '</a>' ),
 		];
 		echo '<ul>';
 		foreach ( $links as $link ) {
@@ -300,7 +319,6 @@ class SpeedGuard_Widgets {
 	}
 
 	public static function about_widget_function() {
-		$speedguard_cwv_origin = SpeedGuard_Admin::get_this_plugin_option( 'sg_origin_results' );
 		$picture               = '<a href="https://sabrinazeidan.com/?utm_source=speedguard&utm_medium=sidebar&utm_campaign=avatar" target="_blank"><div id="szpic"></div></a>';
 		$hey                   = sprintf(
 			__(
