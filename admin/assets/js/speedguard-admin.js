@@ -10,13 +10,13 @@ document.addEventListener(
         const thead = table.getElementsByTagName("thead")[0];
         const testTypeRow = document.createElement("tr");
         if (table.classList.contains('psi-test-type')) {
-            console.log('it does psi!');
+           // console.log('it does psi!');
             testTypeRow.innerHTML = '< th colspan      = "2" > < / th > < th colspan      = "2" class = "test-type-thead psi-mobile"> PSI < / th > < th colspan      = "2" class = "test-type-thead psi-desktop" > PSI < / th >';
             var column_count = 2;
         }
 
         if (table.classList.contains('cwv-test-type')) {
-            console.log('it does cwv!');
+           // console.log('it does cwv!');
             testTypeRow.innerHTML = '< th colspan      = "2" > < / th > < th colspan      = "3" class ="test-type-thead cwv-mobile" > CWV < / th > < th colspan      = "3" class = "test-type-thead cwv-desktop" > CWV < / th > ';
             var column_count = 3;
         }

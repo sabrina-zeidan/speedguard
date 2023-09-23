@@ -14,9 +14,9 @@ class SpeedGuard_Lighthouse {
 
 	/** Perform a New Test -- Test both Desktop and Mobile once request to test is made, save PSI, CWV and CWV for origin */
 	public static function lighthouse_new_test( $guarded_page_id ) {
-		$guarded_page_url = get_post_meta( $guarded_page_id, 'speedguard_page_url', true );
-		$devices          = [ 'desktop', 'mobile' ];
-		$origin = [];
+		$guarded_page_url    = get_post_meta( $guarded_page_id, 'speedguard_page_url', true );
+		$devices             = [ 'desktop', 'mobile' ];
+		$origin              = [];
 		$both_devices_values = []; //for post_meta sg_test_result
 		foreach ( $devices as $device ) {
 			//sleep( 5 ); // So we can use LightHouse without API
@@ -31,12 +31,13 @@ class SpeedGuard_Lighthouse {
 			$args     = [ 'timeout' => 30 ];
 			$response = wp_safe_remote_get( $request, $args );
 			if ( is_wp_error( $response ) ) { // if no response
-				return false;
+				return 'error';
 			}
 			$response      = wp_remote_retrieve_body( $response );
 			$json_response = json_decode( $response, true, 1512 );
 			// If test has PSI results (request was successful)
 			if ( ! empty( $json_response['lighthouseResult'] ) ) {
+				$test_result = true;
 				// Save PSI and CWV together to meta sg_test_result as device array
 				$device_values['psi']           = [
 					'lcp' => $json_response['lighthouseResult']['audits']['largest-contentful-paint'],
@@ -52,10 +53,10 @@ class SpeedGuard_Lighthouse {
 				$both_devices_values[ $device ] = $device_values;
 				// Save CWV for origin for this Device
 				if ( ! empty( $json_response['originLoadingExperience'] ) ) {
-					$notavailable = "N/A";
-					$LCP          = isset( $json_response['originLoadingExperience']['metrics']['LARGEST_CONTENTFUL_PAINT_MS'] ) ? $json_response['originLoadingExperience']['metrics']['LARGEST_CONTENTFUL_PAINT_MS'] : $notavailable; // percentile,distributions, category
-					$CLS          = isset( $json_response['originLoadingExperience']['metrics']['CUMULATIVE_LAYOUT_SHIFT_SCORE'] ) ? $json_response['originLoadingExperience']['metrics']['CUMULATIVE_LAYOUT_SHIFT_SCORE'] : $notavailable; // percentile,distributions, category
-					$FID          = isset( $json_response['originLoadingExperience']['metrics']['FIRST_INPUT_DELAY_MS'] ) ? $json_response['originLoadingExperience']['metrics']['FIRST_INPUT_DELAY_MS'] : $notavailable; // percentile,distributions, category
+					$notavailable              = "N/A";
+					$LCP                       = isset( $json_response['originLoadingExperience']['metrics']['LARGEST_CONTENTFUL_PAINT_MS'] ) ? $json_response['originLoadingExperience']['metrics']['LARGEST_CONTENTFUL_PAINT_MS'] : $notavailable; // percentile,distributions, category
+					$CLS                       = isset( $json_response['originLoadingExperience']['metrics']['CUMULATIVE_LAYOUT_SHIFT_SCORE'] ) ? $json_response['originLoadingExperience']['metrics']['CUMULATIVE_LAYOUT_SHIFT_SCORE'] : $notavailable; // percentile,distributions, category
+					$FID                       = isset( $json_response['originLoadingExperience']['metrics']['FIRST_INPUT_DELAY_MS'] ) ? $json_response['originLoadingExperience']['metrics']['FIRST_INPUT_DELAY_MS'] : $notavailable; // percentile,distributions, category
 					$origin[ $device ] ['cwv'] = [
 						'lcp' => $LCP,
 						'cls' => $CLS,
@@ -65,7 +66,8 @@ class SpeedGuard_Lighthouse {
 					$origin[ $device ]['cwv'] = "no CWV available"; // No sidewide CWV available
 				}
 			} else {
-				// TODOIf no PSI data -- meaning test failed to execute -- add error message
+				// No PSI data -- meaning test failed to execute
+				$test_result = false;
 			}
 		}
 		// Create a new test CPT
@@ -78,15 +80,16 @@ class SpeedGuard_Lighthouse {
 		//And save all data
 		//Save CWV for origin
 		SpeedGuard_Admin::update_this_plugin_option( 'sg_origin_results', $origin );
-
 		$waiting_tests = get_transient( 'speedguard_waiting_tests' );
-		if ( $waiting_tests ) {
-			if ( 1 === count( json_decode( $waiting_tests ) ) ) {  //if this is the last test
+		//Update PSI if it's the last test in the queue
+		if ( empty($waiting_tests)) {
+			//if ( 0 === count( json_decode( $waiting_tests ) ) ) {  //if this is the last test
 				SpeedGuard_Lighthouse::update_average_psi();
-			}
+			//}
 		}
 
-		return $updated;
+		//in case one of 2 tests failed the error will be returned
+		return 'success';
 	}
 
 	public static function update_average_psi() {

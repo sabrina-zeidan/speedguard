@@ -136,8 +136,25 @@ class SpeedGuard_Widgets {
 	public static function origin_results_widget_function( $post = '', $args = '' ) {
 		// Retrieving data to display
 		$speedguard_cwv_origin = SpeedGuard_Admin::get_this_plugin_option( 'sg_origin_results' );
+		$current= get_transient('current_tests_array');
 
-		pr($speedguard_cwv_origin);
+		echo "<br>running: ". pr($current);
+		$current= get_transient('current_tests_array', true);
+		echo "<br>running: ". pr($current);
+		$current= get_transient('tests_complete', true);
+		echo "<br>running: ". pr($current);
+		$updated_ts         = get_post_timestamp( '34', 'modified' ); // no timezone
+		$updated_plus_three = $updated_ts + 3 * 60;
+
+
+
+
+
+$running = get_transient('speedguard-tests-running');
+//echo "<br>running: ". pr($running);
+$waiting = get_transient('speedguard_waiting_tests');
+	//	echo "<br>waiting: ". pr($waiting);
+		//pr($speedguard_cwv_origin);
 		// Preparing data to display
 		// TODO make this constant
 		$sg_test_type = SpeedGuard_Settings::global_test_type();
@@ -252,7 +269,7 @@ class SpeedGuard_Widgets {
 		<span>
 			<?php
 			echo sprintf(
-				__( 'If you see "N/A" for a metric in Core Web Vitals tests, it means that there is not enough real-user data to provide a score. This can happen if your website is new or has very low traffic. The same will be displayed in your Google Search Console (GSC), which uses the same data source (<a href="%s">CrUX report</a>) as CWV.', 'my-text-domain' ),
+				__( 'If you see "N/A" for a metric in Core Web Vitals tests, it means that there is not enough real-user data to provide a score. This can happen if your website is new or has very low traffic. The same will be displayed in your Google Search Console (GSC), which uses the same data source (<a href="%s">CrUX report</a>) as CWV.', 'speedguard' ),
 				esc_url( 'https://developer.chrome.com/docs/crux/' )
 			);
 			?>

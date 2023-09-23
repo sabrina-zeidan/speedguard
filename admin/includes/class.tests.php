@@ -355,20 +355,28 @@ class SpeedGuard_Tests {
 	 * Update the existing test
 	 */
 	public static function update_speedguard_test( $guarded_page_id ) {
-		// TODO: All these if not automatically on activation
-		$updated_ts         = get_post_timestamp( $guarded_page_id, 'modified' ); // no timezone
-		$updated_plus_three = $updated_ts + 3 * 60;
-		if ( time() > $updated_plus_three ) {
-			// TODO if there are a few newer and a few old - show notice accordingly
+		//Define current tests array
+		$transient_exists    = get_transient( 'current_tests_array' );
+		$current_tests_array = $transient_exists ? json_decode( $transient_exists, true ) : [];
+		//$updated_ts         = get_post_timestamp( $guarded_page_id, 'modified' ); // no timezone
+	//	$updated_plus_three = $updated_ts + 3 * 60;
+		//Check if we can add this test to the queue
+		//Check if is already in the queue
+		if ( true === in_array( $guarded_page_id, $current_tests_array ) ) {
+			//TODO display notice the test is currently being updated
+			$response = 'already_in_queue';
 
-			// Set waiting status for the tests and sidewide
-			update_post_meta( $guarded_page_id, 'sg_test_result', 'waiting' );
-			SpeedGuard_Admin::update_this_plugin_option( 'sg_origin_results', 'waiting' );
-
-			// TODO: Replace with action
-			$response = 'speedguard_test_being_updated'; // TODO: true, false, error
-		} else {
+			return $response;
+		} //check if it was tested recently
+		else if ( time() < (get_post_timestamp( $guarded_page_id, 'modified' ) + 3 * 60 )) {
 			$response = 'slow_down';
+		} else { //looks good, let's add it to the queue
+			$current_tests_array[] = $guarded_page_id;
+			set_transient( 'current_tests_array', json_encode( array_unique( $current_tests_array ) ) );
+			update_post_meta( $guarded_page_id, 'sg_test_result', 'waiting' );
+            //TODO Maybe remove this action to update post_meta and just sho loading for those who are in transient?
+			SpeedGuard_Admin::update_this_plugin_option( 'sg_origin_results', 'waiting' );
+			$response = 'speedguard_test_being_updated';
 		}
 
 		return $response;

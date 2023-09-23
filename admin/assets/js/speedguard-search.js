@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', function () {
     const min_letters = 2;
     var autocomplete_field = document.getElementById('speedguard_new_url');
-    console.log(autocomplete_field);
+   // console.log(autocomplete_field);
     var awesomplete_field = new Awesomplete(autocomplete_field);
     
     // When the user presses and releases a key, get the input value
