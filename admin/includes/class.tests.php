@@ -164,7 +164,7 @@ class SpeedGuard_List_Table extends WP_List_Table {
 		if ( ! empty( $doaction ) && ! empty( $_POST['guarded-pages'] ) ) {
 			foreach ( $_POST['guarded-pages'] as $guarded_page_id ) {
 				if ( $doaction === 'retest_load_time' ) {
-					$result = SpeedGuard_Tests::update_speedguard_test( $guarded_page_id );
+					$result = SpeedGuard_Tests::update_test_fn( $guarded_page_id );
 				} elseif ( $doaction === 'delete' ) {
 					wp_delete_post( $guarded_page_id, true ); // TODO check error
 					$result = 'delete_guarded_pages';
@@ -307,7 +307,7 @@ class SpeedGuard_Tests {
 					// we have: $url_to_add, $guarded_item_type, $guarded_item_id, $guarded_post_blog_id now + $already_guarded status
 
 					if ( ! empty( $already_guarded ) && ( $already_guarded === true ) && empty( $redirect_to ) && ! empty( $existing_test_id ) && ( 'publish' === get_post_status( $existing_test_id ) ) ) {
-						$result      = self::update_speedguard_test( $existing_test_id );
+						$result      = self::update_test_fn( $existing_test_id );
 						$redirect_to = add_query_arg( 'speedguard', $result );
 					} else { // Valid and not guarded yet >>> ADD
 						$result = self::create_speedguard_test( $url_to_add, $guarded_item_type, $guarded_item_id );
@@ -354,33 +354,42 @@ class SpeedGuard_Tests {
 	/*
 	 * Update the existing test
 	 */
-	public static function update_speedguard_test( $guarded_page_id ) {
+
+	public static function update_test_fn( $guarded_page_id, $action = 'update' ) {
 		//Define current tests array
 		$transient_exists    = get_transient( 'speedguard_tests_in_queue' );
 		$current_tests_array = $transient_exists ? json_decode( $transient_exists, true ) : [];
-		//$updated_ts         = get_post_timestamp( $guarded_page_id, 'modified' ); // no timezone
-	//	$updated_plus_three = $updated_ts + 3 * 60;
+
 		//Check if we can add this test to the queue
-		//Check if is already in the queue
 		if ( true === in_array( $guarded_page_id, $current_tests_array ) ) {
 			//TODO display notice the test is currently being updated
 			$response = 'already_in_queue';
-
 			return $response;
 		} //check if it was tested recently
-		else if ( time() < (get_post_timestamp( $guarded_page_id, 'modified' ) + 3 * 60 )) {
+		else if ( ($action === 'update') && (time() < (get_post_timestamp( $guarded_page_id, 'modified' ) + 3 * 60 ))) {
 			$response = 'slow_down';
 		} else { //looks good, let's add it to the queue
+
+
+
+
 			$current_tests_array[] = $guarded_page_id;
 			set_transient( 'speedguard_tests_in_queue', json_encode( array_unique( $current_tests_array ) ) );
 			update_post_meta( $guarded_page_id, 'sg_test_result', 'waiting' );
-            //TODO Maybe remove this action to update post_meta and just sho loading for those who are in transient?
 			SpeedGuard_Admin::update_this_plugin_option( 'sg_origin_results', 'waiting' );
-			$response = 'speedguard_test_being_updated';
+			;
 		}
+
+        if ( $action == 'update'){
+            $response = 'speedguard_test_being_updated';
+        } else {
+	        $response = 'new_url_added';
+        }
 
 		return $response;
 	}
+
+
 
 	/*
 	* Create a new test
@@ -403,9 +412,13 @@ class SpeedGuard_Tests {
 			update_post_meta( $target_page_id, 'speedguard_page_url', $url_to_add );
 			update_post_meta( $target_page_id, 'speedguard_item_type', $guarded_item_type );
 
-			// Set waiting status for the tests and sidewide
-			SpeedGuard_Admin::update_this_plugin_option( 'sg_origin_results', 'waiting' );
-			update_post_meta( $target_page_id, 'sg_test_result', 'waiting' );
+
+            // Set waiting status for the tests and sidewide
+		//	SpeedGuard_Admin::update_this_plugin_option( 'sg_origin_results', 'waiting' );
+		//	update_post_meta( $target_page_id, 'sg_test_result', 'waiting' );
+
+
+
 
 			// TODO always pass blog id
 			if ( ! empty( $guarded_post_blog_id ) ) {
@@ -426,7 +439,10 @@ class SpeedGuard_Tests {
 			if ( defined( 'SPEEDGUARD_MU_NETWORK' ) ) {
 				restore_current_blog();
 			}
-			$response = 'new_url_added'; // TODO check thouroughly
+
+
+			$response = SpeedGuard_Tests::update_test_fn( $target_page_id, 'create' );
+
 		} else {
 			$response = 'error';
 		}

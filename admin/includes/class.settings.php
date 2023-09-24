@@ -148,7 +148,7 @@ class SpeedGuard_Settings {
 
 		// Update the test results for each guarded page
 		foreach ( $guarded_pages as $guarded_page_id ) {
-			SpeedGuard_Tests::update_speedguard_test( $guarded_page_id );
+			SpeedGuard_Tests::update_test_fn( $guarded_page_id );
 		}
 	}
 
