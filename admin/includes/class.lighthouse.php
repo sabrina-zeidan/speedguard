@@ -81,9 +81,6 @@ class SpeedGuard_Lighthouse {
 		//Save CWV for origin
 		SpeedGuard_Admin::update_this_plugin_option( 'sg_origin_results', $origin );
 
-		 if (count(json_decode( get_transient( 'speedguard_tests_in_queue', true    )) === 1)){ // if there is 1 tests in queue at this point it means this is the last one
-			 SpeedGuard_Lighthouse::update_average_psi();
-		 }
 		//in case one of 2 tests failed the error will be returned
 		return 'success';
 	}

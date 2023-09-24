@@ -166,7 +166,7 @@ class SpeedGuard_List_Table extends WP_List_Table {
 				if ( $doaction === 'retest_load_time' ) {
 					$result = SpeedGuard_Tests::update_test_fn( $guarded_page_id );
 				} elseif ( $doaction === 'delete' ) {
-				//	$result = SpeedGuard_Tests::delete_test_fn( $guarded_page_id);
+					$result = SpeedGuard_Tests::delete_test_fn( $guarded_page_id);
 				}
 			}
 		}

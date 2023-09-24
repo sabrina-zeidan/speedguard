@@ -195,6 +195,7 @@ class SpeedGuard_Admin {
 		//if after removing this test there are no tests left to process, mark that this is the last test in queue and delete transient
 		if ( count( $current_tests_array ) < 1 ) {
 			delete_transient( 'speedguard_tests_in_queue' );
+            SpeedGuard_Lighthouse::update_average_psi();
 			set_transient( 'speedguard_last_test_is_done', true, 120 );
 
 		} else {
