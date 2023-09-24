@@ -117,7 +117,8 @@ class SpeedGuard_Admin {
 			// Run 1 test async in the separate function
 			//If it's the first request and any test in not in progress now
 			if ( ! get_transient( 'speedguard_test_in_progress' ) ) {
-				$one_test_id = array_shift( array_values( $current_tests_array ) );
+                //$one_test_id = array_shift( array_values( $current_tests_array ) );
+				$one_test_id = current($current_tests_array);
 				set_transient( 'speedguard_test_in_progress', $one_test_id );
 				$upd_tr_value = get_transient('speedguard_test_in_progress');
                 $tests_are_running  = [
@@ -152,7 +153,6 @@ class SpeedGuard_Admin {
 		wp_send_json( $response );
 	}
 	function run_one_test_fn() {
-		///check_ajax_referer( 'sg_run_one_test_nonce', 'nonce' );
 		//check current tests transient
 		$speedguard_test_in_progress = get_transient( 'speedguard_test_in_progress' );
 		$test_id = $_POST['current_test_id'];
@@ -188,7 +188,6 @@ class SpeedGuard_Admin {
 		//fired in case test function responded success
 		$current_test = $_POST['$current_test_id'];
 		$current_tests_array = json_decode( get_transient( 'speedguard_tests_in_queue' ), true );
-	//	$current_test        = json_decode( get_transient( 'speedguard_test_in_progress' ) );
 		if ( ( $key = array_search( $current_test, $current_tests_array ) ) !== false ) {
 			unset( $current_tests_array[ $key ] );
 		}
@@ -197,6 +196,7 @@ class SpeedGuard_Admin {
 		if ( count( $current_tests_array ) < 1 ) {
 			delete_transient( 'speedguard_tests_in_queue' );
 			set_transient( 'speedguard_last_test_is_done', true, 120 );
+
 		} else {
 			// delete_transient('speedguard_waiting_for_the_last_test_to_finish'); //for the case test was added while the last one was running, and that one is not the last one anymore
 			set_transient( 'speedguard_tests_in_queue', json_encode( $current_tests_array ) );
@@ -371,7 +371,7 @@ class SpeedGuard_Admin {
 				);
 				if ( $connected_guarded_pages ) {
 					foreach ( $connected_guarded_pages as $connected_guarded_page_id ) {
-						wp_delete_post( $connected_guarded_page_id, true );
+						SpeedGuard_Tests::delete_test_fn($connected_guarded_page_id);
 					}
 					// uncheck speedguard_on
 					update_post_meta( $post->ID, 'speedguard_on', 'false' );

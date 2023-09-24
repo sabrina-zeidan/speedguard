@@ -166,8 +166,7 @@ class SpeedGuard_List_Table extends WP_List_Table {
 				if ( $doaction === 'retest_load_time' ) {
 					$result = SpeedGuard_Tests::update_test_fn( $guarded_page_id );
 				} elseif ( $doaction === 'delete' ) {
-					wp_delete_post( $guarded_page_id, true ); // TODO check error
-					$result = 'delete_guarded_pages';
+				//	$result = SpeedGuard_Tests::delete_test_fn( $guarded_page_id);
 				}
 			}
 		}
@@ -310,7 +309,7 @@ class SpeedGuard_Tests {
 						$result      = self::update_test_fn( $existing_test_id );
 						$redirect_to = add_query_arg( 'speedguard', $result );
 					} else { // Valid and not guarded yet >>> ADD
-						$result = self::create_speedguard_test( $url_to_add, $guarded_item_type, $guarded_item_id );
+						$result = self::create_test_fn( $url_to_add, $guarded_item_type, $guarded_item_id );
 
 						if ( empty( $redirect_to ) ) {
 							$redirect_to = add_query_arg( 'speedguard', 'new_url_added' );
@@ -350,10 +349,32 @@ class SpeedGuard_Tests {
 		return ! empty( $posts );
 	}
 
-	// TODO unify create and update functions
+
 	/*
-	 * Update the existing test
+	 * Delete the existing test
 	 */
+	public static function delete_test_fn( $guarded_page_id, $action = 'delete' ) {
+		$deleted = wp_delete_post( $guarded_page_id, true );
+
+        //delete from the queue if it's currently there
+		$current_tests_array = json_decode( get_transient( 'speedguard_tests_in_queue' ), true );
+		if ( ( $key = array_search( $guarded_page_id, $current_tests_array ) ) !== false ) {
+			unset( $current_tests_array[ $key ] );
+		}
+        set_transient('speedguard_tests_in_queue', json_encode( $current_tests_array ));
+
+        if (json_decode(get_transient( 'speedguard_test_in_progress')) == $guarded_page_id){
+	        delete_transient( 'speedguard_test_in_progress' );
+        }
+		if (json_decode(get_transient( ' speedguard_sending_request_now')) == $guarded_page_id){
+			delete_transient( ' speedguard_sending_request_now' );
+		}
+        if ( $deleted ) {
+	        $response = 'delete_guarded_pages';
+	        return $response;
+        }
+	}
+
 
 	public static function update_test_fn( $guarded_page_id, $action = 'update' ) {
 		//Define current tests array
@@ -394,7 +415,7 @@ class SpeedGuard_Tests {
 	/*
 	* Create a new test
 	*/
-	public static function create_speedguard_test( $url_to_add = '', $guarded_item_type = '', $guarded_item_id = '' ) {
+	public static function create_test_fn( $url_to_add = '', $guarded_item_type = '', $guarded_item_id = '' ) {
 		if ( empty( $url_to_add ) ) {
 			return;
 		}
