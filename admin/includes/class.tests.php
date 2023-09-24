@@ -356,7 +356,7 @@ class SpeedGuard_Tests {
 	 */
 	public static function update_speedguard_test( $guarded_page_id ) {
 		//Define current tests array
-		$transient_exists    = get_transient( 'current_tests_array' );
+		$transient_exists    = get_transient( 'speedguard_tests_in_queue' );
 		$current_tests_array = $transient_exists ? json_decode( $transient_exists, true ) : [];
 		//$updated_ts         = get_post_timestamp( $guarded_page_id, 'modified' ); // no timezone
 	//	$updated_plus_three = $updated_ts + 3 * 60;
@@ -372,7 +372,7 @@ class SpeedGuard_Tests {
 			$response = 'slow_down';
 		} else { //looks good, let's add it to the queue
 			$current_tests_array[] = $guarded_page_id;
-			set_transient( 'current_tests_array', json_encode( array_unique( $current_tests_array ) ) );
+			set_transient( 'speedguard_tests_in_queue', json_encode( array_unique( $current_tests_array ) ) );
 			update_post_meta( $guarded_page_id, 'sg_test_result', 'waiting' );
             //TODO Maybe remove this action to update post_meta and just sho loading for those who are in transient?
 			SpeedGuard_Admin::update_this_plugin_option( 'sg_origin_results', 'waiting' );
