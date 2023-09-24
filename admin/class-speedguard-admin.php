@@ -208,33 +208,15 @@ class SpeedGuard_Admin {
 		wp_send_json( $response );
 	}
 
-
 	function run_tests_js() {
 		//TODO: include this only on Tests page
 		//this runs on every sinle admin page (good), but we need to insure it doesn't send multiple reguests. S0 -- check on every page, run tests from this function, after checking that there is no tests are running just now
-        $reload = self::is_screen( 'tests' ) ? 'true' : 'false';
+		$reload = self::is_screen( 'tests' ) ? 'true' : 'false';
 		?>
         <script type="text/javascript">
-            // Get the AJAX URL, nonce, and reload variables
-
-
-
-            const llongpoll = async (ajaxurl, sgnonce, reload) => {
-
-                if ('true' === reload) {
-                    console.log('should be reloading page');
-                    //AI, here reload works properly
-
-                }
-                else if('false' === reload){
-                    console.log('shoud not reloading page');
-                    //AI, here reload works properly
-                }
-
-
+            const check_tests_queue_status = async (ajaxurl, sgnonce, reload) => {
                 try {
-                    // Make a fetch request to the AJAX endpoint.
-                    const response = await fetch(ajaxurl,{
+                    const response = await fetch(ajaxurl, {
                         method: 'POST',
                         credentials: 'same-origin',
                         headers: {
@@ -245,48 +227,37 @@ class SpeedGuard_Admin {
                         body: `action=check_tests_progress&nonce=${sgnonce}`,
                     });
 
-                    // Parse the response data.
                     const data = await response.json();
                     console.log(data);
-                    // Check the status of the response.
-                    if (data.status === 'queue') {
-                        // Parse the response data and use it in your application.
-                        //repeat this request in 10 seconds
 
-                        //TODO if queue -> Run the test from here!
-                        setTimeout(function () {
-                            llongpoll(ajaxurl, sgnonce, reload);
-                        }, 10000);
-                        console.log('sending id to test:');
+                    if (data.status === 'queue') {
+                        // TODO If queue -> Run the test from here!
+                        setTimeout(() => check_tests_queue_status(ajaxurl, sgnonce, reload), 30000);
+                        console.log('Sending ID to test:');
                         console.log(data.speedguard_test_in_progress);
                         return sg_run_one_test(ajaxurl, data.speedguard_test_in_progress);
-
-
                     } else if (data.status === 'complete') {
-                        console.log('tests complete');
-                        if ('true' === reload) {
+                        console.log('Tests complete');
+                        if (reload === 'true') {
                             window.location.replace(window.location.href + '&speedguard=load_time_updated');
                         }
-                    } else if (data.status === 'no_tests') {   //do nothing
-                        console.log('no_tests');
+                    } else if (data.status === 'no_tests') {
+                        console.log('No tests');
                     } else {
-                        //catch error
+                        // Catch error
                     }
                 } catch (err) {
                     console.log(err);
                 }
             };
+
             const reload = '<?php echo $reload;  ?>';
             const sgnonce = '<?php echo wp_create_nonce( 'sgnonce' ); ?>';
             const sg_run_one_test_nonce = '<?php echo wp_create_nonce( 'sg_run_one_test_nonce' ); ?>';
-            // Start the long poll.
-            llongpoll(ajaxurl, sgnonce, reload);
-        </script>
 
+            // Start the process of Checking on page load
+            check_tests_queue_status(ajaxurl, sgnonce, reload);
 
-
-        <script type="text/javascript">
-            //this runs on every single admin page (good), to insure that there are no multiple requests we use transient
             //Updating test status as done after successful API response
             const update_test_status_done = async (ajaxurl, post_id) => {
                 try {
@@ -308,13 +279,6 @@ class SpeedGuard_Admin {
 
             }
 
-        </script>
-
-        <script type="text/javascript">
-
-
-            //const sg_run_one_test = async (ajaxurl, sg_run_one_test_nonce) => {
-
             const sg_run_one_test = async (ajaxurl, test_id) => {
                 console.log('sg_run_one_test function started');
                 console.log('test id is: ' + test_id);
@@ -330,10 +294,8 @@ class SpeedGuard_Admin {
                         },
                         body: `action=run_one_test&current_test_id=${test_id}`,
                     });
-
                     const data = await response.json();
-                    console.log(data);
-                    console.log(response);
+
                     // Check the status of the response.
                     if (data.status === 'success') {
                         console.log('it is success, test done');
@@ -341,43 +303,14 @@ class SpeedGuard_Admin {
                         return update_test_status_done(ajaxurl, data.test_id);
                     } else if (data.status === 'error') {
                         // console.log('one or both requests to API failed');
-                    } else if (data.status === 'empty') {
-                        // console.log('there was no test to run');
-                    } else {
-                        //catch error
                     }
                 } catch (err) {
                     console.log(err);
                 }
-
             }
-            //  setTimeout(function () {
-            // sg_run_one_test(ajaxurl, sg_run_one_test_nonce);
-            //   }, 10000);
-
-
         </script>
-
-
-
-
 		<?php
 	}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 	public static function capability() {
 		$capability = 'manage_options';

@@ -413,13 +413,6 @@ class SpeedGuard_Tests {
 			update_post_meta( $target_page_id, 'speedguard_item_type', $guarded_item_type );
 
 
-            // Set waiting status for the tests and sidewide
-		//	SpeedGuard_Admin::update_this_plugin_option( 'sg_origin_results', 'waiting' );
-		//	update_post_meta( $target_page_id, 'sg_test_result', 'waiting' );
-
-
-
-
 			// TODO always pass blog id
 			if ( ! empty( $guarded_post_blog_id ) ) {
 				update_post_meta( $target_page_id, 'guarded_post_blog_id', $guarded_post_blog_id );
