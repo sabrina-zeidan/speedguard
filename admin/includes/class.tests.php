@@ -198,8 +198,7 @@ class SpeedGuard_List_Table extends WP_List_Table {
 			case 'psi_desktop_lcp':
 			case 'psi_desktop_cls':
 			case 'report_date':
-				// case 'load_time':// TODO remove
-				if ( isset( $item[ $column_name ] ) ) { // TODO fix this after load_time
+				if ( isset( $item[ $column_name ] ) ) {
 					$item[ $column_name ] = is_string( $item[ $column_name ] ) ? $item[ $column_name ] : 'error';
 
 					return $item[ $column_name ];

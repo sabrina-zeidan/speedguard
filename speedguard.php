@@ -8,7 +8,7 @@
  * Plugin Name:       SpeedGuard
  * Plugin URI:        https://sabrinazeidan.com/speedguard/
  * Description:       Keeps an eye on your website’s speed for you; every single day for free.
- * Version:           1.8.5
+ * Version:           2.0
  * Author:            Sabrina Zeidan
  * Author URI:        https://sabrinazeidan.com/
  * License:           GPL-2.0+
@@ -21,7 +21,7 @@ if ( ! defined( 'WPINC' ) ) {
 	die;
 }
 
-const SPEEDGUARD_VERSION = '1.8.5';
+const SPEEDGUARD_VERSION = '2.0';
 
 
 /**
