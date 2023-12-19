@@ -358,9 +358,12 @@ class SpeedGuard_Tests {
 
         //delete from the queue if it's currently there
 		$current_tests_array = json_decode( get_transient( 'speedguard_tests_in_queue' ), true );
-		if ( ( $key = array_search( $guarded_page_id, $current_tests_array ) ) !== false ) {
-			unset( $current_tests_array[ $key ] );
-		}
+		if (!empty($current_tests_array)){
+            if ( ( $key = array_search( $guarded_page_id, $current_tests_array ) ) !== false ) {
+                unset( $current_tests_array[ $key ] );
+            }
+        }
+
         set_transient('speedguard_tests_in_queue', json_encode( $current_tests_array ));
 
         if (json_decode(get_transient( 'speedguard_test_in_progress')) == $guarded_page_id){
