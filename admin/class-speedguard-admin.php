@@ -31,6 +31,10 @@ class SpeedGuard_Admin {
 	public static $cpt_name = 'guarded-page';
 	private $plugin_name;
 	private $version;
+	public $main_page;
+	public $tests_page_hook;
+	public $settings_page_hook;
+
 
 	public function __construct( $plugin_name, $version ) {
 		$this->plugin_name = $plugin_name;
@@ -86,232 +90,114 @@ class SpeedGuard_Admin {
 				]
 			);
 		}
-		add_action( 'wp_ajax_check_tests_progress', [ $this, 'check_tests_progress_fn' ] );
-		add_action( 'wp_ajax_run_one_test', [ $this, 'run_one_test_fn' ] );
-		add_action( 'wp_ajax_mark_test_as_done', [ $this, 'mark_test_as_done_fn' ] );
-		//Move to Lighrhouse afer
-		add_action( 'admin_footer', [ $this, 'run_tests_js' ] );
+		//add_action( 'admin_footer', [ $this, 'run_waiting_tests_ajax' ] );
+		//add_action( 'wp_ajax_run_waiting_tests', [ $this, 'run_waiting_tests' ] );
+
+
+		add_action( 'wp_ajax_to_check_tests_progress', [ $this, 'to_check_tests_progress'] );
+	//	add_action( 'wp_ajax_to_run_tests_in_queue', [ $this, 'to_run_tests_in_queue');
+		add_action( 'admin_footer', [ $this, 'just_to_include_JS'] );
+
+	}
+	function to_check_tests_progress() {
+        //Only transient here
+		check_ajax_referer( 'mynonce', 'nonce' );
+		//check current tests transient
+        $current_tests = get_transient( 'current_tests_array' );
+        $currently_running = get_transient( 'currently_running' );
+
+        if ( $currently_running && $current_tests) { //if there are tests in the queue
+            //$current_tests = json_decode( $current_tests, true );
+	      //  $array  = array_reverse( $current_tests );
+	       // $one_test_id = array_pop( $array );
+
+           // $test   =
+          // SpeedGuard_Lighthouse::lighthouse_new_test($one_test_id);
+            //remove it from the array
+	      //  if (($key = array_search( $one_test_id, $current_tests)) !== false) {
+		     //   unset($current_tests[$key]);
+	      //  }
+            //update transient
+          //  $current_tests = json_encode( $current_tests );
+          //  set_transient( 'current_tests_array', $current_tests, 60 * 60 * 24 );
+
+            //send json response
+            //if there are no tests in the queue
+            //send json response
+            //get first test
+
+	        $return = array(
+		        'status'  => 'queue',
+		        'message'  => 'There are tests in queue',
+		        'tests_in_queue'  => $current_tests,
+		       // 'this_test_id'       => $one_test_id
+	        );
+
+
+
+        }
+	        $return = array(
+		        'status'  => 'empty',
+		        'message'  => 'There are no tests currently running'
+	        );
+		wp_send_json($return);
+		//do nothing if there are no tests in the queue
 
     }
 
-	function check_tests_progress_fn() {
-		//Only transient here
-		check_ajax_referer( 'sgnonce', 'nonce' );
-		//check current tests transient
-		$current_tests_array  = get_transient( 'speedguard_tests_in_queue', true    );
-		$last_test_is_done_tr = get_transient( 'speedguard_last_test_is_done' );
-		$test_in_progress     = get_transient( 'speedguard_test_in_progress' );
-		//Possible responses:
-		$last_test_complete = [
-			'status'  => 'complete',
-			'message' => 'All tests are complete',
-		];
+    function just_to_include_JS() {
 
-		$do_nothing         = [
-			'status'  => 'no_tests',
-			'message' => 'There are no tests in queue',
-		];
-		//If there are tests in the queue
-		if ( $current_tests_array ) {
-			$current_tests_array = json_decode( $current_tests_array, true );
-			// Run 1 test async in the separate function
-			//If it's the first request and any test in not in progress now
-			if ( ! get_transient( 'speedguard_test_in_progress' ) ) {
-                //$one_test_id = array_shift( array_values( $current_tests_array ) );
-				$one_test_id = current($current_tests_array);
-				set_transient( 'speedguard_test_in_progress', $one_test_id );
-				$upd_tr_value = get_transient('speedguard_test_in_progress');
-                $tests_are_running  = [
-	                'status'         => 'queue',
-	                'message'        => 'There are tests in queue, there was NO speedguard_test_in_progress transient, setting it now',
-	                'tr_value' => $upd_tr_value,
-	                'tests_in_queue' => $current_tests_array,
-	                'speedguard_test_in_progress'       => $one_test_id,
-                    'action_just_done' => 'set_transient_speedguard_test_in_progress'
-                ];
-
-			}
-            else { //if there is a test in progress
-
-	            $one_test_id = json_decode(get_transient( 'speedguard_test_in_progress' ), true );
-                $tests_are_running  = [
-                    'status'         => 'queue',
-                    'message'        => 'There are tests in queue, there WAS speedguard_test_in_progress transient, do not update',
-                    'tests_in_queue' => $current_tests_array,
-                    'speedguard_test_in_progress'       => $one_test_id,
-                    'action_just_done' => 'nothing, test in progress was added before'
-                ];
-
-            }
-			$response = $tests_are_running;
-		} else if ( ! $current_tests_array && ! $test_in_progress && $last_test_is_done_tr ) { //if there are no tests in the queue, but last test has just completed
-			delete_transient( 'speedguard_last_test_is_done' );
-			$response = $last_test_complete;
-		} else { // if there are no tests and not waiting for the last one to complete
-			$response = $do_nothing;
-		}
-		wp_send_json( $response );
-	}
-	function run_one_test_fn() {
-		//check current tests transient
-		$speedguard_test_in_progress = get_transient( 'speedguard_test_in_progress' );
-		$test_id = $_POST['current_test_id'];
-		$speedguard_sending_request_now = get_transient( 'speedguard_sending_request_now' );
-		//if test in progress, and the request to Lighthouse is sending at the moment
-		if ( $speedguard_test_in_progress && $speedguard_sending_request_now ) {
-			$response = [
-				'status' => 'busy',
-				'comment' => 'waiting for LightHouse to respond'
-			];
-		}
-        //if test in progress, and the request to Lighthouse has not been sent yet -- send it
-        else if ( $speedguard_test_in_progress && !$speedguard_sending_request_now ) {
-            set_transient('speedguard_sending_request_now', $test_id );
-			$test_response = SpeedGuard_Lighthouse::lighthouse_new_test( json_decode( $test_id ) );
-			delete_transient('speedguard_sending_request_now');
-            $response      = [
-				'status'  => $test_response,
-				'test_id' => $test_id
-			];
-		}
-        else {
-			$response = [
-				'status' => 'weird',
-				'comment' => 'no other cases where this funciton is called should exist, only when there is speedguard_test_in_progress transient set',
-			];
-		}
-		wp_send_json( $response );
-	}
-
-
-	function mark_test_as_done_fn() {
-		//fired in case test function responded success
-		$current_test = $_POST['$current_test_id'];
-		$current_tests_array = json_decode( get_transient( 'speedguard_tests_in_queue' ), true );
-		if ( ( $key = array_search( $current_test, $current_tests_array ) ) !== false ) {
-			unset( $current_tests_array[ $key ] );
-		}
-		delete_transient( 'speedguard_test_in_progress' );
-		//if after removing this test there are no tests left to process, mark that this is the last test in queue and delete transient
-		if ( count( $current_tests_array ) < 1 ) {
-			delete_transient( 'speedguard_tests_in_queue' );
-            SpeedGuard_Lighthouse::update_average_psi();
-			set_transient( 'speedguard_last_test_is_done', true, 120 );
-
-		} else {
-			// delete_transient('speedguard_waiting_for_the_last_test_to_finish'); //for the case test was added while the last one was running, and that one is not the last one anymore
-			set_transient( 'speedguard_tests_in_queue', json_encode( $current_tests_array ) );
-		}
-		$response = [
-			'status' => 'test marked as done',
-			// 'test_id_passed'  => $test_id
-		];
-		wp_send_json( $response );
-	}
-
-	function run_tests_js() {
-		//TODO: include this only on Tests page
-		//this runs on every sinle admin page (good), but we need to insure it doesn't send multiple reguests. S0 -- check on every page, run tests from this function, after checking that there is no tests are running just now
-		$reload = self::is_screen( 'tests' ) ? 'true' : 'false';
-		?>
+        ?>
         <script type="text/javascript">
-            const check_tests_queue_status = async (ajaxurl, sgnonce, reload) => {
+
+            async function longPoll(ajaxurl, mynonce) {
+                // Make a fetch request to the AJAX endpoint with the keep-alive header set.
                 try {
                     const response = await fetch(ajaxurl, {
                         method: 'POST',
-                        credentials: 'same-origin',
                         headers: {
                             'Content-Type': 'application/x-www-form-urlencoded',
-                            'Cache-Control': 'no-cache',
                             'Connection': 'keep-alive',
                         },
-                        body: `action=check_tests_progress&nonce=${sgnonce}`,
+                        body: `action=my_ajax_action&nonce=${mynonce}`,
                     });
-
-                    const data = await response.json();
-                    console.log(data);
-
-                    if (data.status === 'queue') {
-                        // TODO If queue -> Run the test from here!
-                        setTimeout(() => check_tests_queue_status(ajaxurl, sgnonce, reload), 30000);
-                        console.log('Sending ID to test:');
-                        console.log(data.speedguard_test_in_progress);
-                        return sg_run_one_test(ajaxurl, data.speedguard_test_in_progress);
-                    } else if (data.status === 'complete') {
-                        console.log('Tests complete');
-                        if (reload === 'true') {
-                            window.location.replace(window.location.href + '&speedguard=load_time_updated');
-                        }
-                    } else if (data.status === 'no_tests') {
-                        console.log('No tests');
+console.log(response);
+                    // Check if the response was successful.
+                    if (response.status === 200) {
+                        // Return the response data as JSON.
+                        return await response.json();
                     } else {
-                        // Catch error
+                        // If the response was not successful, throw an error.
+                        throw new Error(`Failed to execute long poll: ${response.statusText}`);
                     }
-                } catch (err) {
-                    console.log(err);
+                } catch (error) {
+                    // If an error occurs, log it to the console and try again.
+                    console.error(error);
+                    await new Promise((resolve, reject) => setTimeout(resolve, 1000));
+                    return longPoll(ajaxurl, mynonce);
                 }
-            };
-
-            const reload = '<?php echo $reload;  ?>';
-            const sgnonce = '<?php echo wp_create_nonce( 'sgnonce' ); ?>';
-            const sg_run_one_test_nonce = '<?php echo wp_create_nonce( 'sg_run_one_test_nonce' ); ?>';
-
-            // Start the process of Checking on page load
-            check_tests_queue_status(ajaxurl, sgnonce, reload);
-
-            //Updating test status as done after successful API response
-            const update_test_status_done = async (ajaxurl, post_id) => {
-                try {
-                    // Make a fetch request to the AJAX endpoint.
-                    const response = await fetch(ajaxurl, {
-                        method: 'POST',
-                        credentials: 'same-origin',
-                        headers: {
-                            'Content-Type': 'application/x-www-form-urlencoded',
-                            'Cache-Control': 'no-cache',
-                            'Connection': 'keep-alive',
-                        },
-                        body: `action=mark_test_as_done&$current_test_id=${post_id}`,
-                    });
-                    console.log('Updating test status as done');
-                } catch (err) {
-                    console.log(err);
-                }
-
             }
 
-            const sg_run_one_test = async (ajaxurl, test_id) => {
-                console.log('sg_run_one_test function started');
-                console.log('test id is: ' + test_id);
-                try {
-                    // Make a fetch request to the AJAX endpoint.
-                    const response = await fetch(ajaxurl, {
-                        method: 'POST',
-                        credentials: 'same-origin',
-                        headers: {
-                            'Content-Type': 'application/x-www-form-urlencoded',
-                            'Cache-Control': 'no-cache',
-                            'Connection': 'keep-alive',
-                        },
-                        body: `action=run_one_test&current_test_id=${test_id}`,
-                    });
-                    const data = await response.json();
 
-                    // Check the status of the response.
-                    if (data.status === 'success') {
-                        console.log('it is success, test done');
-                        // Update test as done
-                        return update_test_status_done(ajaxurl, data.test_id);
-                    } else if (data.status === 'error') {
-                        // console.log('one or both requests to API failed');
-                    }
-                } catch (err) {
-                    console.log(err);
-                }
-            }
+            const mynonce = '<?php echo wp_create_nonce( 'mynonce' ); ?>';
+            // Start the long poll.
+            longPoll(ajaxurl, mynonce).then((response) => {
+                // Do something with the response data.
+                console.log(response);
+            });
+
+
+
+
         </script>
-		<?php
-	}
+
+
+            <?php
+
+    }
+
+
+
 
 	public static function capability() {
 		$capability = 'manage_options';
@@ -349,6 +235,7 @@ class SpeedGuard_Admin {
 		}
 	}
 
+	// Delete test data when original post got unpublished
 	public static function guarded_page_unpublished_hook( $new_status, $old_status, $post ) {
 		// Delete test data when original post got unpublished
 		if ( ( $old_status === 'publish' ) && ( $new_status != 'publish' ) && ( get_post_type( $post->ID ) ) != self::$cpt_name ) {
@@ -372,7 +259,7 @@ class SpeedGuard_Admin {
 				);
 				if ( $connected_guarded_pages ) {
 					foreach ( $connected_guarded_pages as $connected_guarded_page_id ) {
-						SpeedGuard_Tests::delete_test_fn($connected_guarded_page_id);
+						wp_delete_post( $connected_guarded_page_id, true );
 					}
 					// uncheck speedguard_on
 					update_post_meta( $post->ID, 'speedguard_on', 'false' );
@@ -408,6 +295,7 @@ class SpeedGuard_Admin {
 		register_post_type( 'guarded-page', $args );
 	}
 
+	// Remove meta when test is deleted
 	public static function show_admin_notices() {
 		if ( ! current_user_can( 'manage_options' ) ) {
 			return;
@@ -479,7 +367,6 @@ class SpeedGuard_Admin {
 		}
 	}
 
-	// Delete test data when original post got unpublished
 	public static function get_this_plugin_option( $option_name ) {
 		if ( defined( 'SPEEDGUARD_MU_NETWORK' ) ) {
 			return get_site_option( $option_name );
@@ -520,6 +407,8 @@ class SpeedGuard_Admin {
 		return $return;
 	}
 
+
+	// WordPress functions 'get_site_option' and 'get_option'
 	public static function speedguard_page_url( $page ) {
 		if ( $page === 'tests' ) {
 			$admin_page_url = defined( 'SPEEDGUARD_MU_NETWORK' ) ? network_admin_url( 'admin.php?page=speedguard_tests' ) : admin_url( 'admin.php?page=speedguard_tests' );
@@ -530,9 +419,215 @@ class SpeedGuard_Admin {
 		return $admin_page_url;
 	}
 
+	// WordPress functions 'update_site_option' and 'update_option'
 	public static function set_notice( $message, $class ) {
 		return "<div class='notice notice-$class is-dismissible'><p>$message</p></div>";
 	}
+
+	function run_waiting_tests_ajax() {
+		if (self::is_screen('tests') || self::is_screen('clients')) {
+			$args          = [
+				'post_type'      => self::$cpt_name,
+				'post_status'    => 'publish',
+				'posts_per_page' => 100,
+				'fields'         => 'ids',
+				'meta_query'     => [
+					[
+						'key'     => 'sg_test_result',
+						'value'   => 'waiting',
+						'compare' => 'LIKE',
+					],
+				],
+				'no_found_rows'  => true,
+			];
+			$waiting_pages = get_posts($args);
+			if (empty($waiting_pages)) {
+				delete_transient('speedguard-tests-running');
+				delete_transient('speedguard_waiting_tests');
+				return;
+			}
+			//if there are waiting pages, save them in a transient
+			$value = json_encode($waiting_pages);
+			set_transient('speedguard_waiting_tests', $value, MINUTE_IN_SECONDS * 10);
+			?>
+            <script type="text/javascript">
+                var waiting_posts = <?php echo json_encode(array_values($waiting_pages)); ?>;
+
+                const params = new URLSearchParams();
+                params.append('action', 'RUN_TESTS_ACTION');
+                waiting_posts.forEach(postId => params.append('post_ids[]', postId));
+
+
+                // Define the action to execute the tests.
+                const RUN_TESTS_ACTION = 'run_waiting_tests';
+
+                // Define the action to check the status of the tests.
+                const CHECK_STATUS_ACTION = 'check_test_status';
+  const post_ids = [34, 27];
+                // Start the long polling process.
+                async function longPoll(post_ids) {
+                    // Send an AJAX request to the server to execute the tests.
+                    const response = await fetch(ajaxurl, {
+                        method: 'POST',
+                        credentials: 'same-origin',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: new URLSearchParams({
+                            action: RUN_TESTS_ACTION,
+                            post_ids: post_ids,
+                        }),
+                    });
+
+                    // Check if the response is successful.
+                    if (response.ok) {
+                        // The tests have been started. Start the long polling process to check the status of the tests.
+                        setTimeout(() => checkStatus(post_ids), 1000);
+                    } else {
+                        // Handle the error.
+                    }
+                }
+
+                // Check the status of the tests.
+                async function checkStatus(post_ids) {
+                    // Send an AJAX request to the server to check the status of the tests.
+                    const response = await fetch(ajaxurl, {
+                        method: 'POST',
+                        credentials: 'same-origin',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: new URLSearchParams({
+                            action: CHECK_STATUS_ACTION,
+                            post_ids: post_ids,
+                        }),
+                    });
+
+                    // Check if the response is successful.
+                    if (response.ok) {
+                        // Decode the JSON response.
+                        const status = await response.json();
+
+                        // Check if the tests are complete.
+                        if (status === 'success') {
+                            // The tests are complete. Get the results of the tests.
+                            getResults(post_ids);
+                        } else if (status === 'running') {
+                            // The tests are still running. Call the checkStatus function again to check the status of the tests again.
+                            setTimeout(() => checkStatus(post_ids), 1000);
+                        } else {
+                            // Handle the error.
+                        }
+                    } else {
+                        // Handle the error.
+                    }
+                }
+
+                // Get the results of the tests.
+                async function getResults(post_ids) {
+                    // Send an AJAX request to the server to get the results of the tests.
+                    const response = await fetch(ajaxurl, {
+                        method: 'POST',
+                        credentials: 'same-origin',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: new URLSearchParams({
+                            action: 'get_test_results',
+                            post_ids: post_ids,
+                        }),
+                    });
+
+                    // Check if the response is successful.
+                    if (response.ok) {
+                        // Decode the JSON response.
+                        const results = await response.json();
+
+                        // Update the UI with the results.
+                        // ...
+                    } else {
+                        // Handle the error.
+                    }
+                }
+
+                // Start the long polling process with the post IDs.
+                longPoll(post_ids);
+
+
+
+            </script>
+			<?php
+		}
+	}
+
+
+
+	function run_waiting_tests() {
+		$posts_ids = $_POST['post_ids'];
+		$results = [];
+		$senttotest = [];
+
+		// Check if the `speedguard-tests-running` transient is set. If it is not set, set it to `true`.
+		if (!get_transient('speedguard-tests-running')) {
+			set_transient('speedguard-tests-running', true);
+		}
+
+		// Loop through the post IDs and run the SpeedGuard_Lighthouse::lighthouse_new_test() function on each post.
+		foreach ($posts_ids as $post_id) {
+			$result = SpeedGuard_Lighthouse::lighthouse_new_test($post_id);
+
+			// Add the result to the $results array and the $senttotest array.
+			$results[] = $result;
+			$senttotest[] = $post_id;
+
+			// Get the current tests from the `speedguard_waiting_tests` transient.
+			$current_tests = json_decode(get_transient('speedguard_waiting_tests'), true);
+
+			// Remove the current post from the $current_tests array.
+			if (($key = array_search($post_id, $current_tests)) !== false) {
+				unset($current_tests[$key]);
+			}
+
+			// Update the `speedguard_waiting_tests` transient with the updated $current_tests array.
+			set_transient('speedguard_waiting_tests', json_encode($current_tests), MINUTE_IN_SECONDS * 10);
+		}
+
+		// Check if the $results array is empty. If it is empty, return a response with the status `waiting`.
+		if (empty($results)) {
+			$response = [
+				'status' => 'waiting',
+				'message' => 'Empty $results Tests are running',
+				'results' => $results,
+				'sent_ids' => $senttotest,
+			];
+		} else {
+			// Check if the $results array contains the string `error`. If it does, return a response with the status `error`.
+			if (in_array('error', $results, true)) {
+				$response = [
+					'status' => 'error',
+					'message' => 'There was an error running the tests.',
+					'results' => $results,
+					'sent_ids' => $senttotest,
+				];
+			} else {
+				// Return a response with the status `success`.
+				$response = [
+					'status' => 'success',
+					'message' => 'Tests ran successfully.',
+					'results' => $results,
+					'sent_ids' => $senttotest,
+				];
+			}
+		}
+
+		// Echo the JSON encoded response.
+		echo json_encode($response);
+
+		// Die.
+		wp_die();
+	}
+
+
 
 
 
@@ -555,6 +650,7 @@ class SpeedGuard_Admin {
 
 		return $query_args;
 	}
+
 
 
 	// Plugin Body classes

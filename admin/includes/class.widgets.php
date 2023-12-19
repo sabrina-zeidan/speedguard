@@ -137,18 +137,7 @@ class SpeedGuard_Widgets {
 		// Retrieving data to display
 		$speedguard_cwv_origin = SpeedGuard_Admin::get_this_plugin_option( 'sg_origin_results' );
 		$current= get_transient('current_tests_array');
-
 		echo "<br>running: ". pr($current);
-		$current= get_transient('current_tests_array', true);
-		echo "<br>running: ". pr($current);
-		$current= get_transient('tests_complete', true);
-		echo "<br>running: ". pr($current);
-		$updated_ts         = get_post_timestamp( '34', 'modified' ); // no timezone
-		$updated_plus_three = $updated_ts + 3 * 60;
-
-
-
-
 
 $running = get_transient('speedguard-tests-running');
 //echo "<br>running: ". pr($running);
@@ -198,14 +187,15 @@ $waiting = get_transient('speedguard_waiting_tests');
 	' . $fid_tr . '
 	</thbody>
 	</table>
-
 	';
 
-		if ( ( 'cwv' === $sg_test_type ) && ( "N/A" === $mobile_lcp ) ) {
+		if ( ( 'cwv' === $sg_test_type ) &&  str_contains($mobile_lcp, 'N')) {
 			$info_text = sprintf( __( 'N/A means that there is no data from Google available -- most likely your website have not got enough traffic for Google to make evaluation (Not enough usage data in the last 90 days for this device type)', 'speedguard' ), '<a href="#">', '</a>' ) . '<div><br></div>';
 		} elseif ( 'psi' === $sg_test_type ) {
 			$info_text = sprintf( __( 'This is not real user data. These are averages calculated based on the tests below. Core Web Vitals -- is where the the real data is. You can switch in Settings', 'speedguard' ), '<a href="#">', '</a>' ) . '<div><br></div>';
 		}
+        else $info_text ='';
+
 
 		echo $content . $info_text;
 	}
@@ -269,8 +259,9 @@ $waiting = get_transient('speedguard_waiting_tests');
 		<span>
 			<?php
 			echo sprintf(
-				__( 'If you see "N/A" for a metric in Core Web Vitals tests, it means that there is not enough real-user data to provide a score. This can happen if your website is new or has very low traffic. The same will be displayed in your Google Search Console (GSC), which uses the same data source (<a href="%s">CrUX report</a>) as CWV.', 'speedguard' ),
-				esc_url( 'https://developer.chrome.com/docs/crux/' )
+				__( 'If you see "N/A" for a metric in Core Web Vitals tests, it means that there is not enough real-user data to provide a score. This can happen if your website is new or has very low traffic. The same will be displayed in your <a href="%1$s">Google Search Console (GSC)</a>, which uses the same data source (<a href="%2$s">CrUX report</a>) as CWV.', 'speedguard' ),
+				esc_url( 'https://search.google.com/search-console/' ),
+				esc_url( 'https://developer.chrome.com/docs/crux/' ),
 			);
 			?>
 
