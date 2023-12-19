@@ -40,7 +40,7 @@ function addSGHeadersToTable() {
 
     // For Debugging Only    thead.prepend(testTypeRow);
     const deviceRow = document.createElement("tr");
-    deviceRow.innerHTML = "<th colspan='2'></th><th colspan='" + column_count + "'><i class='sg-device-column mobile' aria-hidden='true' title='Mobile'></i></th><th colspan='" + column_count + "'><i class='sg-device-column desktop' aria-hidden='true' title='Desktop'></i></th>";
+    deviceRow.innerHTML = "<th colspan='2'></th><th colspan='" + column_count + "'><i class='sg-device-column mobile' aria-hidden='true' title='Mobile'></i></th><th colspan='" + column_count + "'><i class='sg-device-column desktop' aria-hidden='true' title='Desktop'></i></th><th colspan='1'></th>";
     thead.prepend(deviceRow);
 
 

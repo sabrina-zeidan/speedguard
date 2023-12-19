@@ -39,7 +39,7 @@
 }
 
 /** Results Page**/
-.toplevel_page_speedguard_tests thead th {
+#speedguard-dashboard-widget thead th {
 	text-align: center;
 }
 
