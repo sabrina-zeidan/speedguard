@@ -27,6 +27,7 @@
 if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 	exit;
 }
+require_once plugin_dir_path( __FILE__ ) . '/admin/includes/class.tests.php';
 function speedguard_delete_data() {
 	// Delete CPTs
 	$guarded_pages = get_posts( [
