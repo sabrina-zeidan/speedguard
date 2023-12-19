@@ -385,7 +385,7 @@ class SpeedGuard_Tests {
 		$current_tests_array = $transient_exists ? json_decode( $transient_exists, true ) : [];
 
 		//Check if we can add this test to the queue
-		if ( true === in_array( $guarded_page_id, $current_tests_array ) ) {
+		if ( !empty($current_tests_array) && (true === in_array( $guarded_page_id, $current_tests_array )) ) {
 			//TODO display notice the test is currently being updated
 			$response = 'already_in_queue';
 			return $response;

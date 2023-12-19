@@ -48,7 +48,7 @@ class SpeedGuard_Notifications {
 													' . sprintf( __( 'Core Web Vitals for the entire website:', 'speedguard' ) ) . '</p>
 													
 													<p>												
-													' . sprintf( __( 'Currently %3$ pages are monitored. You can see the  %1$sdetailed report here%2$ and also add more pages to be tracked there.', 'speedguard' ), '<a href="' . SpeedGuard_Admin::speedguard_page_url( 'tests' ) . '" target="_blank">', '</a>', count( $guarded_pages ) ) . '</p>
+													' . sprintf( __( 'Currently %3$ pages are monitored. You can see the  %1$sdetailed report here%2$ and also add more pages to be tracked there.', 'speedguard' ), '<a href="' . SpeedGuard_Admin::speedguard_page_url( 'tests' ) . '" target="_blank">', '</a>', get_transient('speedguard_tests_count') ) . '</p>
 													
 													<p>' . SpeedGuard_Widgets::origin_results_widget_function() . '																			
 										</p>

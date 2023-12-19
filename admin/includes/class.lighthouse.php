@@ -113,6 +113,7 @@ class SpeedGuard_Lighthouse {
 				]
 			]
 		] );
+        set_transient('speedguard_tests_count', count($guarded_pages));
 		// If there are no tests with valid results, return an empty array
 		if ( empty( $guarded_pages ) ) {
 			return [];

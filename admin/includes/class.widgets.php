@@ -137,7 +137,7 @@ class SpeedGuard_Widgets {
 		// Retrieving data to display
 		$speedguard_cwv_origin = SpeedGuard_Admin::get_this_plugin_option( 'sg_origin_results' );
 		$current= get_transient('current_tests_array');
-		echo "<br>running: ". pr($current);
+	//	echo "<br>running: ". pr($current);
 
 $running = get_transient('speedguard-tests-running');
 //echo "<br>running: ". pr($running);
@@ -194,9 +194,7 @@ $waiting = get_transient('speedguard_waiting_tests');
 		} elseif ( 'psi' === $sg_test_type ) {
 			$info_text = sprintf( __( 'This is not real user data. These are averages calculated based on the tests below. Core Web Vitals -- is where the the real data is. You can switch in Settings', 'speedguard' ), '<a href="#">', '</a>' ) . '<div><br></div>';
 		}
-        else $info_text ='';
-
-
+        else $info_text = '';
 		echo $content . $info_text;
 	}
 
