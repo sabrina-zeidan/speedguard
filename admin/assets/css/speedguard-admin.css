@@ -39,7 +39,7 @@
 }
 
 /** Results Page**/
-#speedguard-dashboard-widget thead th {
+#speedguard_dashboard_widget thead th, #speedguard-dashboard-widget thead th {
 	text-align: center;
 }
 

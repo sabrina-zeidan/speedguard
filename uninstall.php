@@ -88,7 +88,8 @@ function speedguard_delete_data() {
 		'speedguard_tests_in_queue',
 		'speedguard_test_in_progress',
 		'speedguard_sending_request_now',
-		'speedguard_last_test_is_done'
+		'speedguard_last_test_is_done',
+        'speedguard_tests_count'
 	];
 	foreach ( $speedguard_transients as $speedguard_transient ) {
 		delete_transient( $speedguard_transient );
