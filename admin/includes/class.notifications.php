@@ -27,7 +27,7 @@ class SpeedGuard_Notifications {
 		if ( $guarded_pages ) { //if there are monitored pages
 			$speedguard_options = SpeedGuard_Admin::get_this_plugin_option( 'speedguard_options' );
 			$admin_email        = $speedguard_options['email_me_at'];
-			$site_url           = parse_url( get_home_url() );
+			$site_url           = wp_parse_url( get_home_url() );
 			$site_url           = $site_url['host'];
 			$subject            = sprintf( __( 'Performance update for %1$s', 'speedguard' ), $site_url );
 			ob_start();

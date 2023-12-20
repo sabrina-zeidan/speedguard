@@ -203,7 +203,7 @@ class SpeedGuard_Admin {
 
         } else {
             // delete_transient('speedguard_waiting_for_the_last_test_to_finish'); //for the case test was added while the last one was running, and that one is not the last one anymore
-            set_transient( 'speedguard_tests_in_queue', json_encode( $current_tests_array ) );
+            set_transient( 'speedguard_tests_in_queue', wp_json_encode( $current_tests_array ) );
         }
         $response = [
             'status' => 'test marked as done',

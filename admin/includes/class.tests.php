@@ -265,7 +265,7 @@ class SpeedGuard_Tests {
 			if ( ! filter_var( $url_to_add, FILTER_VALIDATE_URL ) ) {
 				$redirect_to = add_query_arg( 'speedguard', 'add_new_url_error_not_url' );
 			} else { // it's a valid URL. Does it belong to the current domain?
-				$entered_domain = parse_url( $url_to_add );
+				$entered_domain = wp_parse_url( $url_to_add );
 				// If it doesn't belong to the current domain and it's not a PRO version -> redirect
 				if ( ( $_SERVER['SERVER_NAME'] != $entered_domain['host'] ) && ! defined( 'SPEEDGUARD_PRO' ) ) {
 					$redirect_to = add_query_arg( 'speedguard', 'add_new_url_error_not_current_domain' );
@@ -363,7 +363,7 @@ class SpeedGuard_Tests {
             }
         }
 
-        set_transient('speedguard_tests_in_queue', json_encode( $current_tests_array ));
+        set_transient('speedguard_tests_in_queue', wp_json_encode( $current_tests_array ));
 
         if (json_decode(get_transient( 'speedguard_test_in_progress')) == $guarded_page_id){
 	        delete_transient( 'speedguard_test_in_progress' );
@@ -397,7 +397,7 @@ class SpeedGuard_Tests {
 
 
 			$current_tests_array[] = $guarded_page_id;
-			set_transient( 'speedguard_tests_in_queue', json_encode( array_unique( $current_tests_array ) ) );
+			set_transient( 'speedguard_tests_in_queue', wp_json_encode( array_unique( $current_tests_array ) ) );
 			update_post_meta( $guarded_page_id, 'sg_test_result', 'waiting' );
 			SpeedGuard_Admin::update_this_plugin_option( 'sg_origin_results', 'waiting' );
 			;
