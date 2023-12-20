@@ -248,10 +248,29 @@ class SpeedGuard_Tests {
 
 	public static function process_speedguard_actions() {
 		// add new test via form
-		if ( ! empty( $_POST['speedguard'] ) && $_POST['speedguard'] === 'add_new_url' ) {
-			$url    = ( ! empty( $_POST['speedguard_new_url_permalink'] ) ) ? $_POST['speedguard_new_url_permalink'] : $_POST['speedguard_new_url'];
-			$result = self::try_add_speedguard_test( $url, $_POST['speedguard_item_type'], $_POST['speedguard_new_url_id'], $_POST['blog_id'] );
-		}
+
+            // process form data
+
+            if ( ! empty( $_POST['speedguard'] ) && $_POST['speedguard'] === 'add_new_url' ) {
+
+                if ( ! isset( $_POST['sg_add_new_nonce_field'] )
+                    || ! wp_verify_nonce( $_POST['sg_add_new_nonce_field'], 'sg_add_new_url' )
+                ) {
+                    print 'Sorry, your nonce did not verify.';
+                    exit;
+                } else {
+
+                    $url = (!empty($_POST['speedguard_new_url_permalink'])) ? $_POST['speedguard_new_url_permalink'] : $_POST['speedguard_new_url'];
+                    $result = self::try_add_speedguard_test($url, $_POST['speedguard_item_type'], $_POST['speedguard_new_url_id'], $_POST['blog_id']);
+
+                }
+
+            }
+
+
+
+
+
 	}
 
 	// TODO: separate add_test (decide here add or update) then: update_test and create_test
@@ -319,7 +338,8 @@ class SpeedGuard_Tests {
 		}
 		// Result: Should be set in any case
 		if ( ! get_transient( 'speedguard-notice-activation' ) ) {
-			wp_safe_redirect( esc_url_raw( $redirect_to ) );
+			$redirect_to_nonce = wp_nonce_url($redirect_to,'sg_redirect_nonce');
+            wp_safe_redirect( esc_url_raw( $redirect_to_nonce ) );
 			exit;
 		}
 	}

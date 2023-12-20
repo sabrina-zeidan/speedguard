@@ -302,7 +302,12 @@ $waiting = get_transient('speedguard_waiting_tests');
 	}
 
 	public static function add_new_widget_function() {
-		$content = '<form name="speedguard_add_url" id="speedguard_add_url"  method="post" action="">   
+var_dump($_GET);
+var_dump($_POST);
+var_dump($_REQUEST);
+        //$nonce = wp_create_nonce('sg_add_new_nonce');
+        $nonce_field = wp_nonce_field('sg_add_new_url', 'sg_add_new_nonce_field');
+        $content = '<form name="speedguard_add_url" id="speedguard_add_url"  method="post" action="">   
 		<input class="form-control"  type="text" id="speedguard_new_url" name="speedguard_new_url" value="" placeholder="' . __( 'Start typing the title of the post, page or custom post type...', 'speedguard' ) . '" autofocus="autofocus"/>
 		<input type="hidden" id="blog_id" name="blog_id" value="" />
 		<input type="hidden" id="speedguard_new_url_permalink" name="speedguard_new_url_permalink" value=""/> 
@@ -310,7 +315,7 @@ $waiting = get_transient('speedguard_waiting_tests');
 		<input type="hidden" id="speedguard_new_url_id" name="speedguard_new_url_id" value=""/>
 		<input type="hidden" name="speedguard" value="add_new_url" />
 		<input type="submit" name="Submit" class="button action" value="' . __( 'Add', 'speedguard' ) . '" />
-		</form>';
+		'. $nonce_field .'</form>';
 		echo $content;
 	}
 
