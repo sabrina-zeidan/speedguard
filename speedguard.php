@@ -32,9 +32,6 @@ function activate_speedguard( $network_wide ) {
 	// Network-wide  activation is a PRO feature. If tries to activate Network wide, stop:
 	if ( is_multisite() && $network_wide && ( ! defined( 'SPEEDGUARD_PRO' ) ) ) {
 		deactivate_plugins( plugin_basename( __FILE__ ) );
-		if ( isset( $_GET['activate'] ) ) {
-			unset( $_GET['activate'] );
-		}
 		wp_die( __( 'Network activation is not available at the moment. But feel free to activate this plugin on per-site basis!', 'speedguard' ) );
 	}
 
