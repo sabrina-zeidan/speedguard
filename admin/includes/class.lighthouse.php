@@ -80,6 +80,14 @@ class SpeedGuard_Lighthouse {
 		//And save all data
 		//Save CWV for origin
 		SpeedGuard_Admin::update_this_plugin_option( 'sg_origin_results', $origin );
+		$waiting_tests = get_transient( 'speedguard_waiting_tests' );
+		//Update PSI if it's the last test in the queue
+		if ( empty($waiting_tests)) {
+			//if ( 0 === count( json_decode( $waiting_tests ) ) ) {  //if this is the last test
+				SpeedGuard_Lighthouse::update_average_psi();
+				wp_schedule_single_event( time() + 1 * 60, 'speedguard_email_test_results' );
+			//}
+		}
 
 		//in case one of 2 tests failed the error will be returned
 		return 'success';
@@ -113,7 +121,6 @@ class SpeedGuard_Lighthouse {
 				]
 			]
 		] );
-        set_transient('speedguard_tests_count', count($guarded_pages));
 		// If there are no tests with valid results, return an empty array
 		if ( empty( $guarded_pages ) ) {
 			return [];

@@ -134,12 +134,10 @@ class SpeedGuard_Widgets {
 	 * Function responsible for displaying the Origin widget, both n Tests page and Dashboard
 	 */
 	public static function origin_results_widget_function( $post = '', $args = '' ) {
-
-
 		// Retrieving data to display
+        //echo SpeedGuard_Notifications::test_results_email('regular');
 		$speedguard_cwv_origin = SpeedGuard_Admin::get_this_plugin_option( 'sg_origin_results' );
-		$current= get_transient('current_tests_array');
-	
+
 		// Preparing data to display
 		// TODO make this constant
 		$sg_test_type = SpeedGuard_Settings::global_test_type();
@@ -190,7 +188,9 @@ class SpeedGuard_Widgets {
 		} elseif ( 'psi' === $sg_test_type ) {
 			$info_text = sprintf( __( 'This is not real user data. These are averages calculated based on the tests below. Core Web Vitals -- is where the the real data is. You can switch in Settings', 'speedguard' ), '<a href="#">', '</a>' ) . '<div><br></div>';
 		}
-        else $info_text = '';
+        else $info_text ='';
+
+
 		echo $content . $info_text;
 	}
 
@@ -298,8 +298,7 @@ class SpeedGuard_Widgets {
 	}
 
 	public static function add_new_widget_function() {
-        $nonce_field = wp_nonce_field('sg_add_new_url', 'sg_add_new_nonce_field');
-        $content = '<form name="speedguard_add_url" id="speedguard_add_url"  method="post" action="">   
+		$content = '<form name="speedguard_add_url" id="speedguard_add_url"  method="post" action="">   
 		<input class="form-control"  type="text" id="speedguard_new_url" name="speedguard_new_url" value="" placeholder="' . __( 'Start typing the title of the post, page or custom post type...', 'speedguard' ) . '" autofocus="autofocus"/>
 		<input type="hidden" id="blog_id" name="blog_id" value="" />
 		<input type="hidden" id="speedguard_new_url_permalink" name="speedguard_new_url_permalink" value=""/> 
@@ -307,7 +306,7 @@ class SpeedGuard_Widgets {
 		<input type="hidden" id="speedguard_new_url_id" name="speedguard_new_url_id" value=""/>
 		<input type="hidden" name="speedguard" value="add_new_url" />
 		<input type="submit" name="Submit" class="button action" value="' . __( 'Add', 'speedguard' ) . '" />
-		'. $nonce_field .'</form>';
+		</form>';
 		echo $content;
 	}
 
@@ -323,7 +322,13 @@ class SpeedGuard_Widgets {
 		}
 		echo '</ul>';
 	}
+	public static function important_questions_widget_function_return() {
 
+        $content = 'This is content';
+        $content = SpeedGuard_Widgets::important_questions_widget_function();
+        return $content;
+
+	}
 	public static function about_widget_function() {
 		$picture               = '<a href="https://sabrinazeidan.com/?utm_source=speedguard&utm_medium=sidebar&utm_campaign=avatar" target="_blank"><div id="szpic"></div></a>';
 		$hey                   = sprintf(

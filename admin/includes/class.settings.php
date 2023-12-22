@@ -126,16 +126,7 @@ class SpeedGuard_Settings {
 
 
 	function update_results_cron_function() {
-		// If send report is on: schedule cron job
-		$speedguard_options = get_option( 'speedguard_options' );
-		$email_me_case      = $speedguard_options['email_me_case'];
-		if ( $email_me_case != 'never' ) {
-			if ( ! wp_next_scheduled( 'speedguard_email_test_results' ) ) {
-				// In 2 minutes
-				wp_schedule_single_event( time() + 2 * 60, 'speedguard_email_test_results' );
-			}
-		}
-
+		/**
 		// Get all guarded pages
 		$args          = [
 			'post_type'      => SpeedGuard_Admin::$cpt_name,
@@ -150,6 +141,19 @@ class SpeedGuard_Settings {
 		foreach ( $guarded_pages as $guarded_page_id ) {
 			SpeedGuard_Tests::update_speedguard_test( $guarded_page_id );
 		}
+        **/
+        //TODO update on cron
+		// If send report is on: schedule cron job
+		$speedguard_options = get_option( 'speedguard_options' );
+		$email_me_case      = $speedguard_options['email_me_case'];
+		if ( $email_me_case != 'never' ) {
+			if ( ! wp_next_scheduled( 'speedguard_email_test_results' ) ) {
+				// In 2 minutes
+				wp_schedule_single_event( time() + 5 * 60, 'speedguard_email_test_results' );
+			}
+		}
+
+
 	}
 
 	function email_test_results_function() {
@@ -162,8 +166,8 @@ class SpeedGuard_Settings {
 
 	function speedguard_cron_schedules( $schedules ) {
 		$check_recurrence = 1; // Check every day
-		$value            = constant( 'DAY_IN_SECONDS' );
-		//$value                            = 1200; //every 10 mins for testing
+	//	$value            = constant( 'DAY_IN_SECONDS' );
+		$value                            = 600; //every 5 mins for testing
 		$interval                         = (int) $check_recurrence * $value;
 		$schedules['speedguard_interval'] = [
 			'interval' => $interval, // user input integer in second
