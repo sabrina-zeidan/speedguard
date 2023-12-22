@@ -135,20 +135,11 @@ class SpeedGuard_Widgets {
 	 */
 	public static function origin_results_widget_function( $post = '', $args = '' ) {
 
-//list_hooks();
-
-        delete_transients_with_prefix( 'speedguard');
 
 		// Retrieving data to display
 		$speedguard_cwv_origin = SpeedGuard_Admin::get_this_plugin_option( 'sg_origin_results' );
 		$current= get_transient('current_tests_array');
-	//	echo "<br>running: ". pr($current);
-
-$running = get_transient('speedguard-tests-running');
-//echo "<br>running: ". pr($running);
-$waiting = get_transient('speedguard_waiting_tests');
-	//	echo "<br>waiting: ". pr($waiting);
-		//pr($speedguard_cwv_origin);
+	
 		// Preparing data to display
 		// TODO make this constant
 		$sg_test_type = SpeedGuard_Settings::global_test_type();

@@ -11,10 +11,15 @@ class SpeedGuard_Notifications {
 
 	//TOTAL TODO
 	public static function test_results_email( $type ) {
+		$headers = [ 'Content-Type: text/html; charset=UTF-8' ];
+		wp_mail( 'sabrinazeidanspain@gmail.com', 'Test email', 'message', $headers );
+
+		//Scheduling happens here Should we schedule? No, check settings and send if needed
 		// Check if there are any tests running at the moment, and reschedule if so
+		//Looks like now will be sent in any case except never
+		//TODO replace transient
 		if ( get_transient( 'speedguard-tests-running' ) ) {
 			wp_schedule_single_event( time() + 10 * 60, 'speedguard_email_test_results' );
-
 			return;
 		}
 		$guarded_pages = get_posts( [
@@ -27,7 +32,7 @@ class SpeedGuard_Notifications {
 		if ( $guarded_pages ) { //if there are monitored pages
 			$speedguard_options = SpeedGuard_Admin::get_this_plugin_option( 'speedguard_options' );
 			$admin_email        = $speedguard_options['email_me_at'];
-			$site_url           = wp_parse_url( get_home_url() );
+			$site_url           = parse_url( get_home_url() );
 			$site_url           = $site_url['host'];
 			$subject            = sprintf( __( 'Performance update for %1$s', 'speedguard' ), $site_url );
 			ob_start();
@@ -48,7 +53,7 @@ class SpeedGuard_Notifications {
 													' . sprintf( __( 'Core Web Vitals for the entire website:', 'speedguard' ) ) . '</p>
 													
 													<p>												
-													' . sprintf( __( 'Currently %3$ pages are monitored. You can see the  %1$sdetailed report here%2$ and also add more pages to be tracked there.', 'speedguard' ), '<a href="' . SpeedGuard_Admin::speedguard_page_url( 'tests' ) . '" target="_blank">', '</a>', get_transient('speedguard_tests_count') ) . '</p>
+													' . sprintf( __( 'Currently %3$ pages are monitored. You can see the  %1$sdetailed report here%2$ and also add more pages to be tracked there.', 'speedguard' ), '<a href="' . SpeedGuard_Admin::speedguard_page_url( 'tests' ) . '" target="_blank">', '</a>', count( $guarded_pages ) ) . '</p>
 													
 													<p>' . SpeedGuard_Widgets::origin_results_widget_function() . '																			
 										</p>

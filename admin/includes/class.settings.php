@@ -103,7 +103,7 @@ class SpeedGuard_Settings {
 			$new_value['email_me_at'] = $admin_email;
 		}
 		if ( empty( $new_value['email_me_case'] ) ) {
-			$new_value['email_me_case'] = 'current state';
+			$new_value['email_me_case'] = 'everyday';
 		}
 		if ( empty( $new_value['test_type'] ) ) {
 			$new_value['test_type'] = 'cwv';
@@ -148,7 +148,7 @@ class SpeedGuard_Settings {
 
 		// Update the test results for each guarded page
 		foreach ( $guarded_pages as $guarded_page_id ) {
-			SpeedGuard_Tests::update_test_fn( $guarded_page_id );
+			SpeedGuard_Tests::update_speedguard_test( $guarded_page_id );
 		}
 	}
 
@@ -209,10 +209,11 @@ class SpeedGuard_Settings {
 		$options    = SpeedGuard_Admin::get_this_plugin_option( 'speedguard_options' );
 		$field_name = esc_attr( $args['label_for'] );
 		$items      = [
-			'current state'           => __( 'Every day with the current state', 'speedguard' ),
-			'if any URL is not GOOD'  => __( 'if any URL is not passing CWV (after daily check)', 'speedguard' ),
-			'if CWV origing not GOOD' => __( 'only if CWV for the whole site (origin) is not passing CWV (after daily check)', 'speedguard' ),
-			'never'                   => __( 'never', 'speedguard' ),
+			'everyday'      => __( 'After daily check with the current state', 'speedguard' ),
+			'any_URL_fails' => __( 'After daily check in case any URL is not passing CWV', 'speedguard' ),
+			'origin_fails'  => __( 'After daily check only in case Origin (whole site) is not passing CWV', 'speedguard' ),
+			'everytime'     => __( 'every time the tests are run', 'speedguard' ),
+			'never'         => __( 'never', 'speedguard' ),
 		];
 
 		foreach ( $items as $item => $item_label ) {
