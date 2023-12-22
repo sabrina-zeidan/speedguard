@@ -4,92 +4,6 @@
  *
  *   Class responsible for adding metaboxes
  */
-function pr( $data ) {
-    echo "<pre>";
-    print_r( $data ); // or var_dump($data);
-    echo "</pre>";
-}
-
-function dump_hook( $tag, $hook ) {
-    ksort($hook);
-
-    echo "<pre>>>>>>\t$tag<br>";
-
-    foreach( $hook as $priority => $functions ) {
-
-        echo $priority;
-
-        foreach( $functions as $function )
-            if( $function['function'] != 'list_hook_details' ) {
-
-                echo "\t";
-
-                if( is_string( $function['function'] ) )
-                    echo $function['function'];
-
-                elseif( is_string( $function['function'][0] ) )
-                    echo $function['function'][0] . ' -> ' . $function['function'][1];
-
-                elseif( is_object( $function['function'][0] ) )
-                    echo "(object) " . get_class( $function['function'][0] ) . ' -> ' . $function['function'][1];
-
-                else
-                    print_r($function);
-
-                echo ' (' . $function['accepted_args'] . ') <br>';
-            }
-    }
-
-    echo '</pre>';
-}
-
-function list_hooks( $filter = false ){
-    global $wp_filter;
-
-    $hooks = $wp_filter;
-    $hooks = json_decode( json_encode( $hooks ), true );
-
-    ksort( $hooks );
-
-    foreach( $hooks as $tag => $hook )
-        if ( false === $filter || false !== strpos( $tag, $filter ) )
-            dump_hook($tag, $hook);
-}
-
-function delete_transients_with_prefix( $prefix ) {
-    foreach ( get_transient_keys_with_prefix( $prefix ) as $key ) {
-       // delete_transient( $key );
-        echo "<br>". $key." ".get_transient( $key );
-    }
-}
-
-/**
- * Gets all transient keys in the database with a specific prefix.
- *
- * Note that this doesn't work for sites that use a persistent object
- * cache, since in that case, transients are stored in memory.
- *
- * @param  string $prefix Prefix to search for.
- * @return array          Transient keys with prefix, or empty array on error.
- */
-function get_transient_keys_with_prefix( $prefix ) {
-    global $wpdb;
-
-    $prefix = $wpdb->esc_like( '_transient_' . $prefix );
-    $sql    = "SELECT `option_name` FROM $wpdb->options WHERE `option_name` LIKE '%s'";
-    $keys   = $wpdb->get_results( $wpdb->prepare( $sql, $prefix . '%' ), ARRAY_A );
-
-    if ( is_wp_error( $keys ) ) {
-        return [];
-    }
-
-    return array_map( function( $key ) {
-        // Remove '_transient_' from the option name.
-        return substr( $key['option_name'], strlen( '_transient_' ) );
-    }, $keys );
-}
-
-
 class SpeedGuard_Widgets {
 	public function __construct() {
 		$options = SpeedGuard_Admin::get_this_plugin_option( 'speedguard_options' );
@@ -393,10 +307,6 @@ $waiting = get_transient('speedguard_waiting_tests');
 	}
 
 	public static function add_new_widget_function() {
-var_dump($_GET);
-var_dump($_POST);
-var_dump($_REQUEST);
-        //$nonce = wp_create_nonce('sg_add_new_nonce');
         $nonce_field = wp_nonce_field('sg_add_new_url', 'sg_add_new_nonce_field');
         $content = '<form name="speedguard_add_url" id="speedguard_add_url"  method="post" action="">   
 		<input class="form-control"  type="text" id="speedguard_new_url" name="speedguard_new_url" value="" placeholder="' . __( 'Start typing the title of the post, page or custom post type...', 'speedguard' ) . '" autofocus="autofocus"/>

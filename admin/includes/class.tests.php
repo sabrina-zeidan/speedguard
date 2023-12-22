@@ -159,33 +159,47 @@ class SpeedGuard_List_Table extends WP_List_Table {
 
 	// Columns data
 
-	public function process_bulk_action() {
-		$doaction = $this->current_action();
-		if ( ! empty( $doaction ) && ! empty( $_POST['guarded-pages'] ) ) {
-			foreach ( $_POST['guarded-pages'] as $guarded_page_id ) {
-				if ( $doaction === 'retest_load_time' ) {
-					$result = SpeedGuard_Tests::update_test_fn( $guarded_page_id );
-				} elseif ( $doaction === 'delete' ) {
-					$result = SpeedGuard_Tests::delete_test_fn( $guarded_page_id);
-				}
-			}
-		}
+    public function process_bulk_action()    {
+        $doaction = $this->current_action();
+        if ($this->current_action() === 'delete' || $this->current_action() === 'retest_load_time') {
 
-		if ( isset( $result ) ) {
-            set_transient('speedguard_notice_'.$result, true,5);
-			$redirect_to = add_query_arg( 'speedguard', $result );
-			wp_safe_redirect( esc_url_raw( $redirect_to ) );
-			exit;
+            if (wp_verify_nonce($_REQUEST['speedguard_wp_list_table_action_nonce'], 'speedguard_wp_list_table_action')) {
+
+                if (!empty($doaction) && !empty($_POST['guarded-pages'])) {
+                    foreach ($_POST['guarded-pages'] as $guarded_page_id) {
+                        if ($doaction === 'retest_load_time') {
+                            $result = SpeedGuard_Tests::update_test_fn($guarded_page_id);
+                        } elseif ($doaction === 'delete') {
+                            $result = SpeedGuard_Tests::delete_test_fn($guarded_page_id);
+                        }
+                    }
+                }
+                if (isset($result)) {
+                    set_transient('speedguard_notice_' . $result, true, 5);
+                    $redirect_to = add_query_arg('speedguard', $doaction);
+                    $redirect_to_nonce = wp_nonce_url($redirect_to, 'sg_redirect_nonce');
+                    wp_safe_redirect(esc_url_raw($redirect_to_nonce));
+                    exit;
+                }
+
+            } else {
+
+                die('This is a secure website. Your nonce did not verify. Go get a coffee.');
+            }
+            //  $true = wp_verify_nonce($_REQUEST['_wpnonce'], 'bulk-' . $this->_args['plural']);
+            // $true = wp_verify_nonce($_REQUEST['_wpnonce'], 'speedguard_nonce_tests_bulk_actions');
 
 
-		}
-	}
+        }
 
 
-	function column_cb( $item ) {
-		return sprintf( '<input type="checkbox" name="guarded-pages[]" value="%s" />', $item['guarded_page_id'] );
-	}
+    }
 
+
+    function column_cb( $item ) {
+        $sg_nonce = wp_nonce_field('speedguard_wp_list_table_action','speedguard_wp_list_table_action_nonce');
+        return '<input type="checkbox" name="guarded-pages[]" value="' . esc_attr( $item['guarded_page_id'] ) . '"> ' . $sg_nonce;
+    }
 	// Sort data the variables set in the $_GET
 
 	public function column_default( $item, $column_name ) {

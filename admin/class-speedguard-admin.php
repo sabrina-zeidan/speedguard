@@ -186,6 +186,7 @@ class SpeedGuard_Admin {
 
 
     function mark_test_as_done_fn() {
+        check_ajax_referer( 'sg_run_one_test_nonce', 'nonce' );
         //fired in case test function responded success
         $current_test = $_POST['$current_test_id'];
         $current_tests_array = json_decode( get_transient( 'speedguard_tests_in_queue' ), true );
@@ -255,13 +256,13 @@ class SpeedGuard_Admin {
 
             const reload = '<?php echo $reload;  ?>';
             const sgnonce = '<?php echo wp_create_nonce( 'sgnonce' ); ?>';
-            const sg_run_one_test_nonce = '<?php echo wp_create_nonce( 'sg_run_one_test_nonce' ); ?>';
+
 
             // Start the process of Checking on page load
             check_tests_queue_status(ajaxurl, sgnonce, reload);
-
+            const sgnoncee = '<?php echo wp_create_nonce( 'sgnoncee' ); ?>';
             //Updating test status as done after successful API response
-            const update_test_status_done = async (ajaxurl, post_id) => {
+            const update_test_status_done = async (ajaxurl, sgnoncee, post_id) => {
                 try {
                     // Make a fetch request to the AJAX endpoint.
                     const response = await fetch(ajaxurl, {
@@ -272,7 +273,7 @@ class SpeedGuard_Admin {
                             'Cache-Control': 'no-cache',
                             'Connection': 'keep-alive',
                         },
-                        body: `action=mark_test_as_done&$current_test_id=${post_id}`,
+                        body: `action=mark_test_as_done&$current_test_id=${post_id}&nonce=${sgnoncee}`,
                     });
                     console.log('Updating test status as done');
                 } catch (err) {
@@ -280,10 +281,9 @@ class SpeedGuard_Admin {
                 }
 
             }
-
+            const sg_run_one_test_nonce = '<?php echo wp_create_nonce( 'sg_run_one_test_nonce' ); ?>';
             const sg_run_one_test = async (ajaxurl, sg_run_one_test_nonce, test_id) => {
-                console.log('sg_run_one_test function started');
-                console.log('test id is: ' + test_id);
+                console.log('sg_run_one_test function is going to start with test_id:' + test_id);
                 try {
                     // Make a fetch request to the AJAX endpoint.
                     const response = await fetch(ajaxurl, {
@@ -300,9 +300,9 @@ class SpeedGuard_Admin {
 
                     // Check the status of the response.
                     if (data.status === 'success') {
-                        console.log('it is success, test done');
+                        console.log('it is success, test done. Trying: update_test_status_done');
                         // Update test as done
-                        return update_test_status_done(ajaxurl, data.test_id);
+                        return update_test_status_done(ajaxurl, sg_run_one_test_nonce, data.test_id);
                     } else if (data.status === 'error') {
                         // console.log('one or both requests to API failed');
                     }
