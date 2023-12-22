@@ -170,10 +170,14 @@ class SpeedGuard_List_Table extends WP_List_Table {
 				}
 			}
 		}
+
 		if ( isset( $result ) ) {
+            set_transient('speedguard_notice_'.$result, true,5);
 			$redirect_to = add_query_arg( 'speedguard', $result );
 			wp_safe_redirect( esc_url_raw( $redirect_to ) );
 			exit;
+
+
 		}
 	}
 
@@ -275,74 +279,96 @@ class SpeedGuard_Tests {
 
 	// TODO: separate add_test (decide here add or update) then: update_test and create_test
 
-	public static function try_add_speedguard_test( $url_to_add = '', $guarded_item_type = '', $guarded_item_id = '', $guarded_post_blog_id = '', $already_guarded = false ) {
-		// blog id 1
-		if ( empty( $url_to_add ) ) {
-			$redirect_to = add_query_arg( 'speedguard', 'add_new_url_error_empty' );
-		} elseif ( ! empty( $url_to_add ) ) {
-			$url_to_add = strtok( trim( preg_replace( '/\t+/', '', htmlspecialchars( $url_to_add ) ) ), '?' );
-			if ( ! filter_var( $url_to_add, FILTER_VALIDATE_URL ) ) {
-				$redirect_to = add_query_arg( 'speedguard', 'add_new_url_error_not_url' );
-			} else { // it's a valid URL. Does it belong to the current domain?
-				$entered_domain = wp_parse_url( $url_to_add );
-				// If it doesn't belong to the current domain and it's not a PRO version -> redirect
-				if ( ( $_SERVER['SERVER_NAME'] != $entered_domain['host'] ) && ! defined( 'SPEEDGUARD_PRO' ) ) {
-					$redirect_to = add_query_arg( 'speedguard', 'add_new_url_error_not_current_domain' );
-				}//$url_to_add doesn't belong to the current domain and it's not PRO
-				else { // $url_to_add is a valid URL. It belongs to the current domain. Do we know the type?
-					if ( empty( $guarded_item_type ) ) {// find out the type, item id and blog id //TODO
-						if ( trailingslashit( $url_to_add ) === trailingslashit( get_site_url() ) ) { // homepage
-							$guarded_item_type   = 'homepage';
-							$is_homepage_guarded = self::is_homepage_guarded();
-							$already_guarded     = ( ! empty( $is_homepage_guarded ) ) ? true : false;
-							$existing_test_id    = ( ! empty( $is_homepage_guarded ) ) ? $is_homepage_guarded : false;
-						} else { // single or archive
-							$guarded_item_id = url_to_postid( $url_to_add );
-							if ( $guarded_item_id != 0 ) {
-								$guarded_item_type = 'single';
-								$speedguard_on     = get_post_meta( $guarded_item_id, 'speedguard_on', true );
-								$already_guarded   = ( ! empty( $speedguard_on ) && ( $speedguard_on[0] === 'true' ) ) ? true : false;
-								$existing_test_id  = ( ! empty( $speedguard_on ) && ( $speedguard_on[0] === 'true' ) ) ? ( $speedguard_on[1] ) : false;
-							} elseif ( $guarded_item_id === 0 ) { // it's archive. Let's find the term
-								// $slug = basename($url_to_add).PHP_EOL;
-								$taxonomies = get_taxonomies();
-								foreach ( $taxonomies as $tax_type_key => $taxonomy ) {
-									if ( $term_object = get_term_by( 'slug', basename( $url_to_add ) . PHP_EOL, $taxonomy ) ) {
-										// TODO what if there are a few terms with the same slug in different taxonomies
-										// TODO What if nothing is found
-										$guarded_item_id   = $term_object->term_id;
-										$guarded_item_type = 'archive';
-										break;
-									}
-								}
-								$speedguard_on    = get_term_meta( $guarded_item_id, 'speedguard_on', true );
-								$already_guarded  = ( ! empty( $speedguard_on ) && ( $speedguard_on[0] === 'true' ) ) ? true : false;
-								$existing_test_id = ( ! empty( $speedguard_on ) && ( $speedguard_on[0] === 'true' ) ) ? ( $speedguard_on[1] ) : false;
-							}
-						}
-					}
-					// we have: $url_to_add, $guarded_item_type, $guarded_item_id, $guarded_post_blog_id now + $already_guarded status
 
-					if ( ! empty( $already_guarded ) && ( $already_guarded === true ) && empty( $redirect_to ) && ! empty( $existing_test_id ) && ( 'publish' === get_post_status( $existing_test_id ) ) ) {
-						$result      = self::update_test_fn( $existing_test_id );
-						$redirect_to = add_query_arg( 'speedguard', $result );
-					} else { // Valid and not guarded yet >>> ADD
-						$result = self::create_test_fn( $url_to_add, $guarded_item_type, $guarded_item_id );
 
-						if ( empty( $redirect_to ) ) {
-							$redirect_to = add_query_arg( 'speedguard', 'new_url_added' );
-						}
-					}
-				}
-			}
-		}
-		// Result: Should be set in any case
-		if ( ! get_transient( 'speedguard-notice-activation' ) ) {
-			$redirect_to_nonce = wp_nonce_url($redirect_to,'sg_redirect_nonce');
-            wp_safe_redirect( esc_url_raw( $redirect_to_nonce ) );
-			exit;
-		}
-	}
+    public static function try_add_speedguard_test( $url_to_add = '', $guarded_item_type = '', $guarded_item_id = '', $guarded_post_blog_id = '', $already_guarded = false ) {
+        // blog id 1
+        //Case: Nothing is entered
+        if ( empty( $url_to_add ) ) {
+            set_transient('speedguard_notice_add_new_url_error_empty',true,5);
+        }
+        //Case: Something is entered
+        elseif ( ! empty( $url_to_add ) ) {
+            $url_to_add = strtok( trim( preg_replace( '/\t+/', '', htmlspecialchars( $url_to_add ) ) ), '?' );
+            //Case: It's not a valid URL
+            if ( ! filter_var( $url_to_add, FILTER_VALIDATE_URL ) ) {
+                set_transient('speedguard_notice_add_new_url_error_not_url',true,5);
+            }
+            //Seems to be valid URL
+            else {
+                // Does it belong to the current domain?
+                $entered_domain = wp_parse_url( $url_to_add );
+                // If it doesn't belong to the current domain and it's not a PRO version:
+                if ( ( $_SERVER['SERVER_NAME'] != $entered_domain['host'] ) && ! defined( 'SPEEDGUARD_PRO' ) ) {
+                    set_transient('speedguard_notice_add_new_url_error_not_current_domain', true, 5 );
+                }//$url_to_add doesn't belong to the current domain and it's not PRO
+                else { // $url_to_add is a valid URL. It belongs to the current domain. Do we know the type?
+                    if ( empty( $guarded_item_type ) ) {// find out the type, item id and blog id //TODO
+                        if ( trailingslashit( $url_to_add ) === trailingslashit( get_site_url() ) ) { // homepage
+                            $guarded_item_type   = 'homepage';
+                            $is_homepage_guarded = self::is_homepage_guarded();
+                            $already_guarded     = ( ! empty( $is_homepage_guarded ) ) ? true : false;
+                            $existing_test_id    = ( ! empty( $is_homepage_guarded ) ) ? $is_homepage_guarded : false;
+                        } else { // single or archive
+                            $guarded_item_id = url_to_postid( $url_to_add );
+                            if ( $guarded_item_id != 0 ) {
+                                $guarded_item_type = 'single';
+                                $speedguard_on     = get_post_meta( $guarded_item_id, 'speedguard_on', true );
+                                $already_guarded   = ( ! empty( $speedguard_on ) && ( $speedguard_on[0] === 'true' ) ) ? true : false;
+                                $existing_test_id  = ( ! empty( $speedguard_on ) && ( $speedguard_on[0] === 'true' ) ) ? ( $speedguard_on[1] ) : false;
+                            } elseif ( $guarded_item_id === 0 ) { // it's archive. Let's find the term
+                                // $slug = basename($url_to_add).PHP_EOL;
+                                $taxonomies = get_taxonomies();
+                                foreach ( $taxonomies as $tax_type_key => $taxonomy ) {
+                                    if ( $term_object = get_term_by( 'slug', basename( $url_to_add ) . PHP_EOL, $taxonomy ) ) {
+                                        // TODO what if there are a few terms with the same slug in different taxonomies
+                                        // TODO What if nothing is found
+                                        $guarded_item_id   = $term_object->term_id;
+                                        $guarded_item_type = 'archive';
+                                        break;
+                                    }
+                                }
+                                $speedguard_on    = get_term_meta( $guarded_item_id, 'speedguard_on', true );
+                                $already_guarded  = ( ! empty( $speedguard_on ) && ( $speedguard_on[0] === 'true' ) ) ? true : false;
+                                $existing_test_id = ( ! empty( $speedguard_on ) && ( $speedguard_on[0] === 'true' ) ) ? ( $speedguard_on[1] ) : false;
+                            }
+                        }
+                    }
+                    // we have: $url_to_add, $guarded_item_type, $guarded_item_id, $guarded_post_blog_id now + $already_guarded status
+
+                    if ( ! empty( $already_guarded ) && ( $already_guarded === true )  && ! empty( $existing_test_id ) && ( 'publish' === get_post_status( $existing_test_id ) ) ) {
+                        //Already guarded, let's try to update
+                        $result      = self::update_test_fn( $existing_test_id );
+                        set_transient('speedguard_notice_'.$result, true,5);
+
+                    } else { // Valid and not guarded yet >>> ADD
+                        $result = self::create_test_fn( $url_to_add, $guarded_item_type, $guarded_item_id );
+                        set_transient('speedguard_notice_'.$result, true,5);
+                    }
+
+                    //  set_transient('speedguard_notice_'.$result, true,5);
+
+                }
+            }
+
+
+        }
+
+
+
+
+        //Transients to display admin notices are set, we can reload the page
+        $redirect_to =  add_query_arg( array(
+            'speedguard' => 'new_url_submitted',
+            'sg_redirect_nonce' => wp_create_nonce( 'sg_redirect_nonce_action'),
+        ) );
+        if ( ! get_transient( 'speedguard-notice-activation' ) ) {
+            wp_safe_redirect( esc_url_raw( $redirect_to ) );
+            exit;
+        }
+
+    }
+
 
 	/**
 	 * @return bool
@@ -407,7 +433,7 @@ class SpeedGuard_Tests {
 		if ( !empty($current_tests_array) && (true === in_array( $guarded_page_id, $current_tests_array )) ) {
 			//TODO display notice the test is currently being updated
 			$response = 'already_in_queue';
-			return $response;
+			
 		} //check if it was tested recently
 		else if ( ($action === 'update') && (time() < (get_post_timestamp( $guarded_page_id, 'modified' ) + 3 * 60 ))) {
 			$response = 'slow_down';
@@ -420,14 +446,10 @@ class SpeedGuard_Tests {
 			set_transient( 'speedguard_tests_in_queue', wp_json_encode( array_unique( $current_tests_array ) ) );
 			update_post_meta( $guarded_page_id, 'sg_test_result', 'waiting' );
 			SpeedGuard_Admin::update_this_plugin_option( 'sg_origin_results', 'waiting' );
-			;
+            $response = 'speedguard_test_being_updated';
 		}
 
-        if ( $action == 'update'){
-            $response = 'speedguard_test_being_updated';
-        } else {
-	        $response = 'new_url_added';
-        }
+
 
 		return $response;
 	}
