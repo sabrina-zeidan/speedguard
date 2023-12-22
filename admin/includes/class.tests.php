@@ -433,7 +433,7 @@ class SpeedGuard_Tests {
 		if ( !empty($current_tests_array) && (true === in_array( $guarded_page_id, $current_tests_array )) ) {
 			//TODO display notice the test is currently being updated
 			$response = 'already_in_queue';
-			
+
 		} //check if it was tested recently
 		else if ( ($action === 'update') && (time() < (get_post_timestamp( $guarded_page_id, 'modified' ) + 3 * 60 ))) {
 			$response = 'slow_down';
