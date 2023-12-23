@@ -49,6 +49,7 @@ class SpeedGuard_Lighthouse {
 					// percentile, distributions, category
 					'cls' => $json_response['loadingExperience']['metrics']['CUMULATIVE_LAYOUT_SHIFT_SCORE'],
 					'fid' => $json_response['loadingExperience']['metrics']['FIRST_INPUT_DELAY_MS'],
+                    'overall_category' => $json_response['loadingExperience']['overall_category']
 				];
 				$both_devices_values[ $device ] = $device_values;
 				// Save CWV for origin for this Device

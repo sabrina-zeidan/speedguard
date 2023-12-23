@@ -19,6 +19,10 @@ class SpeedGuard_Notifications {
 		}
         $guarded_pages = get_transient('speedguard_tests_count');
 var_dump($guarded_pages);
+        $speedguard_cwv_origin = SpeedGuard_Admin::get_this_plugin_option( 'sg_origin_results' );
+        echo "<pre>";
+        var_dump($speedguard_cwv_origin);
+        echo "</pre>";
         if ( (int)$guarded_pages > 0) { //if there are monitored pages
 			$speedguard_options = SpeedGuard_Admin::get_this_plugin_option( 'speedguard_options' );
 			$admin_email        = $speedguard_options['email_me_at'];
