@@ -81,14 +81,11 @@ function speedguard_delete_data() {
 			delete_site_option( $option_name );
 		}
 	}
-	// Delete transients
+	// Delete non-expiring transients (auto-expiring will be deleted automatically)
 	$speedguard_transients = [
-		'speedguard-notice-activation',
-		'speedguard-notice-deactivation',
 		'speedguard_tests_in_queue',
 		'speedguard_test_in_progress',
 		'speedguard_sending_request_now',
-		'speedguard_last_test_is_done',
         'speedguard_tests_count'
 	];
 	foreach ( $speedguard_transients as $speedguard_transient ) {

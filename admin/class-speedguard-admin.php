@@ -198,7 +198,7 @@ class SpeedGuard_Admin {
         if ( count( $current_tests_array ) < 1 ) {
             delete_transient( 'speedguard_tests_in_queue' );
             SpeedGuard_Lighthouse::update_average_psi();
-            set_transient( 'speedguard_last_test_is_done', true, 120 );
+            set_transient( 'speedguard_last_test_is_done', true, 5 );
 
         } else {
             // delete_transient('speedguard_waiting_for_the_last_test_to_finish'); //for the case test was added while the last one was running, and that one is not the last one anymore

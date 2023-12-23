@@ -40,6 +40,6 @@ class Speedguard_Deactivator {
 			wp_clear_scheduled_hook( $speedguard_event );
 		}
 
-		set_transient( 'speedguard-notice-deactivation', true, 12 * 60 );
+		set_transient( 'speedguard-notice-deactivation', true, 5 );
 	}
 }
