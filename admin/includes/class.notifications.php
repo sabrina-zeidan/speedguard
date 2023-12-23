@@ -25,7 +25,7 @@ var_dump($guarded_pages);
 			$site_url           = wp_parse_url( get_home_url() );
 			$site_url           = $site_url['host'];
 
-			$status = ''; //TODO
+			$status = ''; //TODO 1
 
 			$subject            = sprintf( __( 'Performance update for %1$s', 'speedguard' ), $site_url );
 
@@ -50,7 +50,9 @@ var_dump($guarded_pages);
 			$message .= __( 'Core Web Vitals report', 'speedguard' );
 			$message .= '</p>';
 			$message .= '<p>';
-			$message .= sprintf( __( 'Currently %1$s is %2$s Core Web Vitals assessment by Google.', 'speedguard' ), $site_url, $status);
+			$message .= sprintf( __( 'Currently the website %1$s is %2$s Core Web Vitals assessment by Google. This result is for Origin, meaning for the website in general.', 'speedguard' ), $site_url, $status);
+            $message .= '<p>';
+            $message .=  __( 'Individual URLs might be passing or not.');
 			$message .= '</p>';
 			$message .= '<p>';
 	        $message .= sprintf( __( '%1$s pages are monitored now.', 'speedguard'), $guarded_pages );
