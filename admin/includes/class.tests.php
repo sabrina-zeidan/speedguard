@@ -414,26 +414,31 @@ class SpeedGuard_Tests {
 	 */
 	public static function delete_test_fn( $guarded_page_id, $action = 'delete' ) {
 		$deleted = wp_delete_post( $guarded_page_id, true );
-
-        //delete from the queue if it's currently there
-		$current_tests_array = json_decode( get_transient( 'speedguard_tests_in_queue' ), true );
-		if (!empty($current_tests_array)){
-            if ( ( $key = array_search( $guarded_page_id, $current_tests_array ) ) !== false ) {
-                unset( $current_tests_array[ $key ] );
-            }
-        }
-
-        set_transient('speedguard_tests_in_queue', wp_json_encode( $current_tests_array ));
-
-        if (json_decode(get_transient( 'speedguard_test_in_progress')) == $guarded_page_id){
-	        delete_transient( 'speedguard_test_in_progress' );
-        }
-		if (json_decode(get_transient( ' speedguard_sending_request_now')) == $guarded_page_id){
-			delete_transient( ' speedguard_sending_request_now' );
-		}
         if ( $deleted ) {
-	        $response = 'delete_guarded_pages';
-	        return $response;
+            //delete from the queue if it is currently there
+            $current_tests_array = json_decode( get_transient( 'speedguard_tests_in_queue' ), true );
+            if (!empty($current_tests_array)){
+                if ( ( $key = array_search( $guarded_page_id, $current_tests_array ) ) !== false ) {
+                    unset( $current_tests_array[ $key ] );
+                }
+            }
+            set_transient('speedguard_tests_in_queue', wp_json_encode( $current_tests_array ));
+
+            //update tests count
+            $monitored_urls_count = json_decode( get_transient( 'speedguard_tests_count' ) );
+            $updated_count = $monitored_urls_count - 1;
+            set_transient('speedguard_tests_count', wp_json_encode( $updated_count));
+
+            //if currently running:
+            if (json_decode(get_transient( 'speedguard_test_in_progress')) == $guarded_page_id){
+                delete_transient( 'speedguard_test_in_progress' );
+            }
+            if (json_decode(get_transient( ' speedguard_sending_request_now')) == $guarded_page_id){
+                delete_transient( ' speedguard_sending_request_now' );
+            }
+
+                $response = 'delete_guarded_pages';
+                return $response;
         }
 	}
 
@@ -491,7 +496,6 @@ class SpeedGuard_Tests {
 			update_post_meta( $target_page_id, 'speedguard_page_url', $url_to_add );
 			update_post_meta( $target_page_id, 'speedguard_item_type', $guarded_item_type );
 
-
 			// TODO always pass blog id
 			if ( ! empty( $guarded_post_blog_id ) ) {
 				update_post_meta( $target_page_id, 'guarded_post_blog_id', $guarded_post_blog_id );
@@ -511,9 +515,14 @@ class SpeedGuard_Tests {
 			if ( defined( 'SPEEDGUARD_MU_NETWORK' ) ) {
 				restore_current_blog();
 			}
-
+            //update tests count
+            $monitored_urls_count = json_decode( get_transient( 'speedguard_tests_count' ) );
+            $monitored_urls_count = isset($monitored_urls_count) ? $monitored_urls_count : 0 ;
+            $updated_count = $monitored_urls_count + 1;
+            set_transient('speedguard_tests_count', wp_json_encode( $updated_count));
 
 			$response = SpeedGuard_Tests::update_test_fn( $target_page_id, 'create' );
+
 
 		} else {
 			$response = 'error';

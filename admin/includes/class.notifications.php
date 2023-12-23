@@ -17,9 +17,9 @@ class SpeedGuard_Notifications {
 			wp_schedule_single_event( time() + 10 * 60, 'speedguard_email_test_results' );
 			return;
 		}
-		//TODO replace with transient
         $guarded_pages = get_transient('speedguard_tests_count');
-		if ( $guarded_pages > 0) { //if there are monitored pages
+var_dump($guarded_pages);
+        if ( (int)$guarded_pages > 0) { //if there are monitored pages
 			$speedguard_options = SpeedGuard_Admin::get_this_plugin_option( 'speedguard_options' );
 			$admin_email        = $speedguard_options['email_me_at'];
 			$site_url           = wp_parse_url( get_home_url() );
