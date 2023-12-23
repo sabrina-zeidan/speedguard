@@ -18,14 +18,8 @@ class SpeedGuard_Notifications {
 			return;
 		}
 		//TODO replace with transient
-		$guarded_pages = get_posts( [
-			'post_type'      => SpeedGuard_Admin::$cpt_name,
-			'post_status'    => 'publish',
-			'posts_per_page' => - 1,
-			'fields'         => 'ids',
-			'no_found_rows'  => true,
-		] );
-		if ( $guarded_pages ) { //if there are monitored pages
+        $guarded_pages = get_transient('speedguard_tests_count');
+		if ( $guarded_pages > 0) { //if there are monitored pages
 			$speedguard_options = SpeedGuard_Admin::get_this_plugin_option( 'speedguard_options' );
 			$admin_email        = $speedguard_options['email_me_at'];
 			$site_url           = wp_parse_url( get_home_url() );
@@ -59,7 +53,7 @@ class SpeedGuard_Notifications {
 			$message .= sprintf( __( 'Currently %1$s is %2$s Core Web Vitals assessment by Google.', 'speedguard' ), $site_url, $status);
 			$message .= '</p>';
 			$message .= '<p>';
-	        $message .= sprintf( __( '%1$s pages are monitored now.', 'speedguard'), count( $guarded_pages ));
+	        $message .= sprintf( __( '%1$s pages are monitored now.', 'speedguard'), $guarded_pages );
 			$message .= '</p>';
 			$message .= '<p>';
 			$message .= sprintf( __( 'You can see the detailed report and add more individual URLs to be monitored %1$shere%2$s.', 'speedguard' ), '<a href="' . SpeedGuard_Admin::speedguard_page_url( "tests" ) . '" target="_blank">', '</a>' );
