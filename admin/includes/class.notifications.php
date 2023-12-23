@@ -18,18 +18,16 @@ class SpeedGuard_Notifications {
 			return;
 		}
         $guarded_pages = get_transient('speedguard_tests_count');
-var_dump($guarded_pages);
-        $speedguard_cwv_origin = SpeedGuard_Admin::get_this_plugin_option( 'sg_origin_results' );
-        echo "<pre>";
-        var_dump($speedguard_cwv_origin);
-        echo "</pre>";
         if ( (int)$guarded_pages > 0) { //if there are monitored pages
 			$speedguard_options = SpeedGuard_Admin::get_this_plugin_option( 'speedguard_options' );
 			$admin_email        = $speedguard_options['email_me_at'];
 			$site_url           = wp_parse_url( get_home_url() );
 			$site_url           = $site_url['host'];
-
-			$status = ''; //TODO 1
+	        $speedguard_cwv_origin = SpeedGuard_Admin::get_this_plugin_option( 'sg_origin_results' );
+	        $overall_category_desktop = $speedguard_cwv_origin['desktop']['cwv']['overall_category'];
+	        $overall_category_mobile = $speedguard_cwv_origin['mobile']['cwv']['overall_category'];
+	        $status_mobile = ($overall_category_mobile === 'FAST') ? 'PASSES' : 'FAILS';
+	        $status_desktop = ($overall_category_desktop === 'FAST') ? 'PASSES' : 'FAILS';
 
 			$subject            = sprintf( __( 'Performance update for %1$s', 'speedguard' ), $site_url );
 
@@ -54,8 +52,8 @@ var_dump($guarded_pages);
 			$message .= __( 'Core Web Vitals report', 'speedguard' );
 			$message .= '</p>';
 			$message .= '<p>';
-			$message .= sprintf( __( 'Currently the website %1$s is %2$s Core Web Vitals assessment by Google. This result is for Origin, meaning for the website in general.', 'speedguard' ), $site_url, $status);
-            $message .= '<p>';
+			$message .= sprintf( __( 'Currently the website %1$s %2$s Core Web Vitals assessment by Google for Mobile and %3$s for Desktop. This result is for Origin, meaning for the website in general.', 'speedguard' ), $site_url, $status_mobile, $status_desktop);
+            $message .= '<p>';  
             $message .=  __( 'Individual URLs might be passing or not.');
 			$message .= '</p>';
 			$message .= '<p>';

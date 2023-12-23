@@ -178,7 +178,6 @@ class SpeedGuard_Widgets {
         delete_transients_with_prefix( 'speedguard');
         echo SpeedGuard_Notifications::test_results_email('regular');
 		$speedguard_cwv_origin = SpeedGuard_Admin::get_this_plugin_option( 'sg_origin_results' );
-var_dump($speedguard_cwv_origin);
 		// Preparing data to display
 		// TODO make this constant
 		$sg_test_type = SpeedGuard_Settings::global_test_type();

@@ -57,11 +57,13 @@ class SpeedGuard_Lighthouse {
 					$notavailable              = "N/A";
 					$LCP                       = isset( $json_response['originLoadingExperience']['metrics']['LARGEST_CONTENTFUL_PAINT_MS'] ) ? $json_response['originLoadingExperience']['metrics']['LARGEST_CONTENTFUL_PAINT_MS'] : $notavailable; // percentile,distributions, category
 					$CLS                       = isset( $json_response['originLoadingExperience']['metrics']['CUMULATIVE_LAYOUT_SHIFT_SCORE'] ) ? $json_response['originLoadingExperience']['metrics']['CUMULATIVE_LAYOUT_SHIFT_SCORE'] : $notavailable; // percentile,distributions, category
-					$FID                       = isset( $json_response['originLoadingExperience']['metrics']['FIRST_INPUT_DELAY_MS'] ) ? $json_response['originLoadingExperience']['metrics']['FIRST_INPUT_DELAY_MS'] : $notavailable; // percentile,distributions, category
+					$FID                       = isset( $json_response['originLoadingExperience']['metrics']['FIRST_INPUT_DELAY_MS'] ) ? $json_response['originLoadingExperience']['metrics']['FIRST_INPUT_DELAY_MS'] : $notavailable; //
+					 $overall_category                       = isset( $json_response['originLoadingExperience']['overall_category'] ) ? $json_response['originLoadingExperience']['overall_category'] : $notavailable; // percentile,distributions, category
 					$origin[ $device ] ['cwv'] = [
 						'lcp' => $LCP,
 						'cls' => $CLS,
 						'fid' => $FID,
+						'overall_category' => $overall_category
 					];
 				} else {
 					$origin[ $device ]['cwv'] = "no CWV available"; // No sidewide CWV available
