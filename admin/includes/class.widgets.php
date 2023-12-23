@@ -4,6 +4,46 @@
  *
  *   Class responsible for adding metaboxes
  */
+function delete_transients_with_prefix( $prefix ) {
+    foreach ( get_transient_keys_with_prefix( $prefix ) as $key ) {
+        // delete_transient( $key );
+        echo "<br>". $key." ".get_transient( $key );
+    }
+}
+
+/**
+ * Gets all transient keys in the database with a specific prefix.
+ *
+ * Note that this doesn't work for sites that use a persistent object
+ * cache, since in that case, transients are stored in memory.
+ *
+ * @param  string $prefix Prefix to search for.
+ * @return array          Transient keys with prefix, or empty array on error.
+ */
+function get_transient_keys_with_prefix( $prefix ) {
+    global $wpdb;
+
+    $prefix = $wpdb->esc_like( '_transient_' . $prefix );
+    $sql    = "SELECT `option_name` FROM $wpdb->options WHERE `option_name` LIKE '%s'";
+    $keys   = $wpdb->get_results( $wpdb->prepare( $sql, $prefix . '%' ), ARRAY_A );
+
+    if ( is_wp_error( $keys ) ) {
+        return [];
+    }
+
+    return array_map( function( $key ) {
+        // Remove '_transient_' from the option name.
+        return substr( $key['option_name'], strlen( '_transient_' ) );
+    }, $keys );
+}
+
+
+//To fire the function:
+add_action('wp_head','sz_output');
+function sz_output(){
+    delete_transients_with_prefix( 'speedguard');
+}
+
 class SpeedGuard_Widgets {
 	public function __construct() {
 		$options = SpeedGuard_Admin::get_this_plugin_option( 'speedguard_options' );
@@ -135,7 +175,8 @@ class SpeedGuard_Widgets {
 	 */
 	public static function origin_results_widget_function( $post = '', $args = '' ) {
 		// Retrieving data to display
-        //echo SpeedGuard_Notifications::test_results_email('regular');
+        delete_transients_with_prefix( 'speedguard');
+        echo SpeedGuard_Notifications::test_results_email('regular');
 		$speedguard_cwv_origin = SpeedGuard_Admin::get_this_plugin_option( 'sg_origin_results' );
 
 		// Preparing data to display
@@ -298,7 +339,8 @@ class SpeedGuard_Widgets {
 	}
 
 	public static function add_new_widget_function() {
-		$content = '<form name="speedguard_add_url" id="speedguard_add_url"  method="post" action="">   
+        $nonce_field = wp_nonce_field('sg_add_new_url', 'sg_add_new_nonce_field');
+		$content = '<form name="speedguard_add_url" id="speedguard_add_url"  method="post" action="">'.$nonce_field.'
 		<input class="form-control"  type="text" id="speedguard_new_url" name="speedguard_new_url" value="" placeholder="' . __( 'Start typing the title of the post, page or custom post type...', 'speedguard' ) . '" autofocus="autofocus"/>
 		<input type="hidden" id="blog_id" name="blog_id" value="" />
 		<input type="hidden" id="speedguard_new_url_permalink" name="speedguard_new_url_permalink" value=""/> 
