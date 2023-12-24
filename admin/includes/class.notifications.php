@@ -28,6 +28,11 @@ class SpeedGuard_Notifications {
 	        $overall_category_mobile = $speedguard_cwv_origin['mobile']['cwv']['overall_category'];
 	        $status_mobile = ($overall_category_mobile === 'FAST') ? 'PASSES' : 'FAILS';
 	        $status_desktop = ($overall_category_desktop === 'FAST') ? 'PASSES' : 'FAILS';
+			$color_mobile = ($overall_category_mobile === 'FAST') ? 'score-green' : 'score-red';
+	        $color_desktop = ($overall_category_desktop === 'FAST') ? 'score-green' : 'score-red';
+	        $status_mobile_display = '<span class="' . $color_mobile . '">' . $status_mobile . '</span>';
+			$status_desktop_display = '<span class="' . $color_desktop . '">' . $status_desktop . '</span>';
+
 
 			$subject            = sprintf( __( 'Performance update for %1$s', 'speedguard' ), $site_url );
 
@@ -42,7 +47,9 @@ class SpeedGuard_Notifications {
 			$message .= 'table {border-collapse: collapse;width: 560px; margin-top: 2em;}';
 			$message .= 'th, td {text-align: left; padding: 8px;}';
 			$message .= 'tr:nth-child(even) {background-color: #f2f2f2;}';
-			$message .= '</style>';
+			$message .= '.score-green {color: #4CAF50;}';
+			$message .= '.score-red {color: #f44336;}';
+			$message .= '</style>'; 
 			$message .= '</head>';
 			$message .= '<body style="padding-top: 50px; padding-bottom: 50px; background:#fff; color:#000;">';
 			$message .= '<table align="center">';
@@ -52,7 +59,7 @@ class SpeedGuard_Notifications {
 			$message .= __( 'Core Web Vitals report', 'speedguard' );
 			$message .= '</p>';
 			$message .= '<p>';
-			$message .= sprintf( __( 'Currently the website %1$s %2$s Core Web Vitals assessment by Google for Mobile and %3$s for Desktop. This result is for Origin, meaning for the website in general.', 'speedguard' ), $site_url, $status_mobile, $status_desktop);
+			$message .= sprintf( __( 'Currently the website %1$s %2$s Core Web Vitals assessment by Google for Mobile and %3$s for Desktop. This result is for Origin, meaning for the website in general.', 'speedguard' ), $site_url, $status_mobile_display, $status_desktop_display);
             $message .= '<p>';  
             $message .=  __( 'Individual URLs might be passing or not.');
 			$message .= '</p>';
