@@ -31,8 +31,8 @@ class SpeedGuard_Notifications {
 	        $status_desktop = ($overall_category_desktop === 'FAST') ? 'PASSES' : 'FAILS';
 			$color_mobile = ($overall_category_mobile === 'FAST') ? 'score-green' : 'score-red';
 	        $color_desktop = ($overall_category_desktop === 'FAST') ? 'score-green' : 'score-red';
-	        $status_mobile_display = '<span class="' . $color_mobile . '">' . $status_mobile . '</span>';
-			$status_desktop_display = '<span class="' . $color_desktop . '">' . $status_desktop . '</span>';
+	        $status_mobile_display = '<span class="' . $color_mobile . '"><strong>' . $status_mobile . '</strong></span>';
+			$status_desktop_display = '<span class="' . $color_desktop . '"><strong>' . $status_desktop . '</strong></span>';
 
 
 			$subject            = sprintf( __( 'Performance update for %1$s', 'speedguard' ), $site_url );
@@ -78,7 +78,7 @@ class SpeedGuard_Notifications {
 			$message .= '<p style="font-size: 1.2em; font-weight: bold;">';
 			$message .= __( 'Important questions:', 'speedguard' );
 			$message .= '</p>';
-	//	$message .= SpeedGuard_Widgets::important_questions_widget_function_return();  // TODO: Address the replacement issue
+			$message .= SpeedGuard_Widgets::get_important_questions_widget_function();  // TODO: Address the replacement issue
 			$message .= '</div>';
 			$message .= '</td>';
 			$message .= '</tr>';
