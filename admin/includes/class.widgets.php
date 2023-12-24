@@ -116,7 +116,7 @@ class SpeedGuard_Widgets {
 	public static function origin_results_widget_function( $post = '', $args = '' ) {
 		// Retrieving data to display
 		delete_transients_with_prefix( 'speedguard' );
-		echo SpeedGuard_Notifications::test_results_email( 'regular' );
+		//echo SpeedGuard_Notifications::test_results_email( 'regular' );
 		$speedguard_cwv_origin = SpeedGuard_Admin::get_this_plugin_option( 'sg_origin_results' );
 		// Preparing data to display
 		// TODO make this constant
@@ -138,11 +138,16 @@ class SpeedGuard_Widgets {
 		} else {
 			$fid_tr = '';
 		}
-		$overall_category_desktop = $speedguard_cwv_origin['desktop']['cwv']['overall_category'];
-		$overall_category_mobile  = $speedguard_cwv_origin['mobile']['cwv']['overall_category'];
-		//overall_category can be FAST, AVERAGE, SLOW. Assign color (red, yellow, green) accordingly
-		$mobile_color  = ( $overall_category_mobile === 'FAST' ) ? 'score-green' : ( ( $overall_category_mobile === 'AVERAGE' ) ? 'score-yellow' : 'score-red' );
-		$desktop_color = ( $overall_category_desktop === 'FAST' ) ? 'score-green' : ( ( $overall_category_desktop === 'AVERAGE' ) ? 'score-yellow' : 'score-red' );
+        if ( isset($speedguard_cwv_origin['desktop']['cwv']['overall_category']) && isset($speedguard_cwv_origin['mobile']['cwv']['overall_category']) ) {
+
+	        $overall_category_desktop = $speedguard_cwv_origin['desktop']['cwv']['overall_category'];
+	        $overall_category_mobile  = $speedguard_cwv_origin['mobile']['cwv']['overall_category'];
+            //overall_category can be FAST, AVERAGE, SLOW. Assign color (red, yellow, green) accordingly
+	        $mobile_color  = ( $overall_category_mobile === 'FAST' ) ? 'score-green' : ( ( $overall_category_mobile === 'AVERAGE' ) ? 'score-yellow' : 'score-red' );
+	        $desktop_color = ( $overall_category_desktop === 'FAST' ) ? 'score-green' : ( ( $overall_category_desktop === 'AVERAGE' ) ? 'score-yellow' : 'score-red' );
+        }
+        $mobile_color = isset($mobile_color)?$mobile_color:'';
+        $desktop_color = isset($desktop_color)?$desktop_color:'';
 		$content       = "
 	<table class='widefat fixed striped toplevel_page_speedguard_tests_cwv_widget'>
 	<thead>
