@@ -23,6 +23,7 @@ class SpeedGuard_Notifications {
 			$admin_email        = $speedguard_options['email_me_at'];
 			$site_url           = wp_parse_url( get_home_url() );
 			$site_url           = $site_url['host'];
+
 	        $speedguard_cwv_origin = SpeedGuard_Admin::get_this_plugin_option( 'sg_origin_results' );
 	        $overall_category_desktop = $speedguard_cwv_origin['desktop']['cwv']['overall_category'];
 	        $overall_category_mobile = $speedguard_cwv_origin['mobile']['cwv']['overall_category'];
@@ -49,7 +50,7 @@ class SpeedGuard_Notifications {
 			$message .= 'tr:nth-child(even) {background-color: #f2f2f2;}';
 			$message .= '.score-green {color: #4CAF50;}';
 			$message .= '.score-red {color: #f44336;}';
-			$message .= '</style>'; 
+			$message .= '</style>';
 			$message .= '</head>';
 			$message .= '<body style="padding-top: 50px; padding-bottom: 50px; background:#fff; color:#000;">';
 			$message .= '<table align="center">';

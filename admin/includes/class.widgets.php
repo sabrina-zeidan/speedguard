@@ -201,12 +201,20 @@ class SpeedGuard_Widgets {
 			$fid_tr = '';
 		}
 
+		$overall_category_desktop = $speedguard_cwv_origin['desktop']['cwv']['overall_category'];
+		$overall_category_mobile = $speedguard_cwv_origin['mobile']['cwv']['overall_category'];
+
+        //overall_category can be FAST, AVERAGE, SLOW. Assign color (red, yellow, green) accordingly
+    $mobile_color = ($overall_category_mobile === 'FAST') ? 'score-green' : (($overall_category_mobile === 'AVERAGE') ? 'score-yellow' : 'score-red');
+    $desktop_color = ($overall_category_desktop === 'FAST') ? 'score-green' : (($overall_category_desktop === 'AVERAGE') ? 'score-yellow' : 'score-red');
+
+
 		$content = "
 	<table class='widefat fixed striped toplevel_page_speedguard_tests_cwv_widget'>
 	<thead>
 	<tr class='bc-platforms'><td></td>
-	<th><i class='sg-device-column mobile' aria-hidden='true' title='Mobile'></i></th>
-	<th><i class='sg-device-column desktop' aria-hidden='true' title='Desktop''></i></th>
+	<th><i class='sg-device-column mobile speedguard-score ".$mobile_color."' aria-hidden='true' title='Mobile'></i></th>
+	<th><i class='sg-device-column desktop speedguard-score ".$desktop_color."' aria-hidden='true' title='Desktop''></i></th>
 	</tr>
 	</thead>
 	<thbody>
@@ -469,9 +477,10 @@ class SpeedGuard_Widgets {
 			$atitle = __( 'Test is running currently', 'speedguard' );
 		} elseif ( isset( $is_guarded ) && $is_guarded === true ) {
 			if ( ( ! empty( $load_time[0]['displayValue'] ) ) && ( ! empty( $load_time[0]['score'] ) ) ) {
-				$title  = '<span data-score="' . $load_time[0]['score'] . '" class="speedguard-score"><span>●</span> ' . $load_time[0]['displayValue'] . '</span>';
-				$href   = SpeedGuard_Admin::speedguard_page_url( 'tests' ) . '#speedguard-add-new-url-meta-box';
-				$atitle = __( 'This page load time', 'speedguard' );
+                //TODO can be removed
+               // $title  = '<span data-score="' . $load_time[0]['score'] . '" class="speedguard-score"><span>●</span> ' . $load_time[0]['displayValue'] . '</span>';
+				//$href   = SpeedGuard_Admin::speedguard_page_url( 'tests' ) . '#speedguard-add-new-url-meta-box';
+				//$atitle = __( 'This page load time', 'speedguard' );
 			}
 		} elseif ( isset( $is_guarded ) && $is_guarded === false ) { // Item is not guarded or test is in process currently
 			$add_url_link = add_query_arg(

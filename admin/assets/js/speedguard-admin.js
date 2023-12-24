@@ -51,6 +51,11 @@ function markScoresWithColors() {
     const testscore = document.querySelectorAll(".speedguard-score");
     testscore.forEach((testScore) => {
         const dataCategory = testScore.getAttribute("data-score-category");
+        // check if datacategory is not empty not assign automatically only in cases when it's not defined
+        if (!dataCategory) {
+            return;
+        }
+
         if (dataCategory > 0.7 || dataCategory === "FAST") {
             testScore.classList.add("score-green");
         } else if (dataCategory > 0.4 || dataCategory === "AVERAGE") {
