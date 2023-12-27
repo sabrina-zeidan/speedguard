@@ -13,6 +13,7 @@ class SpeedGuard_Lighthouse {
 	}
 
 	/** Perform a New Test -- Test both Desktop and Mobile once request to test is made, save PSI, CWV and CWV for origin */
+	//TODO move to JS
 	public static function lighthouse_new_test( $guarded_page_id ) {
 		$guarded_page_url    = get_post_meta( $guarded_page_id, 'speedguard_page_url', true );
 		$devices             = [ 'desktop', 'mobile' ];

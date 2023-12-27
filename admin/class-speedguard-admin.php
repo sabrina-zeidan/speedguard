@@ -87,7 +87,7 @@ class SpeedGuard_Admin {
             );
         }
         add_action( 'wp_ajax_check_tests_progress', [ $this, 'check_tests_progress_fn' ] );
-        add_action( 'wp_ajax_run_one_test', [ $this, 'run_one_test_fn' ] );
+      //  add_action( 'wp_ajax_run_one_test', [ $this, 'run_one_test_fn' ] );
         add_action( 'wp_ajax_mark_test_as_done', [ $this, 'mark_test_as_done_fn' ] );
         //Move to Lighrhouse afer
         add_action( 'admin_footer', [ $this, 'run_tests_js' ] );
@@ -126,7 +126,8 @@ class SpeedGuard_Admin {
                     'message'        => 'There are tests in queue, there was NO speedguard_test_in_progress transient, setting it now',
                     'tr_value' => $upd_tr_value,
                     'tests_in_queue' => $current_tests_array,
-                    'speedguard_test_in_progress'       => $one_test_id,
+                    'speedguard_test_in_progress_id'       => $one_test_id,
+                    'speedguard_test_in_progress_url'       => get_post_meta( $one_test_id, 'speedguard_page_url', true ),
                     'action_just_done' => 'set_transient_speedguard_test_in_progress'
                 ];
 
@@ -138,7 +139,8 @@ class SpeedGuard_Admin {
                     'status'         => 'queue',
                     'message'        => 'There are tests in queue, there WAS speedguard_test_in_progress transient, do not update',
                     'tests_in_queue' => $current_tests_array,
-                    'speedguard_test_in_progress'       => $one_test_id,
+                    'speedguard_test_in_progress_id'       => $one_test_id,
+                    'speedguard_test_in_progress_url'       => get_post_meta( $one_test_id, 'speedguard_page_url', true ),
                     'action_just_done' => 'nothing, test in progress was added before'
                 ];
 
@@ -152,7 +154,10 @@ class SpeedGuard_Admin {
         }
         wp_send_json( $response );
     }
-    function run_one_test_fn() {
+
+//TOOD remove this, check JS execution to replicate first
+   /**
+ * function run_one_test_fn() {
         check_ajax_referer( 'sg_run_one_test_nonce', 'nonce' );
         //check current tests transient
         $speedguard_test_in_progress = get_transient( 'speedguard_test_in_progress' );
@@ -184,7 +189,7 @@ class SpeedGuard_Admin {
         wp_send_json( $response );
     }
 
-
+**/
     function mark_test_as_done_fn() {
         check_ajax_referer( 'sg_run_one_test_nonce', 'nonce' );
         //fired in case test function responded success
@@ -234,11 +239,19 @@ class SpeedGuard_Admin {
                     console.log(data);
 
                     if (data.status === 'queue') {
+                    console.log(data);
                         // TODO If queue -> Run the test from here!
-                        setTimeout(() => check_tests_queue_status(ajaxurl, sgnonce, reload), 30000);
+                        setTimeout(() => check_tests_queue_status(ajaxurl, sgnonce, reload), 60000);
                         console.log('Sending ID to test:');
-                        console.log(data.speedguard_test_in_progress);
-                        return sg_run_one_test(ajaxurl, sg_run_one_test_nonce, data.speedguard_test_in_progress);
+                        console.log(data.speedguard_test_in_progress_id);
+                        console.log('Sending URL to test:');
+                        console.log(data.speedguard_test_in_progress_url);
+                        const sg_run_one_test_nonce = '<?php echo wp_create_nonce( 'sg_run_one_test_nonce' ); ?>';
+
+               console.log(' check_tests_queue_status passes data.speedguard_test_in_progress_url:' + data.speedguard_test_in_progress_url);
+               console.log(' check_tests_queue_status passes data.speedguard_test_in_progress_id:' + data.speedguard_test_in_progress_id);
+
+                        return sg_run_one_test(data.speedguard_test_in_progress_url, sg_run_one_test_nonce, data.speedguard_test_in_progress_id);
                     } else if (data.status === 'complete') {
                         console.log('Tests complete');
                         if (reload === 'true') {
@@ -262,8 +275,10 @@ class SpeedGuard_Admin {
             check_tests_queue_status(ajaxurl, sgnonce, reload);
             const sgnoncee = '<?php echo wp_create_nonce( 'sgnoncee' ); ?>';
             //Updating test status as done after successful API response
-            const update_test_status_done = async (ajaxurl, sgnoncee, post_id) => {
+
+            const update_test_status_done = async (ajaxurl, sgnoncee, post_id, test_result_data) => {
                 try {
+                console.log('test_result_data in update_test_status_done function' + test_result_data);
                     // Make a fetch request to the AJAX endpoint.
                     const response = await fetch(ajaxurl, {
                         method: 'POST',
@@ -282,33 +297,30 @@ class SpeedGuard_Admin {
 
             }
 
-            const sg_run_one_test_nonce = '<?php echo wp_create_nonce( 'sg_run_one_test_nonce' ); ?>';
-            const sg_run_one_test = async (ajaxurl, sg_run_one_test_nonce, test_id) => {
-             fetchAll('https://tommcfarlin.com/separate-files-for-ajax-in-wordpress/');
+          // TODO remove and php function
+          //  const sg_run_one_test_nonce = '<?php echo wp_create_nonce( 'sg_run_one_test_nonce' ); ?>';
+            const sg_run_one_test = async (url, sg_run_one_test_nonce, test_id) => {
 
-                console.log('sg_run_one_test function is going to start with test_id:' + test_id);
+                console.log('sg_run_one_test got url:' + url);
+                console.log('sg_run_one_test got test_id:' + test_id);
                 try {
-                    // Make a fetch request to the AJAX endpoint.
-                    const response = await fetch(ajaxurl, {
-                        method: 'POST',
-                        credentials: 'same-origin',
-                        headers: {
-                            'Content-Type': 'application/x-www-form-urlencoded',
-                            'Cache-Control': 'no-cache',
-                            'Connection': 'keep-alive',
-                        },
-                        body: `action=run_one_test&current_test_id=${test_id}&nonce=${sg_run_one_test_nonce}`,
-                    });
-                    const data = await response.json();
 
-                    // Check the status of the response.
-                    if (data.status === 'success') {
-                        console.log('it is success, test done. Trying: update_test_status_done');
-                        // Update test as done
-                        return update_test_status_done(ajaxurl, sg_run_one_test_nonce, data.test_id);
-                    } else if (data.status === 'error') {
-                        // console.log('one or both requests to API failed');
-                    }
+const test_result_data = await fetchAll(url);
+
+if (typeof test_result_data === 'object') {
+ console.log('Success. Test done, response is an object. Trying: update_test_status_done and passing test_result_data there');
+   return update_test_status_done(ajaxurl, sg_run_one_test_nonce, test_id, JSON.stringify(test_result_data, null, 2));
+
+
+
+} else //TODO error handling in fetchall
+{
+console.log('Response is not object');
+}
+
+
+
+
                 } catch (err) {
                     console.log(err);
                 }
@@ -574,7 +586,7 @@ class SpeedGuard_Admin {
         }
     }
 
-     public function speedguard_tests_module( $tag, $handle ) {
+     public function speedguard_tests_module_inline_fix( $tag, $handle ) {
     if( strpos( $handle, 'speedguard_tests_module-js' ) === 0 ) {
         if( current_theme_supports( 'html5', 'script' ) ) {
             return substr_replace( $tag, '<script type="module"', strpos( $tag, '<script' ), 7 );

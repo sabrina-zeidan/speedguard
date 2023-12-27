@@ -16,6 +16,7 @@ async function fetchAll(url_to_test) {
             )
         )
         for (let item of tests) {
+
             //get current device value
             const device = item.lighthouseResult.configSettings.emulatedFormFactor;
             //Data fro Single URL (both CWV and PSI)
@@ -39,17 +40,19 @@ async function fetchAll(url_to_test) {
                 "fid": item.originLoadingExperience.metrics.FIRST_INPUT_DELAY_MS,
                 "overall_category": item.originLoadingExperience.overall_category
             };
-
+//console.log(Origin_CWV);
+//console.log(URL_RESULTS);
             //Save data to the nenw object based on device value
             let singleURLresultperdevice = {
                 [device]: {"psi": URL_RESULTS.psi, "cwv": URL_RESULTS.cwv}
             };
             singleURLresult.push(singleURLresultperdevice);
 
-            console.log(singleURLresult);
+            //console.log(singleURLresult);
         }
 
         console.log(singleURLresult);
+        return singleURLresult;
     } catch (err) {
         console.log(err)
     }
