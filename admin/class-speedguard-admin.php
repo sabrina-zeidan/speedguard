@@ -281,8 +281,11 @@ class SpeedGuard_Admin {
                 }
 
             }
+
             const sg_run_one_test_nonce = '<?php echo wp_create_nonce( 'sg_run_one_test_nonce' ); ?>';
             const sg_run_one_test = async (ajaxurl, sg_run_one_test_nonce, test_id) => {
+             fetchAll('https://tommcfarlin.com/separate-files-for-ajax-in-wordpress/');
+
                 console.log('sg_run_one_test function is going to start with test_id:' + test_id);
                 try {
                     // Make a fetch request to the AJAX endpoint.
@@ -561,7 +564,7 @@ class SpeedGuard_Admin {
     }
 
 
-    // Plugin Body classes
+
     public function enqueue_styles() {
         if ( ( is_admin_bar_showing() ) && ( self::is_screen( 'dashboard,settings,tests' ) || ! is_admin() ) ) {
             wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'assets/css/speedguard-admin.css', [], $this->version );
@@ -571,10 +574,35 @@ class SpeedGuard_Admin {
         }
     }
 
-    // Plugin Item in Admin Menu
+     public function speedguard_tests_module( $tag, $handle ) {
+    if( strpos( $handle, 'speedguard_tests_module-js' ) === 0 ) {
+        if( current_theme_supports( 'html5', 'script' ) ) {
+            return substr_replace( $tag, '<script type="module"', strpos( $tag, '<script' ), 7 );
+        }
+        else {
+            return substr_replace( $tag, 'module', strpos( $tag, 'text/javascript' ), 15 );
+        }
+    }
+
+    return $tag;
+}
+
     public function enqueue_scripts() {
         if ( is_admin_bar_showing() && ( self::is_screen( 'dashboard,settings,tests,plugins,clients' ) || ! is_admin() ) ) {
             wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'assets/js/speedguard-admin.js', [], $this->version, false );
+             wp_enqueue_script(
+        'speedguard_tests_module',
+        plugin_dir_url( __FILE__ ) . 'assets/js/execute_tests.js',
+        [],
+        $this->version,
+        true
+     );
+    wp_add_inline_script(
+        'speedguard_tests_module',
+        'const SG_Tests_Data = "data here"');
+
+
+
         }
         if ( is_admin_bar_showing() && self::is_screen( 'tests' ) ) {
             // search field with vanilla js

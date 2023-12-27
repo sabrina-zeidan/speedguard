@@ -117,6 +117,7 @@ class Speedguard {
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_admin, 'enqueue_styles' );
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
+		$this->loader->add_filter( 'script_loader_tag', $plugin_admin, 'speedguard_tests_module', PHP_INT_MAX, 2 );
 	}
 
 	/**
