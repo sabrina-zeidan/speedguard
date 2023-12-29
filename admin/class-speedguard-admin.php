@@ -191,29 +191,78 @@ class SpeedGuard_Admin {
 
 **/
     function mark_test_as_done_fn() {
-        check_ajax_referer( 'sg_run_one_test_nonce', 'nonce' );
-        //fired in case test function responded success
-        $current_test = $_POST['$current_test_id'];
-        $current_tests_array = json_decode( get_transient( 'speedguard_tests_in_queue' ), true );
-        if ( ( $key = array_search( $current_test, $current_tests_array ) ) !== false ) {
-            unset( $current_tests_array[ $key ] );
-        }
-        delete_transient( 'speedguard_test_in_progress' );
-        //if after removing this test there are no tests left to process, mark that this is the last test in queue and delete transient
-        if ( count( $current_tests_array ) < 1 ) {
-            delete_transient( 'speedguard_tests_in_queue' );
-            SpeedGuard_Lighthouse::update_average_psi();
-            set_transient( 'speedguard_last_test_is_done', true, 5 );
+	    check_ajax_referer( 'sg_run_one_test_nonce', 'nonce' );
 
-        } else {
-            // delete_transient('speedguard_waiting_for_the_last_test_to_finish'); //for the case test was added while the last one was running, and that one is not the last one anymore
-            set_transient( 'speedguard_tests_in_queue', wp_json_encode( $current_tests_array ) );
-        }
-        $response = [
-            'status' => 'test marked as done',
-            // 'test_id_passed'  => $test_id
-        ];
-        wp_send_json( $response );
+	    if (empty($_POST['current_test_id'])) return;
+	    $current_test = $_POST['current_test_id'];
+	    $test_result_data = wp_unslash($_POST['test_result_data']); // don't know where those slashes come from
+	    $test_result_data = json_decode($test_result_data, true);
+        $mobile_data = $test_result_data[0]['mobile'];
+        $desktop_data = $test_result_data[0]['desktop'];
+
+$both_devices_values = ['mobile' =>[
+        'cwv'=>[
+                'lcp' => $mobile_data['cwv']['lcp'], //TODO check seems to be fine
+                'cls' => $mobile_data['cwv']['cls'],
+                'fid' => $mobile_data['cwv']['fid'],
+                'overall_category' => $mobile_data['cwv']['overall_category']
+               ],
+        'psi'=>[
+                'lcp' => $mobile_data['psi']['lcp'],
+            // title, description, score, scoreDisplayMode, displayValue, numericValue
+                'cls' => $mobile_data['psi']['cls'],
+        ]
+ ],
+'desktop' => [
+           'cwv'=>[
+                'lcp' => $desktop_data['cwv']['lcp'], //TODO check seems to be fine
+                'cls' => $desktop_data['cwv']['cls'],
+                'fid' => $desktop_data['cwv']['fid'],
+                'overall_category' => $desktop_data['cwv']['overall_category']
+               ],
+        'psi'=>[
+                'lcp' => $desktop_data['psi']['lcp'],
+            // title, description, score, scoreDisplayMode, displayValue, numericValue
+                'cls' => $desktop_data['psi']['cls'],
+        ]
+
+]];
+
+  $updated = update_post_meta( $current_test, 'sg_test_result',  $both_devices_values );
+wp_mail('sabrinazeidanspain@gmail.com', 'another attempt 910','$test_result_data: '.print_r($test_result_data,true).'<br>$device_values ' .print_r($both_devices_values,true)
+//.'<br>$test_result_data[0]'.print_r($test_result_data[0], true)
+, 'Content-Type: text/html; charset=UTF-8');
+
+
+
+
+        //TODO:update CWV for origin
+
+	    $current_tests_array = json_decode( get_transient( 'speedguard_tests_in_queue' ), true );
+
+
+	    if ( ( $key = array_search( $current_test, $current_tests_array ) ) !== false ) {
+		    unset( $current_tests_array[ $key ] );
+	    }
+	    delete_transient( 'speedguard_test_in_progress' );
+	    //if after removing this test there are no tests left to process, mark that this is the last test in queue and delete transient
+	    if ( count( $current_tests_array ) < 1 ) {
+		    delete_transient( 'speedguard_tests_in_queue' );
+		    //  SpeedGuard_Lighthouse::update_average_psi();
+		    set_transient( 'speedguard_last_test_is_done', true, 5 );
+
+	    } else {
+		    // delete_transient('speedguard_waiting_for_the_last_test_to_finish'); //for the case test was added while the last one was running, and that one is not the last one anymore
+		    set_transient( 'speedguard_tests_in_queue', wp_json_encode( $current_tests_array ) );
+	    }
+	    $response = [
+		    'status' => 'test marked as done',
+		    // 'test_id_passed'  => $test_id
+	    ];
+
+
+	    wp_send_json( $response );
+
     }
 
     function run_tests_js() {
@@ -251,7 +300,7 @@ class SpeedGuard_Admin {
                console.log(' check_tests_queue_status passes data.speedguard_test_in_progress_url:' + data.speedguard_test_in_progress_url);
                console.log(' check_tests_queue_status passes data.speedguard_test_in_progress_id:' + data.speedguard_test_in_progress_id);
 
-                        return sg_run_one_test(data.speedguard_test_in_progress_url, sg_run_one_test_nonce, data.speedguard_test_in_progress_id);
+                        return sg_run_one_test(ajaxurl, data.speedguard_test_in_progress_url, sg_run_one_test_nonce, data.speedguard_test_in_progress_id);
                     } else if (data.status === 'complete') {
                         console.log('Tests complete');
                         if (reload === 'true') {
@@ -278,7 +327,9 @@ class SpeedGuard_Admin {
 
             const update_test_status_done = async (ajaxurl, sgnoncee, post_id, test_result_data) => {
                 try {
-                console.log('test_result_data in update_test_status_done function' + test_result_data);
+                console.log('Variables in update_test_status_done function:');
+                console.log('post_id' + post_id);
+                console.log('test_result_data' + test_result_data);
                     // Make a fetch request to the AJAX endpoint.
                     const response = await fetch(ajaxurl, {
                         method: 'POST',
@@ -288,8 +339,13 @@ class SpeedGuard_Admin {
                             'Cache-Control': 'no-cache',
                             'Connection': 'keep-alive',
                         },
-                        body: `action=mark_test_as_done&$current_test_id=${post_id}&nonce=${sgnoncee}`,
+                        //Pass test data here
+                        body: `action=mark_test_as_done&current_test_id=${post_id}&test_result_data=${test_result_data}&nonce=${sgnoncee}`,
                     });
+                    const data = await response.json();
+                    console.log(data);
+
+
                     console.log('Updating test status as done');
                 } catch (err) {
                     console.log(err);
@@ -299,7 +355,8 @@ class SpeedGuard_Admin {
 
           // TODO remove and php function
           //  const sg_run_one_test_nonce = '<?php echo wp_create_nonce( 'sg_run_one_test_nonce' ); ?>';
-            const sg_run_one_test = async (url, sg_run_one_test_nonce, test_id) => {
+            const newsgnoncee = '<?php echo wp_create_nonce( 'sgnoncee' ); ?>';
+            const sg_run_one_test = async (ajaxurl, url, newsgnoncee, test_id) => {
 
                 console.log('sg_run_one_test got url:' + url);
                 console.log('sg_run_one_test got test_id:' + test_id);
@@ -308,9 +365,36 @@ class SpeedGuard_Admin {
 const test_result_data = await fetchAll(url);
 
 if (typeof test_result_data === 'object') {
- console.log('Success. Test done, response is an object. Trying: update_test_status_done and passing test_result_data there');
-   return update_test_status_done(ajaxurl, sg_run_one_test_nonce, test_id, JSON.stringify(test_result_data, null, 2));
+ console.log('Success. Test done, response is an object. Trying inside the function');
+  // return update_test_status_done(ajaxurl, sg_run_one_test_nonce, test_id, JSON.stringify(test_result_data, null, 2));
+//TODO update test status here, get rid of that fuction
 
+    try {
+        console.log('Variables in update_test_status_done function:');
+        console.log('post_id' + test_id);
+        console.log('test_result_data' + test_result_data);
+        console.log('test_result_data Stringify' + JSON.stringify(test_result_data));
+
+
+
+            //Try mark_test_as_done
+            const test_result_data_string = JSON.stringify(test_result_data);
+            const response = await fetch(ajaxurl, {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'Cache-Control': 'no-cache',
+                'Connection': 'keep-alive',
+            },
+            //Pass test data here
+            body: `action=mark_test_as_done&current_test_id=${test_id}&test_result_data=${test_result_data_string}&nonce=${newsgnoncee}`,
+        });
+        console.log('Sent AJAX request with action mark_test_as_done');
+        console.log(response);
+    } catch (err) {
+        console.log(err);
+    }
 
 
 } else //TODO error handling in fetchall
