@@ -193,27 +193,11 @@ class SpeedGuardWidgets
     public static function important_questions_meta_box()
     {
         $links = array(
-                    sprintf(
-                        __('%1$sHow fast should a website load?%2$s', 'speedguard'),
-                        '<a href="https://sabrinazeidan.com/how-fast-should-my-website-load/?utm_source=speedguard&utm_medium=sidebar&utm_campaign=important_questions" target="_blank">',
-                        '</a>'
-                    ),
-                    sprintf(
-                        __('%1$sHow to serve scaled images to speed up your site?%2$s', 'speedguard'),
-                        '<a href="https://sabrinazeidan.com/serve-scaled-images-wordpress/?utm_source=speedguard&utm_medium=sidebar&utm_campaign=important_questions" target="_blank">',
-                        '</a>'
-                    ),
-                    sprintf(
-                        __('%1$sHow to speed up YouTube videos on your site?%2$s', 'speedguard'),
-                        '<a href="https://sabrinazeidan.com/embed-youtube-video-wordpress-without-slowing/?utm_source=speedguard&utm_medium=sidebar&utm_campaign=important_questions" target="_blank">',
-                        '</a>'
-                    ),
-                    sprintf(
-                        __('%1$s5 popular recommendations that don’t work%2$s', 'speedguard'),
-                        '<a href="https://sabrinazeidan.com/how-to-speed-up-wordpress-this-dont-work/?utm_source=speedguard&utm_medium=sidebar&utm_campaign=important_questions" target="_blank">',
-                        '</a>'
-                    )
-                    );
+            '<a href="https://sabrinazeidan.com/how-fast-should-my-website-load/?utm_source=speedguard&utm_medium=sidebar&utm_campaign=important_questions" target="_blank">' . __('How fast should a website load?', 'speedguard') . '</a>',
+            '<a href="https://sabrinazeidan.com/serve-scaled-images-wordpress/?utm_source=speedguard&utm_medium=sidebar&utm_campaign=important_questions" target="_blank">' . __('How to serve scaled images to speed up your site?', 'speedguard') . '</a>',
+            '<a href="https://sabrinazeidan.com/embed-youtube-video-wordpress-without-slowing/?utm_source=speedguard&utm_medium=sidebar&utm_campaign=important_questions" target="_blank">' . __('How to speed up YouTube videos on your site?', 'speedguard') . '</a>',
+            '<a href="https://sabrinazeidan.com/how-to-speed-up-wordpress-this-dont-work/?utm_source=speedguard&utm_medium=sidebar&utm_campaign=important_questions" target="_blank">' . __('5 popular recommendations that don’t work', 'speedguard') . '</a>'
+        );
         echo '<ul>';
         foreach ($links as $link) {
             echo '<li>'.$link.'</li>';

@@ -122,8 +122,8 @@ class SpeedGuard_Admin
     public function speedguard_actions_links(array $actions)
     {
         return array_merge(array(
-            'settings' => sprintf(__('%1$sSettings%2$s', 'speedguard'), '<a href="' .SpeedGuard_Admin::speedguard_page_url('settings'). '">', '</a>'),
-            'tests' => sprintf(__('%1$sTests%2$s', 'speedguard'), '<a href="' .SpeedGuard_Admin::speedguard_page_url('tests'). '">', '</a>')
+            'settings' => '<a href="' .SpeedGuard_Admin::speedguard_page_url('settings'). '">' . __('Settings', 'speedguard') . '</a>',
+            'tests' => '<a href="' .SpeedGuard_Admin::speedguard_page_url('tests'). '">' . __('Tests', 'speedguard') . '</a>'
         ), $actions);
     }
     public function removable_query_args($query_args)
